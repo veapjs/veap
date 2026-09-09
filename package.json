@@ -1,7 +1,7 @@
 {
   "name": "@veap/core",
-  "version": "0.2.0",
-  "description": "Core headless framework for Veap",
+  "version": "0.3.0",
+  "description": "Core framework for Veap with Knex ORM and router",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",
@@ -10,14 +10,21 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./database": {
+      "types": "./dist/infrastructure/database/index.d.ts",
+      "default": "./dist/infrastructure/database/index.js"
     }
   },
   "dependencies": {
+    "better-sqlite3": "^11.8.1",
     "dotenv": "^16.4.7",
+    "knex": "^3.1.0",
     "pino": "^9.6.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
     "@types/node": "^22.13.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"

@@ -1,5 +1,12 @@
 # @veap/core
 
+## 0.3.0
+
+### Minor Changes
+
+- Introduces the database module on top of Knex: connection lifecycle management, migrations and a fluent query builder with where/orderBy/pagination composition.
+- Extends the ORM with Eloquent-style relations: hasOne, hasMany, belongsTo and belongsToMany with eager loading, plus attribute casting and model accessors.
+
 ## 0.2.0
 
 ### Minor Changes
