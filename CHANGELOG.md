@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.3.1
+
+### Patch Changes
+
+- Public hooks and defaults extracted so the new Veap CLI and the `create-veap` scaffolder can drive the framework programmatically.
+
 ## 0.3.0
 
 ### Minor Changes
