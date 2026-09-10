@@ -1,0 +1,41 @@
+{
+  "name": "@veap/{{name}}-template",
+  "version": "0.0.1",
+  "description": "{{titleName}} theme for Veap",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "dev": "tsc --watch",
+    "build": "rimraf dist && tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@veap/ui": "workspace:*",
+    "@veap/core": "workspace:*",
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19"
+  },
+  "veap": {
+    "type": "template",
+    "id": "{{name}}-template",
+    "name": "{{titleName}}",
+    "description": "{{titleName}} theme for Veap.",
+    "author": ""
+  }
+}

@@ -1,0 +1,35 @@
+"use client";
+
+import * as React from "react";
+
+/**
+ * Root layout of the {{titleName}} template.
+ *
+ * Receives `config` from the template settings in the admin panel and
+ * `breadcrumbs` computed by the virtual router for the rendered page.
+ */
+export default function Layout({
+  children,
+  config,
+  breadcrumbs,
+}: {
+  children: React.ReactNode;
+  config?: any;
+  breadcrumbs?: { id: string; label: string; href?: string }[];
+}) {
+  return (
+    <div className="bg-background text-foreground min-h-screen">
+      <header className="border-b p-6">
+        <span className="text-sm font-bold uppercase tracking-widest">
+          {{titleName}}
+        </span>
+        {breadcrumbs && breadcrumbs.length > 0 && (
+          <span className="ml-4 text-xs text-muted-foreground">
+            {breadcrumbs.map((bc) => bc.label).join(" / ")}
+          </span>
+        )}
+      </header>
+      <main className="mx-auto max-w-4xl p-6">{children}</main>
+    </div>
+  );
+}

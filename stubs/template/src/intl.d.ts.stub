@@ -1,0 +1,7 @@
+import type messages from "./locales/en";
+
+type JsonDataType = typeof messages;
+
+declare module "@veap/core/intl" {
+  export interface IntlMessages extends JsonDataType {}
+}

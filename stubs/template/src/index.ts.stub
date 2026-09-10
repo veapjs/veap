@@ -1,0 +1,16 @@
+import type { ITemplate } from "@veap/core/plugins";
+
+const template: ITemplate = {
+  id: "{{name}}-template",
+  name: "{{titleName}}",
+  description: "{{titleName}} theme for Veap.",
+  version: "0.0.1",
+
+  locales: {
+    en: () => import("./locales/en"),
+  },
+
+  layout: Layout,
+};
+
+export default template;
