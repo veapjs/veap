@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.4.1
+
+### Patch Changes
+
+- Fix locale registration for generated plugins and templates. The CLI stubs now scaffold `src/locales/{en,pl}.ts` dictionaries and register them through the plugin/template `locales` field - previously generated packages shipped translations that were never loaded. Templates gained first-class locale support in the core: `ITemplate.locales` is merged into the message dictionary by the intl discovery loader (after plugins, before app-level fallbacks), and `@veap/minimal-template`'s existing en/pl dictionaries are now actually registered.
+
 ## 0.4.0
 
 ### Minor Changes

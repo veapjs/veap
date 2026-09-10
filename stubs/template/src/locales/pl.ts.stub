@@ -1,0 +1,4 @@
+export default {
+  Home: "Strona główna",
+  Login: "Logowanie",
+};

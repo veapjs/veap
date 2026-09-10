@@ -1,0 +1,42 @@
+{
+  "name": "@veap/{{name}}-plugin",
+  "version": "0.0.1",
+  "description": "{{titleName}} plugin for Veap framework",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "dev": "tsc --watch",
+    "build": "rimraf dist && tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^19",
+    "typescript": "^7.0.2"
+  },
+  "peerDependencies": {
+    "@veap/ui": "workspace:*",
+    "@veap/core": "workspace:*",
+    "react": "^19"
+  },
+  "veap": {
+    "type": "plugin",
+    "id": "{{name}}-plugin",
+    "name": "{{titleName}} Plugin",
+    "description": "{{titleName}} module.",
+    "enabled": true,
+    "system": false,
+    "hasSetup": false,
+    "dependencies": []
+  }
+}

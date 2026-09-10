@@ -1,0 +1,58 @@
+services:
+  # Node.js service (use with: docker compose up {{name}} --build)
+  {{name}}:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: {{name}}-image
+    container_name: {{name}}
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      NEXT_TELEMETRY_DISABLED: "1"
+      DATABASE_URL: "postgresql://postgres:postgres@database:5432/postgres?sslmode=disable"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "80:3000"
+    restart: unless-stopped
+    volumes:
+      - ./storage:/app/public/storage
+
+  # PostgreSQL service
+  database:
+    image: postgres:17-alpine
+    container_name: {{name}}-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis service
+  redis:
+    image: redis:7-alpine
+    container_name: {{name}}-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:
