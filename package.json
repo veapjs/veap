@@ -1,6 +1,6 @@
 {
   "name": "@veap/core",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Core framework for Veap with Knex ORM and router",
   "type": "module",
   "license": "MIT",

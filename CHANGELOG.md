@@ -1,5 +1,16 @@
 # @veap/core
 
+## 0.4.0
+
+### Minor Changes
+
+- Adds the internationalization engine (locale detection, translation loading, pluralization), a storage service with local and provider-backed disks, and the plugin system: manifest, lifecycle hooks, plugin-scoped routes and global model scopes.
+
+### Patch Changes
+
+- Updated dependencies
+  - @veap/ui@0.1.0
+
 ## 0.3.1
 
 ### Patch Changes
