@@ -1,9 +1,12 @@
 {
   "name": "@veap/core",
-  "version": "0.5.0",
-  "description": "Core framework for Veap with Knex ORM and router",
+  "version": "0.5.1",
+  "description": "Unified Veap framework with multi-entry points",
   "type": "module",
   "license": "MIT",
+  "bin": {
+    "veap": "./bin/veap.js"
+  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -14,6 +17,18 @@
     "./database": {
       "types": "./dist/infrastructure/database/index.d.ts",
       "default": "./dist/infrastructure/database/index.js"
+    },
+    "./plugins": {
+      "types": "./dist/entries/plugins.d.ts",
+      "default": "./dist/entries/plugins.js"
+    },
+    "./intl": {
+      "types": "./dist/entries/intl.d.ts",
+      "default": "./dist/entries/intl.js"
+    },
+    "./storage": {
+      "types": "./dist/entries/storage.d.ts",
+      "default": "./dist/entries/storage.js"
     }
   },
   "dependencies": {
