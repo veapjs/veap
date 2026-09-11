@@ -1,5 +1,13 @@
 # @veap/core
 
+## 0.5.1
+
+### Patch Changes
+
+- Align package imports with @veap/core
+- Updated dependencies
+  - @veap/ui@0.1.1
+
 ## 0.5.0
 
 ### Minor Changes
