@@ -1,5 +1,13 @@
 # @veap/core
 
+## 0.5.3
+
+### Patch Changes
+
+- Upgrade Next.js, React, and switch linter to ESLint
+- Updated dependencies
+  - @veap/ui@0.1.2
+
 ## 0.5.2
 
 ### Patch Changes
