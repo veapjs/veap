@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.5.2
+
+### Patch Changes
+
+- Add plugin dependency ID resolution for npm scoped packages
+
 ## 0.5.1
 
 ### Patch Changes
