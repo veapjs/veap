@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 290ed45: Consolidate plugin and template manifests into `package.json`. The standalone `manifest.json` files have been removed - all metadata (`id`, `name`, `description`, `enabled`, `system`, `hasSetup`, `dependencies`, `extends`) now lives in the `veap` field of each package's `package.json`. A new helper `createManifestFromPackageJson()` and types `VeapPackageMetadata` / `VeapPackageJson` are exported from `@veap/core/plugins` for this purpose.
+
 ## 0.4.1
 
 ### Patch Changes
