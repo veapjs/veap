@@ -1,5 +1,12 @@
 # @veap/core
 
+## 0.6.0
+
+### Minor Changes
+
+- Removed the proprietary template engine (`ITemplate`, overrides, and related APIs).
+  - Introduced the `withRouter` Higher-Order Component (HOC) to seamlessly integrate physical Next.js pages with the virtual plugin router, enabling layout inheritance and middleware protection.
+
 ## 0.5.4
 
 ### Patch Changes
