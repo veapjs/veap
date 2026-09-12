@@ -1,5 +1,12 @@
 # @veap/core
 
+## 0.5.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @veap/ui@0.1.3
+
 ## 0.5.3
 
 ### Patch Changes
