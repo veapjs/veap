@@ -1,6 +1,6 @@
 {
   "name": "@veap/core",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Unified Veap framework with multi-entry points",
   "type": "module",
   "license": "MIT",

@@ -1,5 +1,16 @@
 # @veap/core
 
+## 0.9.0
+
+### Minor Changes
+
+- Refactor system initialization to use Laravel-like fluent ApplicationBuilder and update plugins to properly resolve core services via Dependency Injection container instead of static singletons.
+
+### Patch Changes
+
+- Updated dependencies
+  - create-veap@0.2.1
+
 ## 0.8.0
 
 ### Minor Changes
