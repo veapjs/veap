@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.8.0
+
+### Minor Changes
+
+- Refactored Veap Core to use a Dependency Injection (DI) system with a lightweight IoC container. Introduced KernelServiceProvider and SettingsServiceProvider. Added app() helper function for container resolution in Server Actions and React Server Components. Refactored plugins to utilize the new DI container.
+
 ## 0.7.0
 
 ### Minor Changes
