@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.7.0
+
+### Minor Changes
+
+- `@veap/core`: Added the ability for native Next.js applications to run their own migrations. `ensureSystemInitialized` now accepts an `appMigrations` array and executes them securely before loading plugins.
+
 ## 0.6.0
 
 ### Minor Changes
