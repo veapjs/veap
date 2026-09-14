@@ -1,5 +1,13 @@
 # @veap/core
 
+## 0.10.1
+
+### Patch Changes
+
+- Clean up ORM references and migration types
+- Updated dependencies
+  - create-veap@0.2.3
+
 ## 0.10.0
 
 ### Minor Changes
