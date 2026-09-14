@@ -1,5 +1,16 @@
 # @veap/core
 
+## 0.10.0
+
+### Minor Changes
+
+- Refactored internal core modules (Auth, Plugins, Router, Database) to exclusively use the @Injectable() IoC container pattern rather than static singletons. This includes fixes for async initialization sequences, Next.js dual-package hazard for DI containers in Edge/Node workers, and backwards-compatible proxy wrappers for legacy direct imports.
+
+### Patch Changes
+
+- Updated dependencies
+  - create-veap@0.2.2
+
 ## 0.9.0
 
 ### Minor Changes
