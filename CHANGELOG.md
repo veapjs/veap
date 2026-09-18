@@ -1,5 +1,17 @@
 # @veap/core
 
+## 0.11.2
+
+### Patch Changes
+
+- Audit & framework stabilization:
+  - **Exports & Bundler Safety**: Added missing `.` root export to `package.json` to resolve ESM `ERR_PACKAGE_PATH_NOT_EXPORTED`. Added `bin` directory to `package.json` `files` field.
+  - **Turbopack Tracing**: Added `/*turbopackIgnore: true*/` annotation to SQLite filesystem path resolution in `connection.ts` to suppress Next.js build warnings.
+  - **Server/Client Isolation**: Extracted `PathPrefixContext` into a dedicated client context module. Decoupled `auth-provider` and `app-provider` from server-side dependencies. Removed `import "server-only"` from internal application services (`registry.ts`, `templates.ts`, `facade.ts`, `email-verification.service.ts`), preserving it exclusively at server boundaries.
+  - **Clean Architecture (ADR-006)**: Replaced all 33 internal `@veap/core/...` self-imports with relative imports across `domain`, `application`, `infrastructure`, and `presentation`.
+  - **IoC Container Symbols**: Added typed domain symbols (`DATABASE`, `APP_PLUGINS`, `APP_TEMPLATES`, `APP_MIGRATIONS`, `CLI_SERVICE`) in `domain/contracts/token.ts` alongside string tokens for 100% backward compatibility.
+  - **Test Suite Expansion**: Added comprehensive test suites for Router matching & segment classification, router middlewares (`SkipSecurity`, `EnsuredGuest`, `EnsuredUser`, `EnsuredAuth`), `PluginRegistry` topological sorting and hook filtering, and `transaction()` AsyncLocalStorage lifecycle (121/121 tests passing).
+
 ## 0.11.1
 
 ### Patch Changes

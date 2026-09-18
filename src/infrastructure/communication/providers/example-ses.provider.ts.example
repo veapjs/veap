@@ -1,0 +1,40 @@
+/**
+ * EXAMPLE - a custom mail transport for a provider like AWS SES, Postmark or
+ * Resend. Not compiled: rename to a real file, register it under
+ * `CUSTOM_MAILER` in one of your ServiceProviders and set
+ * `MAIL_TRANSPORT=custom`.
+ *
+ * A transport is a *pure delivery service*: it implements exactly one
+ * operation (`sendMail`) and knows nothing about verification codes, resets
+ * or i18n - the `MailMessage` arrives fully built by the mailables
+ * (`application/communication/mail.ts`), the same split as Laravel's
+ * `Transport` vs `Mailable`.
+ *
+ * ```ts
+ * import { container } from "@veap/core/core/server";
+ * import { CUSTOM_MAILER } from "@veap/core/communication";
+ * import { CustomMailTransport } from "./custom-mail-transport";
+ *
+ * class MyServiceProvider extends ServiceProvider {
+ *   register(): void {
+ *     container.register({
+ *       token: CUSTOM_MAILER,
+ *       useValue: new CustomMailTransport(...),
+ *       singleton: true,
+ *     });
+ *   }
+ * }
+ * ```
+ */
+import type { IMailer, MailMessage } from "@veap/core/communication";
+
+export class SesMailTransport implements IMailer {
+  async sendMail(message: MailMessage): Promise<void> {
+    // Map MailMessage → SES SendEmailCommand here:
+    //  - message.from (or your configured default sender) → Source/FromAddress
+    //  - message.to/cc/bcc → Destination
+    //  - message.subject → Content.Simple.Subject
+    //  - message.text / message.html → Content.Simple.Body
+    //  - message.attachments → Raw transport or S3 links
+  }
+}
