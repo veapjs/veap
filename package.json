@@ -1,7 +1,11 @@
 {
   "name": "@veap/core",
-  "version": "0.11.1",
-  "description": "Unified Veap framework with multi-entry points",
+  "version": "0.11.2",
+  "description": "Unified Veap framework",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veap-sh/veap.git"
+  },
   "type": "module",
   "license": "MIT",
   "bin": {
@@ -14,34 +18,147 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./auth": {
+      "types": "./dist/entries/auth.d.ts",
+      "default": "./dist/entries/auth.js"
+    },
+    "./auth/server": {
+      "types": "./dist/entries/auth-server.d.ts",
+      "default": "./dist/entries/auth-server.js"
+    },
+    "./communication": {
+      "types": "./dist/entries/communication.d.ts",
+      "default": "./dist/entries/communication.js"
+    },
+    "./core": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./core/server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    },
     "./database": {
       "types": "./dist/infrastructure/database/index.d.ts",
       "default": "./dist/infrastructure/database/index.js"
-    },
-    "./plugins": {
-      "types": "./dist/entries/plugins.d.ts",
-      "default": "./dist/entries/plugins.js"
     },
     "./intl": {
       "types": "./dist/entries/intl.d.ts",
       "default": "./dist/entries/intl.js"
     },
+    "./intl/client": {
+      "types": "./dist/entries/intl-client.d.ts",
+      "default": "./dist/entries/intl-client.js"
+    },
+    "./intl/server": {
+      "types": "./dist/entries/intl-server.d.ts",
+      "default": "./dist/entries/intl-server.js"
+    },
+    "./plugins": {
+      "types": "./dist/entries/plugins.d.ts",
+      "default": "./dist/entries/plugins.js"
+    },
+    "./plugins/server": {
+      "types": "./dist/entries/plugins-server.d.ts",
+      "default": "./dist/entries/plugins-server.js"
+    },
+    "./plugins/client": {
+      "types": "./dist/entries/plugins-client.d.ts",
+      "default": "./dist/entries/plugins-client.js"
+    },
+    "./router": {
+      "types": "./dist/entries/router.d.ts",
+      "default": "./dist/entries/router.js"
+    },
+    "./router/server": {
+      "types": "./dist/entries/router-server.d.ts",
+      "default": "./dist/entries/router-server.js"
+    },
     "./storage": {
       "types": "./dist/entries/storage.d.ts",
       "default": "./dist/entries/storage.js"
+    },
+    "./settings": {
+      "types": "./dist/entries/settings.d.ts",
+      "default": "./dist/entries/settings.js"
+    },
+    "./react": {
+      "types": "./dist/presentation/react/index.d.ts",
+      "default": "./dist/presentation/react/index.js"
+    },
+    "./package.json": "./package.json",
+    "./auth/models": {
+      "types": "./dist/infrastructure/auth/models/index.d.ts",
+      "default": "./dist/infrastructure/auth/models/index.js"
+    },
+    "./plugins/models": {
+      "types": "./dist/infrastructure/plugins/models/index.d.ts",
+      "default": "./dist/infrastructure/plugins/models/index.js"
+    },
+    "./settings/models": {
+      "types": "./dist/infrastructure/settings/models/index.d.ts",
+      "default": "./dist/infrastructure/settings/models/index.js"
     }
   },
+  "files": [
+    "bin",
+    "dist",
+    "docs",
+    "stubs"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "rimraf dist && tsc",
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
   "dependencies": {
-    "better-sqlite3": "^11.8.1",
-    "dotenv": "^16.4.7",
-    "knex": "^3.1.0",
-    "pino": "^9.6.0",
-    "zod": "^3.24.2"
+    "@clack/prompts": "^0.7.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@formatjs/intl-localematcher": "^0.8.13",
+    "@oslojs/binary": "^1.0.0",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
+    "create-veap": "workspace:*",
+    "@veap/ui": "workspace:*",
+    "bcryptjs": "^3.0.3",
+    "cac": "^6.7.14",
+    "chalk": "^5.3.0",
+    "date-fns": "^4.4.0",
+    "intl-messageformat": "^11.2.12",
+    "ioredis": "^6.0.0",
+    "jiti": "^2.6.1",
+    "knex": "^3.3.0",
+    "negotiator": "^1.0.0",
+    "nodemailer": "^10.0.1",
+    "ora": "^8.1.1",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.7"
+  },
+  "peerDependencies": {
+    "@iconify/react": "^6.0.2",
+    "lucide-react": "^1.27.0",
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19",
+    "react-hook-form": "^7.72.0",
+    "swr": "^2.3.8",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^22.13.1",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.3"
+    "@types/negotiator": "^0.6.3",
+    "@types/node": "^22.20.2",
+    "@types/nodemailer": "^8.0.1",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "swr": "^2.3.8",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.0"
   }
 }
