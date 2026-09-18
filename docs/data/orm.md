@@ -105,12 +105,187 @@ post.comments; // Comment[] with their authors loaded too
 
 Relation builders on instances: `hasOne`, `hasMany`, `belongsTo`, `belongsToMany` (pivot table), and the polymorphic family `morphTo`, `morphOne`, `morphMany`, `morphToMany`, `morphedByMany`. Relation existence queries: `has`, `whereHas`, `whereDoesntHave`, `orWhereHas`, `withCount`.
 
-Polymorphic types are resolved through `MorphMap`:
+## Polymorphic relations
+
+Polymorphic relations allow a model to belong to more than one other model on a single association. Veap uses `MorphMap` to decouple database type strings from TypeScript class names.
+
+### 1. Registering the MorphMap
+
+Register polymorphic aliases at application or plugin initialization (e.g. in `init()` or `lib/veap.ts`), or define `static override morphAlias` on the model:
 
 ```ts
 import { MorphMap } from "@veap/core/database";
+import { Post } from "./models/post";
+import { Video } from "./models/video";
+import { Comment } from "./models/comment";
 
-MorphMap.register({ post: Post, comment: Comment });
+MorphMap.register({
+  post: Post,
+  video: Video,
+  comment: Comment,
+});
+```
+
+### 2. One-to-many polymorphic (`morphMany` / `morphTo`)
+
+Suppose both `Post` and `Video` models can have multiple `Comment` records.
+
+#### Migration schema
+
+The child table needs an ID column and a type string column (snake_case convention):
+
+```ts
+// migrations/0002_create_comments.ts
+await schema.createTable("comments", (table) => {
+  table.uuid("id").primary();
+  table.text("body").notNullable();
+  table.uuid("commentable_id").notNullable();
+  table.string("commentable_type").notNullable();
+  table.timestamps(true, true);
+
+  table.index(["commentable_type", "commentable_id"]);
+});
+```
+
+#### Child model (`Comment`)
+
+The child model calls `this.morphTo(name)` using the polymorphic prefix (`commentable`):
+
+```ts
+import { Model } from "@veap/core/database";
+
+export interface CommentAttributes {
+  id: string;
+  body: string;
+  commentableId: string;
+  commentableType: string;
+}
+
+export class Comment extends Model<CommentAttributes> {
+  static override table = "comments";
+  static override fillable = ["body", "commentable_id", "commentable_type"];
+
+  commentable() {
+    return this.morphTo("commentable");
+  }
+}
+```
+
+#### Parent models (`Post` and `Video`)
+
+The parent models call `this.morphMany(RelatedModel, name)`:
+
+```ts
+import { Model } from "@veap/core/database";
+import { Comment } from "./comment";
+
+export class Post extends Model<PostAttributes> {
+  static override table = "posts";
+  static override morphAlias = "post";
+
+  comments() {
+    return this.morphMany(Comment, "commentable");
+  }
+}
+
+export class Video extends Model<VideoAttributes> {
+  static override table = "videos";
+  static override morphAlias = "video";
+
+  comments() {
+    return this.morphMany(Comment, "commentable");
+  }
+}
+```
+
+### 3. Many-to-many polymorphic (`morphToMany` / `morphedByMany`)
+
+Suppose both `Post` and `Product` models share `Tag` records through a shared pivot table `taggables`.
+
+#### Pivot migration schema
+
+```ts
+// migrations/0003_create_tags_and_taggables.ts
+await schema.createTable("tags", (table) => {
+  table.uuid("id").primary();
+  table.string("name").notNullable();
+  table.string("slug").unique().notNullable();
+  table.timestamps(true, true);
+});
+
+await schema.createTable("taggables", (table) => {
+  table
+    .uuid("tag_id")
+    .notNullable()
+    .references("id")
+    .inTable("tags")
+    .onDelete("CASCADE");
+  table.uuid("taggable_id").notNullable();
+  table.string("taggable_type").notNullable();
+
+  table.primary(["tag_id", "taggable_id", "taggable_type"]);
+  table.index(["taggable_type", "taggable_id"]);
+});
+```
+
+#### Defining the relation on models
+
+The parent models declare `this.morphToMany(Tag, name)`:
+
+```ts
+import { Model } from "@veap/core/database";
+import { Tag } from "./tag";
+
+export class Post extends Model<PostAttributes> {
+  static override table = "posts";
+  static override morphAlias = "post";
+
+  tags() {
+    return this.morphToMany(Tag, "taggable");
+  }
+}
+```
+
+The tag model declares `this.morphedByMany(TargetModel, name)`:
+
+```ts
+import { Model } from "@veap/core/database";
+import { Post } from "./post";
+
+export class Tag extends Model<TagAttributes> {
+  static override table = "tags";
+  static override fillable = ["name", "slug"];
+
+  posts() {
+    return this.morphedByMany(Post, "taggable");
+  }
+}
+```
+
+### 4. Querying and eager loading polymorphic relations
+
+Eager load polymorphic relations with `.with()`:
+
+```ts
+// Eager load comments and tags on posts
+const post = await Post.query()
+  .with("comments", "tags")
+  .where("id", postId)
+  .first();
+
+console.log(post.comments); // Comment[]
+console.log(post.tags); // Tag[]
+
+// Eager load the polymorphic parent on comments
+const comment = await Comment.query().with("commentable").first();
+
+console.log(comment.commentable); // Post or Video instance!
+
+// Filter by relation existence
+const taggedPosts = await Post.query().has("tags").get();
+const specificPosts = await Post.query()
+  .whereHas("tags", (q) => q.where("slug", "typescript"))
+  .get();
 ```
 
 ## Scopes

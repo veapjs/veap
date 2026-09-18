@@ -113,6 +113,11 @@ Built-in port tokens bound by the kernel:
 | `CACHE_PROVIDER`  | `ICacheProvider`      | in-memory cache                          |
 | `COOKIE_STORE`    | `ICookieStore`        | Next.js `cookies()` adapter              |
 | `REQUEST_CONTEXT` | `IHttpRequestContext` | Next.js `headers()`/`redirect()` adapter |
+| `DATABASE`        | `Knex`                | active Knex instance (also `"Knex"`)     |
+| `APP_PLUGINS`     | `IPlugin[]`           | array of registered plugins              |
+| `APP_TEMPLATES`   | `ITemplate[]`         | array of registered templates            |
+| `APP_MIGRATIONS`  | `Migration[]`         | array of native app migrations           |
+| `CLI_SERVICE`     | `CliService`          | CAC CLI command registry service         |
 
 Feature tokens: `PASSWORD_HASHER`, `TOKEN_GENERATOR`, `SECRET_CIPHER` (auth); `USER_REPOSITORY`, `ROLE_REPOSITORY`, `PERMISSION_REPOSITORY`, `SESSION_REPOSITORY`, `PASSWORD_RESET_REPOSITORY`, `EMAIL_VERIFICATION_REPOSITORY` (auth persistence); `MAILER`, `CUSTOM_MAILER` (communication); `PLUGIN_REPOSITORY`, `TEMPLATE_REPOSITORY`, `MIGRATION_RUNNER`, `SETTINGS_REPOSITORY` (platform).
 

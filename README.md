@@ -25,12 +25,15 @@ The package ships several entry points so that client bundles never pull in serv
 | `@veap/core`                                  | client-safe core: errors, events, logging |
 | `@veap/core/core/server`                      | Application, container, providers, config |
 | `@veap/core/auth`, `/auth/server`             | authentication, sessions, RBAC            |
+| `@veap/core/auth/models`                      | User, Session, Role, Permission models    |
 | `@veap/core/plugins` (+ `/server`, `/client`) | plugin system, registry, widgets          |
+| `@veap/core/plugins/models`                   | SystemPlugin, SystemUserWidget models     |
 | `@veap/core/router` (+ `/server`)             | virtual router, middlewares               |
 | `@veap/core/intl` (+ `/server`, `/client`)    | internationalization                      |
 | `@veap/core/communication`                    | mail transports and facades               |
 | `@veap/core/database`                         | ORM, relations, transactions, migrations  |
 | `@veap/core/storage`, `/settings`             | file storage, key-value settings          |
+| `@veap/core/settings/models`                  | Setting model                             |
 | `@veap/core/react`                            | client providers and hooks                |
 
 ## Minimal usage
@@ -61,9 +64,12 @@ veap make:plugin       # scaffold a plugin
 veap make:template     # scaffold a template
 veap make:migration    # create a migration
 veap add <plugin>      # install and register a plugin package
+veap eject <plugin>    # eject an installed plugin to local plugins folder
 veap register          # re-sync lib/plugins.gen.ts
-veap docker            # generate a Dockerfile
+veap docker            # generate Docker configuration
 ```
+
+See [docs/reference/cli.md](./docs/reference/cli.md) for full CLI commands and option flags.
 
 ## Development
 
