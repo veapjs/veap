@@ -113,7 +113,9 @@ describe("Router Middlewares", () => {
 
       await EnsuredGuest(ctx, next);
 
-      expect(mockRedirect).toHaveBeenCalledWith("https://example.com/dashboard");
+      expect(mockRedirect).toHaveBeenCalledWith(
+        "https://example.com/dashboard",
+      );
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -329,7 +331,13 @@ describe("Router Middlewares", () => {
       });
 
       expect(result).toBe("page-content");
-      expect(order).toEqual(["m1-start", "m2-start", "final", "m2-end", "m1-end"]);
+      expect(order).toEqual([
+        "m1-start",
+        "m2-start",
+        "final",
+        "m2-end",
+        "m1-end",
+      ]);
     });
 
     it("allows a middleware to short-circuit the pipeline", async () => {

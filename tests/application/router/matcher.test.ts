@@ -86,7 +86,10 @@ describe("matchRoute", () => {
   });
 
   it("matches multiple dynamic parameters", () => {
-    const result = matchRoute("/org/:orgId/users/:userId", "/org/acme/users/42");
+    const result = matchRoute(
+      "/org/:orgId/users/:userId",
+      "/org/acme/users/42",
+    );
     expect(result).toEqual({ orgId: "acme", userId: "42" });
   });
 
