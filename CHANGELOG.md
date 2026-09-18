@@ -1,5 +1,11 @@
 # @veap/core
 
+## 0.11.1
+
+### Patch Changes
+
+- Path-aware security checks: `checkSecurity` now accepts the request path and forwards it to registered security requirements, which can exempt their own pages (fixes infinite redirect loops with gate plugins). New `SkipSecurity` route middleware suppresses the automatic `EnsuredAuth` injection for gate pages. New `auth:after_verify:redirect` filter lets plugins reroute the post-email-verification landing. `applyFilters` accepts an optional context passed to hook handlers.
+
 ## 0.11.0
 
 ### Minor Changes
