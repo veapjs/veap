@@ -1,6 +1,6 @@
 # API Reference
 
-This reference lists the public API of `@veap/core` 1.0.0, organized by entry point. Every import path shown here exists in the package `exports` map. Symbols marked internal by the code (underscore prefixes, files not re-exported through an entry point) are intentionally omitted.
+This reference lists the public API of `@veap/core` 0.11.x, organized by entry point. Every import path shown here exists in the package `exports` map. Symbols marked internal by the code (underscore prefixes, files not re-exported through an entry point) are intentionally omitted.
 
 ## Entry points
 
@@ -61,7 +61,15 @@ void application.bootstrap();
 ### app() and the container
 
 ```ts
-import { app, container } from "@veap/core/core/server";
+import {
+  app,
+  container,
+  DATABASE,
+  APP_PLUGINS,
+  APP_TEMPLATES,
+  APP_MIGRATIONS,
+  CLI_SERVICE,
+} from "@veap/core/core/server";
 ```
 
 - `app()` returns the global `Container`.
@@ -69,10 +77,10 @@ import { app, container } from "@veap/core/core/server";
 
 ```ts
 const config = await app(ConfigService);
-const knex = await app(Knex); // when withDatabase() is used
+const knex = await app(DATABASE); // typed Knex token (or legacy "Knex")
 ```
 
-The container is a singleton stored on `globalThis` (survives HMR in dev). Resolution is by token (class, `InjectionToken`, or string). Services are singletons by default.
+The container is a singleton stored on `globalThis` (survives HMR in dev). Resolution is by token (class constructor, typed `Token<T>` symbol, or string). Services are singletons by default. Built-in kernel tokens (`DATABASE`, `APP_PLUGINS`, `APP_TEMPLATES`, `APP_MIGRATIONS`, `CLI_SERVICE`) are exported for type-safe bindings.
 
 ### ConfigService
 
@@ -362,6 +370,30 @@ import {
 - All writes must run inside `transaction(async (trx) => { ... })`.
 - Full usage is documented in the Data chapter: [ORM](../data/orm.md), [Transactions](../data/transactions.md), [Migrations](../data/migrations.md).
 
+## `@veap/core/auth/models`, `@veap/core/plugins/models`, `@veap/core/settings/models`
+
+Core domain entities are exported from dedicated subpaths to enforce clean DDD boundaries:
+
+```ts
+// Auth domain models
+import {
+  User,
+  Session,
+  Role,
+  Permission,
+  PasswordResetSession,
+  EmailVerification,
+} from "@veap/core/auth/models";
+
+// Plugin system models
+import { SystemPlugin, SystemUserWidget } from "@veap/core/plugins/models";
+
+// Settings model
+import { Setting } from "@veap/core/settings/models";
+```
+
+All models inherit from `Model` and have full ActiveRecord features (casts, scopes, relations, validation).
+
 ## `@veap/core/react`
 
 ```ts
@@ -375,4 +407,4 @@ import {
 
 ## CLI
 
-The `veap` binary ships with the package (`bin.veap`). Commands are documented in the [guides](../guides/first-plugin.md) and cover: `veap init`, `veap make:plugin`, `veap make:template`, `veap make:migration`, `veap add` / `veap register` (install and register a plugin package), `veap docker`, and `veap lint`.
+The `veap` binary ships with the package (`bin.veap`). Full documentation for all commands and options is in the [CLI reference](./cli.md). Supported commands: `veap init`, `veap make:plugin`, `veap make:template`, `veap make:migration`, `veap add`, `veap eject`, `veap register`, and `veap docker`.

@@ -9,7 +9,11 @@ Veap uses Knex as the query engine, with two client targets: `better-sqlite3` fo
 - URLs starting with `sqlite:` / `file:` or ending in `.sqlite` / `.db` select `better-sqlite3`. All prefix forms (`sqlite:./storage/veap.sqlite`, `sqlite://...`, `file:...`) are understood, and the parent directory is created automatically.
 - Anything else selects `pg`, with SSL enabled automatically in production (unless the URL contains `sslmode=disable`).
 
-The instance is registered in the container under the token `"Knex"` and also set as the global instance used by the ORM.
+<!-- prettier-ignore -->
+> [!NOTE]
+> On serverless platforms (Vercel, AWS Lambda) where `/var/task` is read-only, Veap automatically detects the environment and redirects relative SQLite database files to `/tmp`. Because `/tmp` is ephemeral and cleared between function cold starts, persistent production deployments must use a PostgreSQL `DATABASE_URL`.
+
+The instance is registered in the container under the token `DATABASE` (and string token `"Knex"`) and also set as the global instance used by the ORM.
 
 ```env
 # development

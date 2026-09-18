@@ -29,7 +29,7 @@ Flags:
 | `--skip-install` | Do not run the package manager install step.                                             |
 | `--pm <manager>` | Use a specific package manager (`bun`, `pnpm`, `npm`, `yarn`) instead of auto-detection. |
 
-Under the hood the scaffolder runs the official `create-next-app` with TypeScript, Tailwind CSS, ESLint, the App Router and an `@/*` import alias, then adds Veap-specific files and dependencies on top. Next.js, React and TypeScript versions come from `create-next-app`, so generated projects are not pinned to versions from this documentation.
+Under the hood the scaffolder runs the official `create-next-app` with TypeScript, Tailwind CSS, ESLint, React Compiler, the App Router and an `@/*` import alias, then adds Veap-specific files and dependencies on top. Next.js, React and TypeScript versions come from `create-next-app`, so generated projects are not pinned to versions from this documentation.
 
 The `veap` CLI (from `@veap/core`) delegates to the same flow:
 

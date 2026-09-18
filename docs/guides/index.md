@@ -7,3 +7,4 @@ Task-oriented walkthroughs that combine several parts of the framework.
 - [Authentication walkthrough](./authentication.md): sign-up, sign-in, guards, RBAC, verification and password reset in one flow.
 - [Gate plugins](./gate-plugins.md): block protected routes until a condition is met (onboarding, 2FA enrollment) with security requirements, SkipSecurity and lifecycle hooks.
 - [Database setup](./database-setup.md): engines, connection strings and migration workflow.
+- [Testing](./testing.md): write unit and integration tests with IoC container mocking, fake request contexts, and in-memory SQLite.
