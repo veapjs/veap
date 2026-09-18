@@ -115,14 +115,14 @@ export class PluginServiceProvider extends ServiceProvider {
 
       cli
         .command(
-          "eject <plugin>",
-          "Eject an installed plugin to local plugins folder",
+          "eject <package>",
+          "Eject an installed plugin or template to local workspace folder",
         )
-        .action(async (plugin: string) => {
-          const { ejectPlugin } = await import(
+        .action(async (pkg: string) => {
+          const { ejectPackage } = await import(
             /* webpackIgnore: true */ "./cli/eject.js"
           );
-          await ejectPlugin(plugin);
+          await ejectPackage(pkg);
         });
 
       cli

@@ -12,90 +12,126 @@ A generated Veap application (`create-veap`), dev server running (`bun dev`).
 veap make:plugin notes
 ```
 
-The generator creates a workspace package `plugins/notes-plugin` with a manifest, an entry file and a routes directory. Register it in the application (the CLI prints the exact step, or run `veap add`/`veap register` for an external package):
+The generator creates a workspace package `plugins/notes-plugin` with a manifest, an entry file, and adds it to your package manager workspace. The CLI also automatically refreshes `lib/plugins.gen.ts` (or run `veap register` to re-sync manually).
 
-```ts
-// lib/veap.ts (generated, adjusted)
-import NotesPlugin from "../plugins/notes-plugin/src/index";
+In your application composition root (`lib/veap.ts`), `plugins` imported from `./plugins.gen` automatically include your new plugin.
 
-const plugins = [/* generated entries..., */ NotesPlugin];
-```
+## 2. The entry point and manifest
 
-and rebuild the generated registry if your project uses `plugins.gen.ts` (`veap register` refreshes it).
-
-## 2. The manifest
-
-Each plugin declares itself:
+Each plugin declares itself through `IPlugin`:
 
 ```ts
 // plugins/notes-plugin/src/index.ts
-import type { VeapPlugin } from "@veap/core/plugins";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+import { discoverRoutes } from "@veap/core/router";
+import {
+  createManifestFromPackageJson,
+  type IPlugin,
+} from "@veap/core/plugins";
+import pkg from "../package.json" with { type: "json" };
 
-const NotesPlugin: VeapPlugin = {
-  manifest: {
-    name: "notes",
-    version: "0.1.0",
-    description: "Personal notes",
-  },
-  boot() {
+const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "app");
+
+const notesPlugin: IPlugin = {
+  manifest: createManifestFromPackageJson(pkg),
+  migrations: [],
+
+  init: async () => {
     // optional: register services, subscribe to events
   },
+
+  routeTree: async () =>
+    discoverRoutes(appDir, (relPath) => import(`./app/${relPath}`)),
 };
 
-export default NotesPlugin;
+export default notesPlugin;
 ```
 
-The exact manifest fields are validated by `PluginManifestSchema` (`name`, `version`, `description`, optional navigation, extensions, widgets, hooks).
+The metadata (`id`, `name`, `description`, dependencies) is maintained in `package.json` under the `"veap"` key:
+
+```json
+{
+  "name": "@veap/notes-plugin",
+  "version": "0.0.1",
+  "veap": {
+    "type": "plugin",
+    "id": "notes-plugin",
+    "name": "Notes Plugin",
+    "description": "Personal notes module.",
+    "enabled": true,
+    "system": false,
+    "hasSetup": false,
+    "dependencies": []
+  }
+}
+```
 
 ## 3. A route
 
-Plugin routes are discovered from the plugin's routes directory. Create a page:
+Plugin routes follow App Router conventions inside `src/app/`. Create an admin page:
 
 ```tsx
-// plugins/notes-plugin/src/routes/page.tsx
+// plugins/notes-plugin/src/app/[prefix]/notes/page.tsx
 export default function NotesPage() {
   return <h1>Notes</h1>;
 }
 ```
 
-With the dev server running, visit `/<plugin prefix>/notes` (the default prefix is the plugin name under `privatePath`). Route conventions match Next.js: dynamic segments `[id]`, catch-all `[...slug]`, optional catch-all `[[...slug]]` - see [Plugin routing](../plugins/plugin-routing.md).
+The `[prefix]` directory segment dynamically resolves to the configured private prefix (default: `/app`). Visit `/app/notes` in your browser to view the page.
 
 ## 4. Admin navigation
 
-Add navigation in the manifest so the page appears in the admin menu:
+Add navigation in the plugin object so the page appears in the admin menu:
 
 ```ts
-manifest: {
-  name: "notes",
-  version: "0.1.0",
-  navigation: [
-    { label: "Notes", path: "/notes" },
-  ],
-},
+  navigation: {
+    admin: {
+      Notes: {
+        title: "Notes",
+        priority: 20,
+        items: [
+          { title: "My Notes", url: "/notes", icon: "file-text" },
+        ],
+      },
+    },
+  },
 ```
 
-`getVeapPluginNavigationGrouped()` (server) exposes this to templates; breadcrumbs are derived from the same tree.
+The admin layout and breadcrumb trail automatically pick up this navigation tree.
 
 ## 5. Widgets
 
-Expose a widget another surface can render:
+Expose a widget that dashboard areas can render:
 
 ```tsx
-// plugins/notes-plugin/src/widgets/recent-notes.tsx
+// plugins/notes-plugin/src/ui/recent-notes-widget.tsx
 export default async function RecentNotesWidget() {
-  return <section>Latest notes</section>;
+  return <section className="p-4 border rounded">Latest notes</section>;
 }
 ```
 
-Register the widget in the manifest (widgets section) and render it anywhere with:
+Register the widget on the plugin definition:
 
-```tsx
-import { PluginExtensionPoint } from "@veap/core/plugins/server";
-
-<PluginExtensionPoint name="dashboard.widgets" />;
+```ts
+  widgets: [
+    {
+      id: "recent-notes",
+      name: "Recent Notes",
+      area: "dashboard-stats",
+      component: RecentNotesWidget,
+      priority: 50,
+    },
+  ],
 ```
 
-Every enabled plugin's widget registered for that point renders there - see [Extensions and widgets](../plugins/extensions-and-widgets.md).
+Any layout or page can render all registered widgets for an area using:
+
+```tsx
+import { ExtensionPoint } from "@veap/core/plugins/server";
+
+<ExtensionPoint target="dashboard" point="dashboard-stats" />
+```
 
 ## 6. Data
 
@@ -124,6 +160,8 @@ export async function down(knex: Knex): Promise<void> {
 }
 ```
 
+Export migrations in your plugin's `migrations` array, or manage them at the app level.
+
 ```ts
 // plugins/notes-plugin/src/models/note.ts
 import { Model } from "@veap/core/database";
@@ -136,8 +174,8 @@ export class Note extends Model {
 Read in the page (Server Component):
 
 ```tsx
-// plugins/notes-plugin/src/routes/page.tsx
-import { Note } from "../models/note";
+// plugins/notes-plugin/src/app/[prefix]/notes/page.tsx
+import { Note } from "../../../models/note";
 
 export default async function NotesPage() {
   const notes = await Note.query().orderBy("created_at", "desc").limit(10);
@@ -168,14 +206,17 @@ export async function createNote(title: string, body: string) {
 
 ## 7. Events and settings
 
-Subscribe to system events in `boot()`:
+Subscribe to system events or publish custom events in `init()`:
 
 ```ts
-boot() {
-  eventBus.subscribe("system:auth:user-registered", (event) => {
-    // create default notes for new users
+import { eventBus } from "@veap/core/core";
+
+// Inside init():
+init: async () => {
+  eventBus.subscribe("system:auth:user-registered", "notes-plugin", async (event) => {
+    // create default welcome notes for new users
   });
-}
+},
 ```
 
 Store plugin configuration through the settings service namespaced by plugin name (see [Settings](../services/settings.md)).
@@ -184,4 +225,5 @@ Store plugin configuration through the settings service namespaced by plugin nam
 
 - Guard the admin area with route middlewares (`EnsuredAuth`) - [Middleware](../routing/middleware.md).
 - Ship translations in the plugin - [Intl](../services/intl.md).
-- Publish the plugin as its own npm package and install it with `veap add`.
+- Publish the plugin as its own npm package and install it with `veap add <package>`.
+- Eject any installed third-party plugin or template to customize it locally with `veap eject <package>`.

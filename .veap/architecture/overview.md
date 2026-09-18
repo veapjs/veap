@@ -31,9 +31,18 @@ Imports may only point inward: `presentation → infrastructure → application 
 
 ## Public Entry Points
 
-`@veap/core` ships two entry points, both defined in `packages/veap/package.json`:
+`@veap/core` organizes its public surface into explicit, bounded-context entry points defined in `package.json` and backed by `src/entries/*` barrels:
 
-- `@veap/core` (aliased as `@veap/core/core`) → `dist/index.js`: client-safe primitives (domain errors, event contracts, the event bus, logging, the config service).
-- `@veap/core/core/server` → `dist/server.js`: adds the composition root, IoC container, providers, config loader and CLI service.
+- **Kernel Root**:
+  - `@veap/core` (aliased as `@veap/core/core`) → client-safe primitives (domain errors, event contracts, the event bus, logging, the config service).
+  - `@veap/core/core/server` → adds the composition root (`ApplicationBuilder`), IoC container, providers, config loader and CLI service.
+- **Bounded Contexts & Domain Subpaths**:
+  - Auth: `@veap/core/auth` (types/ports), `@veap/core/auth/server` (facades/actions), `@veap/core/auth/models` (ActiveRecord entities: `User`, `Session`, etc.).
+  - Plugins: `@veap/core/plugins`, `@veap/core/plugins/server`, `@veap/core/plugins/client`, `@veap/core/plugins/models` (`SystemPlugin`, `SystemUserWidget`).
+  - Routing: `@veap/core/router`, `@veap/core/router/server` (middlewares, matcher, pipeline).
+  - Data: `@veap/core/database` (ORM `Model`, query builder, transactions, migrations).
+  - Internationalization: `@veap/core/intl`, `@veap/core/intl/client`, `@veap/core/intl/server`.
+  - Services: `@veap/core/communication`, `@veap/core/storage`, `@veap/core/settings`, `@veap/core/settings/models` (`Setting`).
+  - Client Presentation: `@veap/core/react` (hooks and providers).
 
-The entry files (`src/index.ts`, `src/server.ts`) and the per-module barrels in `src/entries/` are the only files allowed to re-export across layers. No layer-internal file may import an entry barrel.
+The entry files (`src/index.ts`, `src/server.ts`) and the per-module barrels in `src/entries/` are the only files allowed to re-export across layers. No layer-internal file may import an entry barrel or use `@veap/core/...` self-imports.

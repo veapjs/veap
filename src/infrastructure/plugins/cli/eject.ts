@@ -15,9 +15,8 @@ function normalizeGitUrl(url: string): string {
   return url;
 }
 
-export async function ejectPlugin(pluginName: string) {
+export async function ejectPackage(packageName: string) {
   const rootDir = findProjectRoot(process.cwd());
-  console.log(`\n🚀 Ejecting plugin: ${pluginName}...`);
 
   // Check if root package.json has it
   const rootPkgPath = path.join(rootDir, "package.json");
@@ -32,26 +31,37 @@ export async function ejectPlugin(pluginName: string) {
     ...(rootPkg.devDependencies || {}),
   };
 
-  if (!deps[pluginName]) {
+  if (!deps[packageName]) {
     console.error(
-      `Error: Plugin "${pluginName}" is not installed in dependencies.`,
+      `Error: Package "${packageName}" is not installed in dependencies.`,
     );
     process.exit(1);
   }
 
   // Find installed folder in node_modules
-  const nodeModulesDir = path.join(rootDir, "node_modules", pluginName);
-  const pluginPkgJsonPath = path.join(nodeModulesDir, "package.json");
+  const nodeModulesDir = path.join(rootDir, "node_modules", packageName);
+  const pkgJsonPath = path.join(nodeModulesDir, "package.json");
 
-  if (!fs.existsSync(pluginPkgJsonPath)) {
+  if (!fs.existsSync(pkgJsonPath)) {
     console.error(
-      `Error: Cannot find package.json for installed plugin at ${pluginPkgJsonPath}`,
+      `Error: Cannot find package.json for installed package at ${pkgJsonPath}`,
     );
     process.exit(1);
   }
 
-  const pluginPkg = JSON.parse(fs.readFileSync(pluginPkgJsonPath, "utf-8"));
-  const repo = pluginPkg.repository;
+  const installedPkg = JSON.parse(fs.readFileSync(pkgJsonPath, "utf-8"));
+
+  const isTemplate =
+    installedPkg.veap?.type === "template" ||
+    packageName.endsWith("-template") ||
+    packageName.includes("template");
+
+  const itemType = isTemplate ? "template" : "plugin";
+  const targetSubdir = isTemplate ? "templates" : "plugins";
+
+  console.log(`\n🚀 Ejecting ${itemType}: ${packageName}...`);
+
+  const repo = installedPkg.repository;
 
   let gitUrl = "";
   if (typeof repo === "string") {
@@ -61,12 +71,12 @@ export async function ejectPlugin(pluginName: string) {
   }
 
   if (!gitUrl) {
-    // If not found in package.json, try querying pnpm registry
+    // If not found in package.json, try querying registry
     const spinUrl = ora(
-      `Querying registry for Git repository of ${pluginName}...`,
+      `Querying registry for Git repository of ${packageName}...`,
     ).start();
     try {
-      const output = execSync(`npm view ${pluginName} repository.url`, {
+      const output = execSync(`npm view ${packageName} repository.url`, {
         stdio: "pipe",
       })
         .toString()
@@ -77,7 +87,7 @@ export async function ejectPlugin(pluginName: string) {
       } else {
         spinUrl.fail();
         console.error(
-          `Error: Plugin package.json does not specify repository URL, and registry query returned nothing.`,
+          `Error: Package package.json does not specify repository URL, and registry query returned nothing.`,
         );
         process.exit(1);
       }
@@ -91,28 +101,44 @@ export async function ejectPlugin(pluginName: string) {
   }
 
   const normalizedUrl = normalizeGitUrl(gitUrl);
-  const folderName = pluginName.replace(/^@.*\//, "");
-  const destDir = path.join(rootDir, "plugins", folderName);
+  const folderName = packageName.replace(/^@.*\//, "");
+  const destDir = path.join(rootDir, targetSubdir, folderName);
 
   if (fs.existsSync(destDir)) {
-    console.error(`Error: Local plugin directory already exists at ${destDir}`);
+    console.error(
+      `Error: Local ${itemType} directory already exists at ${destDir}`,
+    );
     process.exit(1);
   }
 
+  // Ensure target parent directory exists (e.g. templates/ or plugins/)
+  const targetBaseDir = path.join(rootDir, targetSubdir);
+  if (!fs.existsSync(targetBaseDir)) {
+    fs.mkdirSync(targetBaseDir, { recursive: true });
+  }
+
   const cloneSpin = ora(
-    `Cloning repository ${normalizedUrl} to plugins/${folderName}...`,
+    `Cloning repository ${normalizedUrl} to ${targetSubdir}/${folderName}...`,
   ).start();
   try {
     execSync(`git clone ${normalizedUrl} "${destDir}"`, { stdio: "ignore" });
-    cloneSpin.succeed(`Cloned repository to plugins/${folderName}`);
+    cloneSpin.succeed(`Cloned repository to ${targetSubdir}/${folderName}`);
   } catch (_err) {
     cloneSpin.fail(`Failed to clone repository ${normalizedUrl}`);
     process.exit(1);
   }
 
+  // Ensure workspace pattern exists in root package.json if workspaces array is defined
+  if (Array.isArray(rootPkg.workspaces)) {
+    const workspacePattern = `${targetSubdir}/*`;
+    if (!rootPkg.workspaces.includes(workspacePattern)) {
+      rootPkg.workspaces.push(workspacePattern);
+    }
+  }
+
   // Update root package.json dependency to workspace:*
   rootPkg.dependencies = rootPkg.dependencies || {};
-  rootPkg.dependencies[pluginName] = "workspace:*";
+  rootPkg.dependencies[packageName] = "workspace:*";
   fs.writeFileSync(
     rootPkgPath,
     `${JSON.stringify(rootPkg, null, 2)}\n`,
@@ -125,19 +151,25 @@ export async function ejectPlugin(pluginName: string) {
     await import("../../../infrastructure/cli/package-manager.js");
   const pm = detectPackageManager(rootDir);
   const linkSpin = ora(
-    `Running ${pm} install to link ejected plugin...`,
+    `Running ${pm} install to link ejected ${itemType}...`,
   ).start();
   try {
     execSync(`${pm} install`, { cwd: rootDir, stdio: "ignore" });
-    linkSpin.succeed("Plugin linked successfully.");
+    linkSpin.succeed(
+      `${isTemplate ? "Template" : "Plugin"} linked successfully.`,
+    );
   } catch (_err) {
     linkSpin.fail(`Failed to run ${pm} install automatically.`);
   }
 
-  // Regenerate registry
-  regeneratePluginsRegistry(rootDir);
+  // Regenerate registry only for plugins
+  if (!isTemplate) {
+    regeneratePluginsRegistry(rootDir);
+  }
 
   console.log(
-    `\n✨ Plugin "${pluginName}" ejected successfully to local folder plugins/${folderName}!`,
+    `\n✨ ${isTemplate ? "Template" : "Plugin"} "${packageName}" ejected successfully to local folder ${targetSubdir}/${folderName}!`,
   );
 }
+
+export const ejectPlugin = ejectPackage;

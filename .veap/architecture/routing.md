@@ -12,9 +12,12 @@ Next.js intercepts all dynamic requests via the Catch-All route `app/[[...catchA
 - Executes the required middlewares.
 - Builds the nested layout chain (including parallel `@slots`).
 
-## 2. No Templates - Just Eject
+## 2. Templates and Overrides
 
-Veap does not employ a proprietary template engine. If a developer wishes to override a plugin's layout (e.g., changing the admin sidebar), they must **eject** the plugin code into their workspace and edit it natively as standard React components.
+Veap supports visual theming through the `ITemplate` interface:
+- **Active Template Layout**: Wraps public and dynamic routes via `TemplateLayout` (provided by the active template registered via `.withTemplates()`).
+- **Route Overrides**: The active template can declare route overrides (`activeTemplate.overrides[path]`), which replace the matched plugin page component while preserving the underlying plugin's business logic and API.
+- **Ejecting for Deep Customization**: If a developer wishes to fork or modify a plugin's core logic or layout beyond what templates provide, they can run `veap eject <plugin>` to copy the package into `plugins/` for direct local editing.
 
 ## 3. Physical Page Integration (`withRouter`)
 

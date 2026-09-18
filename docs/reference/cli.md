@@ -69,19 +69,25 @@ Running `veap add` executes:
 
 ---
 
-### `veap eject <plugin>`
+### `veap eject <package>`
 
-Eject an installed npm plugin into your project's local `plugins/` folder, allowing you to modify and customize its source code directly.
+Eject an installed npm plugin or template into your project's local `plugins/` or `templates/` folder, allowing you to modify and customize its source code directly.
 
 ```bash
+# Eject an installed plugin
 veap eject @veap/commentable
+
+# Eject an installed template
+veap eject @veap/minimal-template
 ```
 
 The CLI:
 
-1. Copies the plugin source from `node_modules` into `plugins/<plugin-id>`.
-2. Updates root `package.json` dependencies to point to the local package workspace.
-3. Re-syncs `lib/plugins.gen.ts`.
+1. Detects whether the package is a plugin or template (inspecting `veap.type` in its `package.json`).
+2. Clones the package repository into `plugins/<name>` or `templates/<name>`.
+3. Updates root `package.json` dependencies to point to the local workspace (`workspace:*`).
+4. Re-links workspace packages with the detected package manager.
+5. Re-syncs `lib/plugins.gen.ts` (when ejecting a plugin).
 
 ---
 
