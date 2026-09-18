@@ -1,1 +1,8 @@
 src
+.agents/*
+.github/*
+.veap/*
+.tests/*
+AGENTS.md
+VEAP_CONTEXT.md
+vitest.config.ts
