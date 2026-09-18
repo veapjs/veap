@@ -64,7 +64,7 @@ veap make:plugin       # scaffold a plugin
 veap make:template     # scaffold a template
 veap make:migration    # create a migration
 veap add <plugin>      # install and register a plugin package
-veap eject <plugin>    # eject an installed plugin to local plugins folder
+veap eject <package>    # eject an installed plugin or template to local workspace
 veap register          # re-sync lib/plugins.gen.ts
 veap docker            # generate Docker configuration
 ```

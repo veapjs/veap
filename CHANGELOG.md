@@ -1,5 +1,17 @@
 # @veap/core
 
+## 0.11.3
+
+### Patch Changes
+
+- Add template support to `veap eject <package>` CLI command:
+  - Automatically detect whether an ejected package is a template or a plugin (`veap.type` manifest).
+  - Eject templates into the local `templates/` directory and plugins into `plugins/`.
+  - Ensure workspace directory is present in root `package.json` workspaces array.
+  - Conditionally skip `lib/plugins.gen.ts` regeneration for templates.
+  - Preserve `ejectPlugin` as a backward-compatible alias of `ejectPackage`.
+  - Update CLI and framework documentation for template ejection and plugin authoring.
+
 ## 0.11.2
 
 ### Patch Changes

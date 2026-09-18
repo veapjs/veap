@@ -107,6 +107,19 @@ bun veap make:template my-template
 
 scaffolds the package under `templates/`. Add it to `.withTemplates([...])` and activate it in the panel.
 
+## Ejecting an installed template
+
+To customize an installed npm template package directly in your local workspace:
+
+```bash
+bunx veap eject @veap/minimal-template
+```
+
+The CLI:
+1. Clones the template source repository into your local `templates/minimal-template` directory.
+2. Updates your root `package.json` dependency to `"workspace:*"`.
+3. Links the local template package via your package manager without registering it in `lib/plugins.gen.ts`.
+
 ## Relationship with plugins
 
 Templates restyle; plugins provide features. A template should not register widgets or extensions (it is not a plugin); the override map is its only way to change existing screens, and it keeps plugin behavior intact because only the presentation swaps.
