@@ -1,6 +1,5 @@
 "use client";
 
-
 export { notifyPluginsChanged } from "./react/events";
 
 // Compatibility Aliases

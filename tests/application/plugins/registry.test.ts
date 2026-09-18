@@ -285,24 +285,39 @@ describe("PluginRegistry", () => {
       await registry.init();
 
       // Guest/user without admin role or delete permission
-      const regularExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["user"],
-        permissions: ["posts:read"],
-      });
+      const regularExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["user"],
+          permissions: ["posts:read"],
+        },
+      );
       expect(regularExts).toHaveLength(1);
 
       // Admin user
-      const adminExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["admin"],
-        permissions: ["posts:read"],
-      });
+      const adminExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["admin"],
+          permissions: ["posts:read"],
+        },
+      );
       expect(adminExts).toHaveLength(2);
 
       // User with all permissions
-      const privilegedExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["admin"],
-        permissions: ["posts:read", "posts:delete"],
-      });
+      const privilegedExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["admin"],
+          permissions: ["posts:read", "posts:delete"],
+        },
+      );
       expect(privilegedExts).toHaveLength(3);
     });
   });

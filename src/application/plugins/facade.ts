@@ -1,4 +1,3 @@
-
 import type { IPlugin } from "../../domain/plugins/types";
 import { PluginRegistry } from "./registry";
 import { pluginsContext } from "./context";

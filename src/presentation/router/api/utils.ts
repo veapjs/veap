@@ -1,5 +1,8 @@
 import type { UserPermission, UserRole } from "../../../domain/auth/types";
-import type { ApiMiddleware, VeapMiddleware } from "../../../domain/plugins/types";
+import type {
+  ApiMiddleware,
+  VeapMiddleware,
+} from "../../../domain/plugins/types";
 import type {
   LayoutChainEntry,
   MatchResult,
