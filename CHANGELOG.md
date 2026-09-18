@@ -33,8 +33,6 @@
 ### Patch Changes
 
 - Clean up ORM references and migration types
-- Updated dependencies
-  - create-veap@0.2.3
 
 ## 0.10.0
 
@@ -42,21 +40,11 @@
 
 - Refactored internal core modules (Auth, Plugins, Router, Database) to exclusively use the @Injectable() IoC container pattern rather than static singletons. This includes fixes for async initialization sequences, Next.js dual-package hazard for DI containers in Edge/Node workers, and backwards-compatible proxy wrappers for legacy direct imports.
 
-### Patch Changes
-
-- Updated dependencies
-  - create-veap@0.2.2
-
 ## 0.9.0
 
 ### Minor Changes
 
 - Refactor system initialization to use Laravel-like fluent ApplicationBuilder and update plugins to properly resolve core services via Dependency Injection container instead of static singletons.
-
-### Patch Changes
-
-- Updated dependencies
-  - create-veap@0.2.1
 
 ## 0.8.0
 
@@ -82,15 +70,12 @@
 ### Patch Changes
 
 - Updated dependencies
-  - @veap/ui@0.1.3
 
 ## 0.5.3
 
 ### Patch Changes
 
 - Upgrade Next.js, React, and switch linter to ESLint
-- Updated dependencies
-  - @veap/ui@0.1.2
 
 ## 0.5.2
 
@@ -103,8 +88,6 @@
 ### Patch Changes
 
 - Align package imports with @veap/core
-- Updated dependencies
-  - @veap/ui@0.1.1
 
 ## 0.5.0
 
@@ -123,11 +106,6 @@
 ### Minor Changes
 
 - Adds the internationalization engine (locale detection, translation loading, pluralization), a storage service with local and provider-backed disks, and the plugin system: manifest, lifecycle hooks, plugin-scoped routes and global model scopes.
-
-### Patch Changes
-
-- Updated dependencies
-  - @veap/ui@0.1.0
 
 ## 0.3.1
 
