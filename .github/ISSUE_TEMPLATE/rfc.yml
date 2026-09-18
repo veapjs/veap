@@ -1,0 +1,271 @@
+
+name: "RFC / Architecture Proposal"
+description: "Propose a significant architectural, API, or framework-level change"
+title: "[RFC]: "
+labels:
+  - rfc
+  - architecture
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        # Request for Comments
+
+        Use this template for significant changes to Veap's architecture,
+        public APIs, module system, plugin system, runtime, routing, data layer,
+        build system, or other foundational parts of the framework.
+
+        RFCs are intended to start technical discussion.
+        Opening an RFC does not imply that the proposed design will be accepted.
+
+  - type: textarea
+    id: abstract
+    attributes:
+      label: Abstract
+      description: |
+        Provide a short summary of the proposal.
+        Someone should be able to understand the basic idea without reading
+        the entire RFC.
+      placeholder: |
+        This RFC proposes...
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: |
+        What problem does the proposal solve?
+        Why is the current architecture or API insufficient?
+      placeholder: |
+        Currently...
+
+        This becomes problematic because...
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals
+      description: |
+        What should this proposal achieve?
+      placeholder: |
+        - ...
+        - ...
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: non-goals
+    attributes:
+      label: Non-goals
+      description: |
+        What is explicitly outside the scope of this proposal?
+      placeholder: |
+        - ...
+        - ...
+        - ...
+
+  - type: textarea
+    id: current-architecture
+    attributes:
+      label: Current architecture
+      description: |
+        Explain how the relevant part of Veap currently works.
+        Include diagrams, code, package relationships, or links to the implementation
+        when useful.
+      placeholder: |
+        Current flow:
+
+        ...
+
+  - type: textarea
+    id: proposed-architecture
+    attributes:
+      label: Proposed architecture
+      description: |
+        Describe the proposed architecture in detail.
+
+        Explain components, responsibilities, dependencies, communication,
+        lifecycle, and boundaries between packages/modules/plugins.
+      placeholder: |
+        Proposed flow:
+
+        ...
+
+  - type: textarea
+    id: api
+    attributes:
+      label: API / Developer experience
+      description: |
+        Describe the public API and developer experience.
+
+        Include TypeScript examples, configuration, CLI commands, module APIs,
+        plugin APIs, or other relevant interfaces.
+      placeholder: |
+        Example:
+
+        ```ts
+        // proposed API
+        ```
+      render: ts
+
+  - type: textarea
+    id: module-system
+    attributes:
+      label: Modules & plugins
+      description: |
+        If applicable, explain how this proposal interacts with Veap's modular
+        and plugin architecture.
+
+        Address:
+        - module boundaries
+        - dependencies
+        - lifecycle
+        - communication
+        - public APIs
+        - extensibility
+        - optional vs required functionality
+      placeholder: |
+        Module:
+
+        Dependencies:
+
+        Lifecycle:
+
+        Communication:
+
+  - type: textarea
+    id: data-flow
+    attributes:
+      label: Data flow / lifecycle
+      description: |
+        Describe how data, requests, events, or execution flow through the proposed system.
+      placeholder: |
+        Request
+          ↓
+        ...
+          ↓
+        Response
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: |
+        Describe alternative designs that were considered.
+        Explain their technical trade-offs.
+      placeholder: |
+        ### Alternative A
+
+        ...
+
+        ### Alternative B
+
+        ...
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Trade-offs
+      description: |
+        What are the advantages and disadvantages of the proposal?
+
+        Consider:
+        - complexity
+        - performance
+        - DX
+        - maintainability
+        - extensibility
+        - bundle size
+        - runtime compatibility
+        - backwards compatibility
+      placeholder: |
+        Advantages:
+        - ...
+
+        Disadvantages:
+        - ...
+
+  - type: textarea
+    id: compatibility
+    attributes:
+      label: Compatibility & migration
+      description: |
+        How does this affect existing Veap applications, modules, plugins,
+        packages, and APIs?
+
+        Describe any migration strategy required.
+      placeholder: |
+        Backwards compatible: Yes / No
+
+        Migration:
+        ...
+
+  - type: textarea
+    id: performance
+    attributes:
+      label: Performance considerations
+      description: |
+        Describe any expected performance impact.
+        Include build time, runtime performance, memory usage, bundle size,
+        or other relevant considerations.
+
+  - type: textarea
+    id: security
+    attributes:
+      label: Security considerations
+      description: |
+        Describe potential security implications or new attack surfaces.
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation plan
+      description: |
+        If you have an implementation plan, describe it in incremental steps.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+
+  - type: textarea
+    id: open-questions
+    attributes:
+      label: Open questions
+      description: |
+        List questions that need to be resolved before implementation.
+      placeholder: |
+        - ...
+        - ...
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: |
+        Link to relevant documentation, prior art, GitHub issues,
+        framework implementations, RFCs, or research.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues, discussions, and RFCs.
+          required: true
+        - label: I have described the motivation and problem clearly.
+          required: true
+        - label: I have considered alternative designs.
+          required: true
+        - label: I have considered backwards compatibility.
+          required: true
+        - label: I have considered the impact on Veap's modular architecture.
+          required: true
+        - label: I understand that this RFC is a proposal for discussion, not an implementation requirement.
+          required: true
+

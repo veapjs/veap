@@ -1,0 +1,126 @@
+
+name: "Bug Report"
+description: "Report a reproducible bug or unexpected behavior in Veap"
+title: "[BUG]: "
+labels:
+  - bug
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug in Veap.
+
+        Please provide enough information to reproduce the issue.
+        A minimal reproduction is strongly preferred.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: |
+        Describe the bug clearly and concisely.
+        What did you expect to happen and what actually happened?
+      placeholder: |
+        Expected:
+        ...
+
+        Actual:
+        ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: |
+        Provide the smallest possible set of steps needed to reproduce the issue.
+      placeholder: |
+        1. Create a new Veap application
+        2. Install ...
+        3. Configure ...
+        4. Run ...
+        5. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction-code
+    attributes:
+      label: Minimal reproduction
+      description: |
+        Provide a minimal code example or a link to a repository reproducing the issue.
+        Remove unrelated code whenever possible.
+      render: ts
+
+  - type: input
+    id: veap-version
+    attributes:
+      label: Veap version
+      description: "Which version of Veap are you using?"
+      placeholder: "e.g. 0.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: react-version
+    attributes:
+      label: React version
+      placeholder: "e.g. 19.1.0"
+
+  - type: input
+    id: runtime
+    attributes:
+      label: Runtime
+      description: "Which runtime are you using?"
+      placeholder: "e.g. Bun 1.2.x / Node.js 22.x / Cloudflare Workers"
+
+  - type: input
+    id: package-manager
+    attributes:
+      label: Package manager
+      placeholder: "e.g. Bun / pnpm / npm / yarn"
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Development
+        - Production
+        - Build
+        - CI
+        - Edge runtime
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error output / logs
+      description: |
+        Include relevant error messages, stack traces, build output, or server logs.
+      render: shell
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: |
+        Add anything else that may help diagnose the issue.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues for duplicates.
+          required: true
+        - label: I have provided reproducible steps.
+          required: true
+        - label: I have included relevant version and environment information.
+          required: true
+        - label: I have removed sensitive information from logs and code.
+          required: true
