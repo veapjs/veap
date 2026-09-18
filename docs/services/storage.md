@@ -68,6 +68,10 @@ storage.setDefaultProvider("s3"); // optional; first non-local registration beco
 
 `registerProvider` makes the first registered provider the default unless a default is already set to something other than `"local"`; `unregisterProvider(id)` removes one and re-falls-back to local. `getProviders()` lists registered ids and names (used by settings UI).
 
+<!-- prettier-ignore -->
+> [!TIP]
+> For a full, production-ready S3 and Cloudflare R2 implementation using `@aws-sdk/client-s3`, see the [Custom service adapters guide](../guides/custom-adapters.md#1-custom-storage-provider-s3--cloudflare-r2).
+
 ## The local provider
 
 `LocalFileProvider` (registered automatically on first boot when the system is installed):

@@ -29,7 +29,7 @@ You can also initialize a connection manually with `initDatabase({ client, conne
 
 | Layer         | Import                                                             | Use for                                                                     |
 | ------------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| ORM models    | `Model`, `User`, ... from `@veap/core/database` and model packages | 95% of data access; ActiveRecord API with relations, casts, scopes          |
+| [ORM models](./orm.md) | `Model`, `User`, ... from `@veap/core/database` and model packages | 95% of data access; ActiveRecord API with relations, casts, scopes, and traits |
 | Query builder | `Model.query()` returns `ModelQueryBuilder` (Knex underneath)      | everything the static helpers do not cover; `toKnex()` for raw escape hatch |
 | Raw access    | `dbClient("users").where(...)`, `dbClient.raw(sql)`                | migrations, exotic queries                                                  |
 

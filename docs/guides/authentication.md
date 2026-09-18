@@ -111,7 +111,7 @@ if (!(await hasPermission(userId, "posts.publish"))) {
 }
 ```
 
-Roles and permissions are stored through `RbacService`; the full API and the event flow (`system:auth:*`) are in [RBAC](../auth/rbac.md).
+Roles and permissions are stored through `RbacService`; the full API, Server Action protection patterns, API route middlewares, and the event flow (`system:auth:*`) are in [RBAC](../auth/rbac.md).
 
 ## Email verification and password reset
 

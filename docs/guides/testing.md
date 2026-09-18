@@ -195,12 +195,15 @@ import { eventBus } from "@veap/core";
 describe("Event bus integration", () => {
   it("delivers events to subscribers", async () => {
     const handler = vi.fn();
-    const unsubscribe = eventBus.subscribe("system:start", handler);
+    const subscriberId = "test-subscriber";
+    eventBus.subscribe("system:start", subscriberId, async (event) => {
+      handler(event.payload);
+    });
 
     await eventBus.publish("system:start", { runtime: "nodejs" });
 
     expect(handler).toHaveBeenCalledWith({ runtime: "nodejs" });
-    unsubscribe();
+    eventBus.unsubscribe("system:start", subscriberId);
   });
 });
 ```

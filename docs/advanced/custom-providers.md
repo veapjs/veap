@@ -29,7 +29,11 @@ import { MeilisearchClient } from "../infrastructure/meilisearch-client";
 
 export class SearchServiceProvider implements ServiceProvider {
   register(container: Container): void {
-    container.singleton(SEARCH_CLIENT, () => new MeilisearchClient());
+    container.register({
+      token: SEARCH_CLIENT,
+      useFactory: () => new MeilisearchClient(),
+      singleton: true,
+    });
   }
 }
 ```
@@ -44,23 +48,23 @@ Application.configure()
   .create();
 ```
 
-Token conventions used by the framework: class tokens for concrete services, `InjectionToken`/Symbol constants (upper snake case, e.g. `PASSWORD_HASHER`) for swappable ports. Bind ports with `container.singleton(TOKEN, factory)` or `container.bind(TOKEN).to(Implementation)`.
+Token conventions used by the framework: class tokens for concrete services, typed `Token<T>` symbol constants (upper snake case, e.g. `PASSWORD_HASHER`, `CACHE_PROVIDER`, `CUSTOM_MAILER`) for swappable ports. Bind providers using `container.register({ token, useClass, useValue, useFactory, singleton: true })`.
 
 ## Replacing a framework port
 
-Every framework service that touches the outside world does so through a port bound in a token. Common ones:
+Every framework service that touches the outside world does so through a port bound to a token. Common ones:
 
-| Port              | Token                             | Default                      |
-| ----------------- | --------------------------------- | ---------------------------- |
-| Password hashing  | `PASSWORD_HASHER`                 | bcrypt-based hasher          |
-| Token generation  | `TOKEN_GENERATOR`                 | oslo-based generator         |
-| Secret encryption | `SECRET_CIPHER`                   | AES-GCM cipher               |
-| Cookies / request | `COOKIE_STORE`, `REQUEST_CONTEXT` | Next.js adapters             |
-| Mail transport    | `MAIL_TRANSPORT`                  | nodemailer (smtp) or console |
-| Storage           | `STORAGE_PROVIDER`                | local file provider          |
-| Cache             | cache token                       | in-memory cache              |
+| Port              | Token                             | Registration Mechanism                                            | Default                      |
+| ----------------- | --------------------------------- | ----------------------------------------------------------------- | ---------------------------- |
+| Password hashing  | `PASSWORD_HASHER`                 | `container.register({ token: PASSWORD_HASHER, useClass })`       | bcrypt-based hasher          |
+| Token generation  | `TOKEN_GENERATOR`                 | `container.register({ token: TOKEN_GENERATOR, useClass })`       | oslo-based generator         |
+| Secret encryption | `SECRET_CIPHER`                   | `container.register({ token: SECRET_CIPHER, useClass })`          | AES-GCM cipher               |
+| Cookies / request | `COOKIE_STORE`, `REQUEST_CONTEXT` | Registered by Kernel provider                                     | Next.js request adapters     |
+| Mail transport    | `CUSTOM_MAILER`                   | `container.register({ token: CUSTOM_MAILER, useClass/useValue })` | `MAIL_TRANSPORT=smtp`        |
+| Storage           | `StorageService`                  | `storage.registerProvider(new MyStorageProvider())`               | `LocalFileProvider`          |
+| Cache             | `CACHE_PROVIDER`                  | `container.register({ token: CACHE_PROVIDER, useValue })`         | `MemoryCacheProvider`        |
 
-Bind before providers boot - the safest place is a custom provider listed _before_ the built-in one in `withProviders`, or an explicit `container.bind(...)` right after `Application.configure().create()` and before `bootstrap()`:
+Bind before providers boot - the safest place is a custom provider listed in `withProviders`, or an explicit `container.register(...)` right after `Application.configure().create()` and before `bootstrap()`:
 
 ```ts
 import { PASSWORD_HASHER } from "@veap/core/auth";
@@ -68,16 +72,20 @@ import { Argon2Hasher } from "./argon2-hasher";
 
 const application = Application.configure().withAuth().create();
 
-container.bind(PASSWORD_HASHER).to(Argon2Hasher);
+container.register({
+  token: PASSWORD_HASHER,
+  useClass: Argon2Hasher,
+  singleton: true,
+});
 
 void application.bootstrap();
 ```
 
-Implementations must satisfy the port's interface exactly (`IPasswordHasher`, `IMailer`, `IStorageProvider`, ...), all exported from the matching entry point.
+For complete, copy-pasteable implementations of S3 storage, custom mailers (Resend), and Redis caching, see the [Custom service adapters guide](../guides/custom-adapters.md).
 
 ## Custom providers in plugins
 
-A plugin does not need its own provider class: declare services in the plugin's `register()`/`boot()` hooks (see [Plugin lifecycle](../plugins/hooks.md)). Use a standalone provider when the service must exist even with the plugin disabled, or when multiple plugins share it.
+A plugin does not need its own provider class: declare services in the plugin's `init()` hook (see [Plugin lifecycle](../plugins/hooks.md)). Use a standalone provider when the service must exist even with the plugin disabled, or when multiple plugins share it.
 
 ## Rules to keep the container sane
 

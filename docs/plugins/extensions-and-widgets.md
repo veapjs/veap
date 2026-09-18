@@ -37,9 +37,100 @@ extensions: [
 ],
 ```
 
-`ExtensionPoint` props: `target`, `point`, `className`, `props` (spread into each extension component), `fallback` (rendered when nothing matches), `as` (container element, default `div`), `includeDisabled` (include extensions of disabled plugins, default false). The alias `PluginExtensionPoint` is the long name for the same component.
+`ExtensionPoint` props:
 
-Extensions receive the user's roles/permissions from `getCurrentSession()` and are filtered before render.
+| Prop              | Type                | Default | Description                                                                |
+| ----------------- | ------------------- | ------- | -------------------------------------------------------------------------- |
+| `target`          | `string`            | —       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)       |
+| `point`           | `string`            | —       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`)     |
+| `props`           | `any`               | —       | Context object spread into each injected extension component               |
+| `className`       | `string`            | —       | CSS class names applied to the container wrapper element                   |
+| `as`              | `React.ElementType` | `"div"` | Wrapper element (e.g. `"section"`, `"ul"`, `"nav"`)                        |
+| `fallback`        | `React.ReactNode`   | `null`  | Rendered when no extensions match or when the user fails RBAC checks       |
+| `includeDisabled` | `boolean`           | `false` | Whether to include extensions from disabled plugins                        |
+
+The alias `PluginExtensionPoint` is exported as an alternative name for `ExtensionPoint`.
+
+### Passing context to extensions
+
+The host view can pass dynamic domain context (such as the active model or form handler) to injected components via the `props` attribute:
+
+```tsx
+// Host component: app/[prefix]/posts/[id]/page.tsx
+import { ExtensionPoint } from "@veap/core/plugins/server";
+import { Post } from "@veap/core/database";
+
+export default async function EditPostPage({ params }: { params: { id: string } }) {
+  const post = await Post.findOrFail(params.id);
+
+  return (
+    <div className="grid grid-cols-3 gap-6">
+      <main className="col-span-2">
+        <h1>Editing: {post.title}</h1>
+      </main>
+
+      {/* Render sidebar extensions with the post passed as context */}
+      <aside>
+        <ExtensionPoint
+          target="posts.edit"
+          point="sidebar"
+          props={{ post }}
+          as="section"
+          className="space-y-4"
+        />
+      </aside>
+    </div>
+  );
+}
+```
+
+The plugin component simply receives `post` as a standard React prop:
+
+```tsx
+// Plugin component: plugins/seo-plugin/src/ui/seo-sidebar-box.tsx
+import type { Post } from "@veap/core/database";
+
+interface SeoSidebarProps {
+  post: Post;
+}
+
+export default function SeoSidebarBox({ post }: SeoSidebarProps) {
+  return (
+    <div className="p-4 border rounded-lg bg-card">
+      <h3 className="font-semibold text-sm">SEO Analysis</h3>
+      <p className="text-xs text-muted-foreground">Slug: {post.slug || "None"}</p>
+    </div>
+  );
+}
+```
+
+### RBAC evaluation rules
+
+Extensions and widgets can be protected by user roles and permissions:
+
+```ts
+extensions: [
+  {
+    id: "danger-zone",
+    target: "posts.edit",
+    point: "sidebar",
+    component: DangerZoneComponent,
+    roles: ["admin", "super-admin"],      // OR condition: user must have at least one role
+    permissions: ["posts:delete"],         // AND condition: user must have all listed permissions
+  },
+]
+```
+
+When evaluating access:
+1. **Roles check**: If `roles` array is provided, the user must have **at least one** matching role (`roles.some(...)`).
+2. **Permissions check**: If `permissions` array is provided, the user must possess **all** listed permissions (`permissions.every(...)`).
+3. If the user does not satisfy the criteria, the extension is omitted from rendering. If all extensions are filtered out, the `fallback` prop is displayed.
+
+### Priority and ordering
+
+Extensions and widgets are sorted ascending by their `priority` number:
+- Lower numbers render earlier: an extension with `priority: 10` renders above `priority: 50`.
+- Extensions without an explicit `priority` default to `100` and appear at the end.
 
 ## Widget areas (server)
 
@@ -70,7 +161,60 @@ widgets: [
 
 ## Client components
 
-For client-rendered composition the client entry exposes `ExtensionPointClient` / `WidgetAreaClient` (aliases `ExtensionPoint`, `WidgetArea`) and the hooks `usePluginExtensions` / `usePluginWidgets` from `@veap/core/plugins/client`. These fetch the same data through server actions (`getPluginExtensionsAction`, `getPluginWidgetsAction`) and re-render when plugins change (the client module exports `notifyPluginsChanged` for that).
+In interactive Client Components (marked with `"use client"`), use `ExtensionPointClient` from `@veap/core/plugins/client`:
+
+```tsx
+"use client";
+
+import { ExtensionPointClient } from "@veap/core/plugins/client";
+
+export function RichTextEditorToolbar({ editor }: { editor: any }) {
+  return (
+    <div className="flex items-center gap-2 p-2 border-b">
+      {/* Core formatting buttons */}
+      <button onClick={() => editor.toggleBold()}>Bold</button>
+      <button onClick={() => editor.toggleItalic()}>Italic</button>
+
+      {/* Dynamic plugin buttons injected here */}
+      <ExtensionPointClient
+        target="editor"
+        point="toolbar"
+        props={{ editor }}
+        className="flex items-center gap-2 ml-auto"
+      />
+    </div>
+  );
+}
+```
+
+### Custom client rendering with `usePluginExtensions`
+
+If you need programmatic control over how extensions are structured or wrapped on the client:
+
+```tsx
+"use client";
+
+import { usePluginExtensions } from "@veap/core/plugins/client";
+
+export function CustomNavigationMenu() {
+  const extensions = usePluginExtensions("navigation", "menu-items");
+
+  return (
+    <ul className="flex flex-col gap-1">
+      {extensions.map((ext) => {
+        const Component = ext.component;
+        return (
+          <li key={ext.id} className="nav-item">
+            <Component />
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+```
+
+The hook automatically re-fetches extensions whenever plugins are enabled, disabled, or updated via `onPluginsChanged`.
 
 ## Well-known points used by the platform
 
@@ -84,4 +228,4 @@ Your own targets and points are first-class: pick a target id (usually the compo
 
 ## Hooks vs extensions
 
-Use extensions/widgets for UI. Use hooks (see [Hooks](./hooks.md)) for data transformation pipelines. If you find yourself rendering HTML from a hook, it should have been an extension.
+Use extensions/widgets for UI composition. Use hooks (see [Hooks](./hooks.md)) for data transformation pipelines. If you find yourself rendering HTML from a hook, it should be an extension.

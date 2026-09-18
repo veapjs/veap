@@ -75,7 +75,7 @@ export class SesMailService implements IMailer {
 
 export class MailServiceProvider extends ServiceProvider {
   register(): void {
-    container.register({
+    this.container.register({
       token: CUSTOM_MAILER,
       useValue: new SesMailService(),
     });
@@ -88,6 +88,10 @@ MAIL_TRANSPORT=custom
 ```
 
 All mailables and `sendMail` calls route through your adapter. The same approach works for outbox patterns (store-and-forward) in tests.
+
+<!-- prettier-ignore -->
+> [!TIP]
+> For a full, copy-pasteable Resend and Postmark integration, see the [Custom service adapters guide](../guides/custom-adapters.md#2-custom-mail-transport-resend--postmark).
 
 ## Environment variables
 

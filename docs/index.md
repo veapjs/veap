@@ -16,7 +16,7 @@ This documentation covers `@veap/core` version **0.11.x**. Code in the repositor
 - [Configuration](./configuration/configuration.md): `veap.config.ts` options and environment variables.
 - [Advanced](./advanced/veap-vs-nextjs.md): how Veap relates to Next.js, custom service providers.
 - [Deployment](./deployment/production.md): production builds, environment variables, Docker, Vercel.
-- [Guides](./guides/index.md): step-by-step, task-oriented walkthroughs (first plugin, CRUD, authentication, gate plugins, database setup, testing).
+- [Guides](./guides/index.md): step-by-step, task-oriented walkthroughs (first plugin, CRUD, authentication, gate plugins, database setup, custom adapters, testing, real-world cookbook).
 - [Troubleshooting](./troubleshooting.md): error messages and their causes.
 - [Reference](./reference/entry-points.md): the public API of every entry point and the [CLI reference](./reference/cli.md).
 
