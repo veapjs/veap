@@ -37,7 +37,10 @@ export const onboardingGatePlugin: IPlugin = {
       }
 
       // 2. Prevent infinite redirect loops on gate pages
-      if (path && (path.includes("/onboarding") || path.includes("/api/onboarding"))) {
+      if (
+        path &&
+        (path.includes("/onboarding") || path.includes("/api/onboarding"))
+      ) {
         return { satisfied: true };
       }
 
@@ -79,9 +82,10 @@ export const middlewares = [SkipSecurity, EnsuredUser];
 export default function OnboardingPage() {
   return (
     <div className="mx-auto max-w-md p-8">
-      <h1 className="text-2xl font-bold mb-4">Complete your account setup</h1>
+      <h1 className="mb-4 text-2xl font-bold">Complete your account setup</h1>
       <p className="text-muted-foreground mb-6">
-        Please enter your company name and role to finish setting up your workspace.
+        Please enter your company name and role to finish setting up your
+        workspace.
       </p>
 
       <form action={completeOnboardingAction} className="space-y-4">
@@ -94,13 +98,13 @@ export default function OnboardingPage() {
             name="company"
             type="text"
             required
-            className="w-full border rounded px-3 py-2 mt-1"
+            className="mt-1 w-full rounded border px-3 py-2"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-primary text-white py-2 rounded font-medium"
+          className="bg-primary w-full rounded py-2 font-medium text-white"
         >
           Finish Onboarding
         </button>
@@ -180,11 +184,11 @@ export const fileUploadSchema = z.object({
     .refine((file) => file.size > 0, "File cannot be empty.")
     .refine(
       (file) => file.size <= MAX_FILE_SIZE_BYTES,
-      "File size must not exceed 5 MB."
+      "File size must not exceed 5 MB.",
     )
     .refine(
       (file) => ALLOWED_MIME_TYPES.includes(file.type as any),
-      `Invalid file format. Allowed formats: ${ALLOWED_MIME_TYPES.join(", ")}`
+      `Invalid file format. Allowed formats: ${ALLOWED_MIME_TYPES.join(", ")}`,
     ),
 });
 ```
@@ -256,12 +260,12 @@ Veap applications run seamlessly on both serverless infrastructure (such as Verc
 
 ### Architecture comparison
 
-| Capability | Serverless (Vercel) | Docker (Self-Hosted) |
-| :--- | :--- | :--- |
-| **Database engine** | Managed PostgreSQL (Neon, Supabase, RDS) with connection pooling. | PostgreSQL container or persistent volume SQLite. |
-| **File storage** | Cloud object storage (S3, Cloudflare R2, Vercel Blob). | Mounted volume or S3/R2 object storage. |
-| **Event bus** | In-process per invocation; use webhooks or queues for background tasks. | Persistent process; handles background tasks reliably. |
-| **Process lifespan** | Ephemeral; boots per cold-start. | Long-running Node.js process. |
+| Capability           | Serverless (Vercel)                                                     | Docker (Self-Hosted)                                   |
+| :------------------- | :---------------------------------------------------------------------- | :----------------------------------------------------- |
+| **Database engine**  | Managed PostgreSQL (Neon, Supabase, RDS) with connection pooling.       | PostgreSQL container or persistent volume SQLite.      |
+| **File storage**     | Cloud object storage (S3, Cloudflare R2, Vercel Blob).                  | Mounted volume or S3/R2 object storage.                |
+| **Event bus**        | In-process per invocation; use webhooks or queues for background tasks. | Persistent process; handles background tasks reliably. |
+| **Process lifespan** | Ephemeral; boots per cold-start.                                        | Long-running Node.js process.                          |
 
 ### Configuration for Vercel
 
@@ -404,10 +408,12 @@ describe("BlogPlugin integration test", () => {
       transaction(async () => {
         await Article.create({ title: "Temporary Post", status: "draft" });
         throw new Error("Simulated business logic failure");
-      })
+      }),
     ).rejects.toThrow("Simulated business logic failure");
 
-    const match = await Article.query().where("title", "Temporary Post").first();
+    const match = await Article.query()
+      .where("title", "Temporary Post")
+      .first();
     expect(match).toBeNull();
   });
 
@@ -415,12 +421,19 @@ describe("BlogPlugin integration test", () => {
     let capturedTitle = "";
     const subscriberId = "test-article-watcher";
 
-    eventBus.subscribe("model:created:articles", subscriberId, async (event) => {
-      const model = event.payload.model as Article;
-      capturedTitle = model.title;
-    });
+    eventBus.subscribe(
+      "model:created:articles",
+      subscriberId,
+      async (event) => {
+        const model = event.payload.model as Article;
+        capturedTitle = model.title;
+      },
+    );
 
-    await Article.create({ title: "Event Driven Article", status: "published" });
+    await Article.create({
+      title: "Event Driven Article",
+      status: "published",
+    });
 
     expect(capturedTitle).toBe("Event Driven Article");
     eventBus.unsubscribe("model:created:articles", subscriberId);
@@ -459,10 +472,7 @@ Include the migrations provided by `@veap/commentable` in your plugin manifest o
 import { commentableMigrations } from "@veap/commentable/migrations";
 import { createBlogPostsTable } from "./migrations/create_blog_posts";
 
-export const migrations = [
-  createBlogPostsTable,
-  ...commentableMigrations,
-];
+export const migrations = [createBlogPostsTable, ...commentableMigrations];
 ```
 
 ### 2. Compose traits onto your model
@@ -530,7 +540,7 @@ import { BlogPost } from "../models/BlogPost";
 
 export function PostDetail({ post, comments, currentUserId }: any) {
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="mx-auto max-w-3xl py-8">
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <div className="prose my-6">{post.content}</div>
 

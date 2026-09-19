@@ -1,4 +1,3 @@
-
 name: "Feature Request"
 description: "Propose a new feature or improvement for Veap"
 title: "[FEATURE]: "
@@ -126,4 +125,3 @@ body:
           required: true
         - label: I understand that the final implementation may differ from my proposal.
           required: true
-

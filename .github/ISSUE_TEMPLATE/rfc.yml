@@ -1,4 +1,3 @@
-
 name: "RFC / Architecture Proposal"
 description: "Propose a significant architectural, API, or framework-level change"
 title: "[RFC]: "
@@ -268,4 +267,3 @@ body:
           required: true
         - label: I understand that this RFC is a proposal for discussion, not an implementation requirement.
           required: true
-

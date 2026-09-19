@@ -39,15 +39,15 @@ extensions: [
 
 `ExtensionPoint` props:
 
-| Prop              | Type                | Default | Description                                                                |
-| ----------------- | ------------------- | ------- | -------------------------------------------------------------------------- |
-| `target`          | `string`            | —       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)       |
-| `point`           | `string`            | —       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`)     |
-| `props`           | `any`               | —       | Context object spread into each injected extension component               |
-| `className`       | `string`            | —       | CSS class names applied to the container wrapper element                   |
-| `as`              | `React.ElementType` | `"div"` | Wrapper element (e.g. `"section"`, `"ul"`, `"nav"`)                        |
-| `fallback`        | `React.ReactNode`   | `null`  | Rendered when no extensions match or when the user fails RBAC checks       |
-| `includeDisabled` | `boolean`           | `false` | Whether to include extensions from disabled plugins                        |
+| Prop              | Type                | Default | Description                                                            |
+| ----------------- | ------------------- | ------- | ---------------------------------------------------------------------- |
+| `target`          | `string`            | —       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)   |
+| `point`           | `string`            | —       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`) |
+| `props`           | `any`               | —       | Context object spread into each injected extension component           |
+| `className`       | `string`            | —       | CSS class names applied to the container wrapper element               |
+| `as`              | `React.ElementType` | `"div"` | Wrapper element (e.g. `"section"`, `"ul"`, `"nav"`)                    |
+| `fallback`        | `React.ReactNode`   | `null`  | Rendered when no extensions match or when the user fails RBAC checks   |
+| `includeDisabled` | `boolean`           | `false` | Whether to include extensions from disabled plugins                    |
 
 The alias `PluginExtensionPoint` is exported as an alternative name for `ExtensionPoint`.
 
@@ -60,7 +60,11 @@ The host view can pass dynamic domain context (such as the active model or form 
 import { ExtensionPoint } from "@veap/core/plugins/server";
 import { Post } from "@veap/core/database";
 
-export default async function EditPostPage({ params }: { params: { id: string } }) {
+export default async function EditPostPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const post = await Post.findOrFail(params.id);
 
   return (
@@ -96,9 +100,11 @@ interface SeoSidebarProps {
 
 export default function SeoSidebarBox({ post }: SeoSidebarProps) {
   return (
-    <div className="p-4 border rounded-lg bg-card">
-      <h3 className="font-semibold text-sm">SEO Analysis</h3>
-      <p className="text-xs text-muted-foreground">Slug: {post.slug || "None"}</p>
+    <div className="bg-card rounded-lg border p-4">
+      <h3 className="text-sm font-semibold">SEO Analysis</h3>
+      <p className="text-muted-foreground text-xs">
+        Slug: {post.slug || "None"}
+      </p>
     </div>
   );
 }
@@ -115,13 +121,14 @@ extensions: [
     target: "posts.edit",
     point: "sidebar",
     component: DangerZoneComponent,
-    roles: ["admin", "super-admin"],      // OR condition: user must have at least one role
-    permissions: ["posts:delete"],         // AND condition: user must have all listed permissions
+    roles: ["admin", "super-admin"], // OR condition: user must have at least one role
+    permissions: ["posts:delete"], // AND condition: user must have all listed permissions
   },
-]
+];
 ```
 
 When evaluating access:
+
 1. **Roles check**: If `roles` array is provided, the user must have **at least one** matching role (`roles.some(...)`).
 2. **Permissions check**: If `permissions` array is provided, the user must possess **all** listed permissions (`permissions.every(...)`).
 3. If the user does not satisfy the criteria, the extension is omitted from rendering. If all extensions are filtered out, the `fallback` prop is displayed.
@@ -129,6 +136,7 @@ When evaluating access:
 ### Priority and ordering
 
 Extensions and widgets are sorted ascending by their `priority` number:
+
 - Lower numbers render earlier: an extension with `priority: 10` renders above `priority: 50`.
 - Extensions without an explicit `priority` default to `100` and appear at the end.
 
@@ -170,7 +178,7 @@ import { ExtensionPointClient } from "@veap/core/plugins/client";
 
 export function RichTextEditorToolbar({ editor }: { editor: any }) {
   return (
-    <div className="flex items-center gap-2 p-2 border-b">
+    <div className="flex items-center gap-2 border-b p-2">
       {/* Core formatting buttons */}
       <button onClick={() => editor.toggleBold()}>Bold</button>
       <button onClick={() => editor.toggleItalic()}>Italic</button>
@@ -180,7 +188,7 @@ export function RichTextEditorToolbar({ editor }: { editor: any }) {
         target="editor"
         point="toolbar"
         props={{ editor }}
-        className="flex items-center gap-2 ml-auto"
+        className="ml-auto flex items-center gap-2"
       />
     </div>
   );

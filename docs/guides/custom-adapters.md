@@ -12,11 +12,11 @@ Defined in `@veap/core/storage`:
 
 ```ts
 export interface StorageData {
-  name: string;      // Unique identifier or filename
-  url: string;       // Publicly accessible URL
-  type: string;      // MIME type (e.g. "image/png")
-  size: number;      // Size in bytes
-  service: string;   // Provider ID (e.g. "s3")
+  name: string; // Unique identifier or filename
+  url: string; // Publicly accessible URL
+  type: string; // MIME type (e.g. "image/png")
+  size: number; // Size in bytes
+  service: string; // Provider ID (e.g. "s3")
   serviceId: string; // Remote bucket key/path for deletion
 }
 

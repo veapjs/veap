@@ -116,6 +116,7 @@ bunx veap eject @veap/minimal-template
 ```
 
 The CLI:
+
 1. Clones the template source repository into your local `templates/minimal-template` directory.
 2. Updates your root `package.json` dependency to `"workspace:*"`.
 3. Links the local template package via your package manager without registering it in `lib/plugins.gen.ts`.

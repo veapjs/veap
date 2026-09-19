@@ -186,7 +186,9 @@ export async function deletePostAction(postId: string) {
   }
 
   // 2. Authorize permissions
-  const security = await checkSecurity(session, user, undefined, ["posts:delete"]);
+  const security = await checkSecurity(session, user, undefined, [
+    "posts:delete",
+  ]);
   if (!security.satisfied) {
     throw AppError.Forbidden("You lack the 'posts:delete' permission.");
   }
@@ -220,10 +222,13 @@ const requirePostScope: ApiMiddleware = async (request, context, next) => {
   // Fallback to session check
   const permissions = context.permissions || [];
   if (!permissions.includes("posts:read")) {
-    return new Response(JSON.stringify({ error: "Forbidden: missing posts:read" }), {
-      status: 403,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: "Forbidden: missing posts:read" }),
+      {
+        status: 403,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
   }
 
   return await next();

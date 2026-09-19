@@ -299,9 +299,7 @@ const activeDiscussions = await Post.query()
   .get();
 
 // 3. Filter by absence (whereDoesntHave)
-const unassignedTags = await Tag.query()
-  .whereDoesntHave("posts")
-  .get();
+const unassignedTags = await Tag.query().whereDoesntHave("posts").get();
 
 // 4. Combined with OR conditions
 const featuredOrCommented = await Post.query()
@@ -320,7 +318,7 @@ const post = await Post.query()
   .first();
 
 console.log(post.comments); // Comment[]
-console.log(post.tags);     // Tag[]
+console.log(post.tags); // Tag[]
 
 // Eager load the polymorphic parent on comments (resolves to Post or Video)
 const comments = await Comment.query().with("commentable").limit(20).get();
@@ -361,14 +359,14 @@ export class Product extends Model<ProductAttributes> {
 
 ### Supported cast types
 
-| Cast Type   | Read Behavior                                                    | Write Behavior                                                     |
-| ----------- | ---------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `"json"`    | Automatically parses JSON strings into JS objects/arrays         | `JSON.stringify` automatically applied for SQLite and PostgreSQL   |
-| `"boolean"` | Converts `1`, `"1"`, `true`, `"true"` to boolean `true`          | Serializes to `1`/`0` on SQLite, boolean literal on PostgreSQL     |
-| `"datetime"`| Converts ISO strings and UNIX timestamps into native `Date`     | Formatted to ISO string for SQLite, native `Date` for PostgreSQL   |
-| `"date"`    | Converts date string or timestamp into native `Date`             | Date formatted ISO string for SQLite, native `Date` for PostgreSQL|
-| `"number"`  | Parses numeric strings into `number` (falls back if `NaN`)       | Numeric value passed directly to database driver                   |
-| `"string"`  | Converts primitives to string representation                     | String passed directly to database driver                          |
+| Cast Type    | Read Behavior                                               | Write Behavior                                                     |
+| ------------ | ----------------------------------------------------------- | ------------------------------------------------------------------ |
+| `"json"`     | Automatically parses JSON strings into JS objects/arrays    | `JSON.stringify` automatically applied for SQLite and PostgreSQL   |
+| `"boolean"`  | Converts `1`, `"1"`, `true`, `"true"` to boolean `true`     | Serializes to `1`/`0` on SQLite, boolean literal on PostgreSQL     |
+| `"datetime"` | Converts ISO strings and UNIX timestamps into native `Date` | Formatted to ISO string for SQLite, native `Date` for PostgreSQL   |
+| `"date"`     | Converts date string or timestamp into native `Date`        | Date formatted ISO string for SQLite, native `Date` for PostgreSQL |
+| `"number"`   | Parses numeric strings into `number` (falls back if `NaN`)  | Numeric value passed directly to database driver                   |
+| `"string"`   | Converts primitives to string representation                | String passed directly to database driver                          |
 
 Columns ending in `_count` (e.g. from `withCount`) are automatically cast to `number`.
 
@@ -381,7 +379,9 @@ Define local query shortcuts by prefixing static methods with `scope`:
 ```ts
 export class Post extends Model<PostAttributes> {
   static scopePublished(query: ModelQueryBuilder) {
-    return query.whereNotNull("published_at").where("published_at", "<=", new Date());
+    return query
+      .whereNotNull("published_at")
+      .where("published_at", "<=", new Date());
   }
 
   static scopePopular(query: ModelQueryBuilder, minViews = 100) {
@@ -531,7 +531,10 @@ import { transaction } from "@veap/core/database";
 import { Post } from "./models/post";
 import { Tag } from "./models/tag";
 
-export async function publishArticleWithTags(data: PostInput, tagNames: string[]) {
+export async function publishArticleWithTags(
+  data: PostInput,
+  tagNames: string[],
+) {
   return await transaction(async (trx) => {
     // 1. Create post (automatically joins active transaction)
     const post = await Post.create({
@@ -599,9 +602,7 @@ export function mixinCommentableQueryMethods<T extends any>(builder: T): T {
   return builder;
 }
 
-export function Commentable<TBase extends Constructor<Model>>(
-  Base: TBase,
-) {
+export function Commentable<TBase extends Constructor<Model>>(Base: TBase) {
   return class extends Base {
     static override query<M extends Model>(this: any): any {
       const q = (Base as any).query
@@ -638,10 +639,14 @@ export function Commentable<TBase extends Constructor<Model>>(
       comment.setAttribute("commentable_id", (this as any).id);
       comment.setAttribute("content", attributes.content);
       comment.setAttribute("status", attributes.status ?? "approved");
-      if (attributes.authorId) comment.setAttribute("author_id", attributes.authorId);
-      if (attributes.authorName) comment.setAttribute("author_name", attributes.authorName);
-      if (attributes.authorEmail) comment.setAttribute("author_email", attributes.authorEmail);
-      if (attributes.parentId) comment.setAttribute("parent_id", attributes.parentId);
+      if (attributes.authorId)
+        comment.setAttribute("author_id", attributes.authorId);
+      if (attributes.authorName)
+        comment.setAttribute("author_name", attributes.authorName);
+      if (attributes.authorEmail)
+        comment.setAttribute("author_email", attributes.authorEmail);
+      if (attributes.parentId)
+        comment.setAttribute("parent_id", attributes.parentId);
 
       await comment.save();
       return comment;
@@ -676,7 +681,7 @@ export interface BlogPostAttributes {
 }
 
 export class BlogPost extends Commentable(
-  Categorizable(Taggable(TranslatableModel<BlogPostAttributes>))
+  Categorizable(Taggable(TranslatableModel<BlogPostAttributes>)),
 ) {
   static override table = "blog_posts";
   static override morphAlias = "post"; // Decouples polymorphic foreign keys from table names
@@ -698,10 +703,7 @@ Once composed, all methods and relation queries from every applied trait are imm
 
 ```ts
 // 1. Querying with trait scopes and eager loading
-const posts = await BlogPost.query()
-  .withComments()
-  .whereHasComments()
-  .get();
+const posts = await BlogPost.query().withComments().whereHasComments().get();
 
 // 2. Interacting with instance methods added by traits
 const post = await BlogPost.findOrFail(postId);
@@ -766,7 +768,10 @@ export function Likeable<TBase extends Constructor<Model>>(Base: TBase) {
 
       const like = new Like();
       const morphClass = this.constructor as typeof Model;
-      like.setAttribute("likeable_type", morphClass.morphAlias || morphClass.table);
+      like.setAttribute(
+        "likeable_type",
+        morphClass.morphAlias || morphClass.table,
+      );
       like.setAttribute("likeable_id", (this as any).id);
       like.setAttribute("user_id", userId);
       await like.save();

@@ -54,15 +54,15 @@ Token conventions used by the framework: class tokens for concrete services, typ
 
 Every framework service that touches the outside world does so through a port bound to a token. Common ones:
 
-| Port              | Token                             | Registration Mechanism                                            | Default                      |
-| ----------------- | --------------------------------- | ----------------------------------------------------------------- | ---------------------------- |
-| Password hashing  | `PASSWORD_HASHER`                 | `container.register({ token: PASSWORD_HASHER, useClass })`       | bcrypt-based hasher          |
-| Token generation  | `TOKEN_GENERATOR`                 | `container.register({ token: TOKEN_GENERATOR, useClass })`       | oslo-based generator         |
-| Secret encryption | `SECRET_CIPHER`                   | `container.register({ token: SECRET_CIPHER, useClass })`          | AES-GCM cipher               |
-| Cookies / request | `COOKIE_STORE`, `REQUEST_CONTEXT` | Registered by Kernel provider                                     | Next.js request adapters     |
-| Mail transport    | `CUSTOM_MAILER`                   | `container.register({ token: CUSTOM_MAILER, useClass/useValue })` | `MAIL_TRANSPORT=smtp`        |
-| Storage           | `StorageService`                  | `storage.registerProvider(new MyStorageProvider())`               | `LocalFileProvider`          |
-| Cache             | `CACHE_PROVIDER`                  | `container.register({ token: CACHE_PROVIDER, useValue })`         | `MemoryCacheProvider`        |
+| Port              | Token                             | Registration Mechanism                                            | Default                  |
+| ----------------- | --------------------------------- | ----------------------------------------------------------------- | ------------------------ |
+| Password hashing  | `PASSWORD_HASHER`                 | `container.register({ token: PASSWORD_HASHER, useClass })`        | bcrypt-based hasher      |
+| Token generation  | `TOKEN_GENERATOR`                 | `container.register({ token: TOKEN_GENERATOR, useClass })`        | oslo-based generator     |
+| Secret encryption | `SECRET_CIPHER`                   | `container.register({ token: SECRET_CIPHER, useClass })`          | AES-GCM cipher           |
+| Cookies / request | `COOKIE_STORE`, `REQUEST_CONTEXT` | Registered by Kernel provider                                     | Next.js request adapters |
+| Mail transport    | `CUSTOM_MAILER`                   | `container.register({ token: CUSTOM_MAILER, useClass/useValue })` | `MAIL_TRANSPORT=smtp`    |
+| Storage           | `StorageService`                  | `storage.registerProvider(new MyStorageProvider())`               | `LocalFileProvider`      |
+| Cache             | `CACHE_PROVIDER`                  | `container.register({ token: CACHE_PROVIDER, useValue })`         | `MemoryCacheProvider`    |
 
 Bind before providers boot - the safest place is a custom provider listed in `withProviders`, or an explicit `container.register(...)` right after `Application.configure().create()` and before `bootstrap()`:
 
