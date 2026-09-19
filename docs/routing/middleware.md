@@ -40,6 +40,30 @@ export const requireEarlyAccess: VeapMiddleware = async (ctx, next) => {
 };
 ```
 
+### Execution pipeline order
+
+Middlewares are assembled in a deterministic hierarchy and executed sequentially. Any middleware can abort the chain early by returning a redirect or error boundary:
+
+```mermaid
+flowchart TD
+    Req(["Matched Route"]) --> Prepended{"Route/Layout requires<br/>auth, roles, or permissions?"}
+    Prepended -- "Yes" --> EnsuredAuth["EnsuredAuth<br/>(Verifies session & checkSecurity)"]
+    Prepended -- "No (or SkipSecurity)" --> RootLayoutMW
+
+    EnsuredAuth -- "Unauthorized / Forbidden" --> RedirectLogin(["HTTP Redirect (/signin)"])
+    EnsuredAuth -- "Authorized" --> RootLayoutMW["Root Layout Middlewares<br/>(Outermost layout)"]
+
+    RootLayoutMW -- "Short-circuit" --> ExitMW(["Custom Response / Redirect"])
+    RootLayoutMW -- "next()" --> NestedLayoutMW["Nested Layout Middlewares<br/>(Inner layouts)"]
+
+    NestedLayoutMW -- "Short-circuit" --> ExitMW
+    NestedLayoutMW -- "next()" --> RouteMW["Route-level Middlewares<br/>(Defined in page.tsx)"]
+
+    RouteMW -- "Short-circuit" --> ExitMW
+    RouteMW -- "next()" --> PageRender["Render Page Component<br/>(Wrap with Layouts & Boundaries)"]
+    PageRender --> FinalUI(["Rendered HTML"])
+```
+
 Properties:
 
 - Signature `(context, next) => Promise<React.ReactNode>`.

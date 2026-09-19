@@ -9,13 +9,27 @@ For `API requests` the same idea applies: `app/api/[...catchAll]/route.ts` forwa
 
 ## How URLs are resolved
 
-```text
-GET /tasks/42
-  -> Next.js checks physical pages (app/**) first; none matches
-  -> app/[[...catchAll]]/page.tsx runs
-       path = "/tasks/42"
-       tree = buildRouteTree(true)   // merge all enabled plugin trees
-       VeapRouter matches, runs middlewares, renders
+The routing pipeline resolves URLs by prioritizing physical Next.js files and delegating unmatched routes to the virtual router:
+
+```mermaid
+flowchart TD
+    Req(["Incoming Request: GET /tasks/42"]) --> NextCheck{"Physical file in<br/>app/ directory?"}
+
+    NextCheck -- "Yes" --> ServeNative["Serve physical Next.js page<br/>(Physical routes take priority)"]
+    ServeNative --> ResNative(["HTML Response"])
+
+    NextCheck -- "No" --> CatchAll["Invoke app/[[...catchAll]]/page.tsx"]
+    CatchAll --> CacheCheck{"Route tree in<br/>memory cache?"}
+
+    CacheCheck -- "Hit" --> CachedTree["Use cached RouteTree"]
+    CacheCheck -- "Miss" --> BuildTree["buildRouteTree(true)<br/>Merge route trees from enabled plugins<br/>Resolve [prefix] magic segment"]
+    BuildTree --> SaveCache["Cache merged tree in ICacheProvider"]
+    SaveCache --> CachedTree
+
+    CachedTree --> Match["VeapRouter.match('/tasks/42')"]
+    Match --> Pipe["Execute collected Middleware Pipeline"]
+    Pipe --> RenderRSC["Render matched Plugin Page & Layouts"]
+    RenderRSC --> ResVirtual(["Rendered Response"])
 ```
 
 `buildRouteTree(includePrivate)` merges the `routeTree` of every enabled plugin. Plugin routes whose segments start with the `[prefix]` magic segment are placed under the configured private path (`privatePath` in `veap.config.ts`, default `/app`). The merged tree is cached in the framework cache in production and invalidated when plugins toggle.

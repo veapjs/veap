@@ -1,8 +1,53 @@
 # RBAC (roles and permissions)
 
-Veap's RBAC is simple and explicit: users get roles, roles get permissions, users can also have direct permissions. Checks require "at least one role" and "all permissions".
+Veap provides a role-based access control (RBAC) engine that evaluates roles and permissions for both UI presentation and backend mutations. Checks require "at least one role" and "all permissions".
 
 ## Data model
+
+The RBAC data layer is fully relational and supports both role-based inheritance and direct user permission overrides:
+
+```mermaid
+erDiagram
+    USERS ||--o{ USERS_TO_ROLES : "assigned"
+    ROLES ||--o{ USERS_TO_ROLES : "belongs_to"
+    ROLES ||--o{ ROLES_TO_PERMISSIONS : "grants"
+    PERMISSIONS ||--o{ ROLES_TO_PERMISSIONS : "included_in"
+    USERS ||--o{ USERS_TO_PERMISSIONS : "direct_grant"
+    PERMISSIONS ||--o{ USERS_TO_PERMISSIONS : "granted_to"
+
+    USERS {
+        uuid id PK
+        string email
+        string name
+    }
+
+    ROLES {
+        string id PK
+        string name
+        string description
+    }
+
+    PERMISSIONS {
+        string id PK
+        string name
+        string description
+    }
+
+    USERS_TO_ROLES {
+        uuid user_id FK
+        string role_id FK
+    }
+
+    ROLES_TO_PERMISSIONS {
+        string role_id FK
+        string permission_id FK
+    }
+
+    USERS_TO_PERMISSIONS {
+        uuid user_id FK
+        string permission_id FK
+    }
+```
 
 Tables created by core migrations:
 

@@ -94,6 +94,29 @@ export default myPlugin;
 
 ## Registration and lifecycle
 
+The following diagram illustrates how plugins are discovered, verified against the database, and initialized during application bootstrap:
+
+```mermaid
+flowchart TD
+    CLI["1. CLI & Package Discovery<br/>(veap add / lib/plugins.gen.ts)"] --> AppConfig["2. Application.configure().withPlugins(...)"]
+    AppConfig --> Registry["3. PluginRegistry.register()<br/>Registers root and nested plugins"]
+
+    Registry --> DBSync["4. Database Synchronization<br/>Seed and fetch status from 'plugins' table"]
+    DBSync --> DepSort["5. Topological Dependency Sorting<br/>Resolve dependencies & validate cycles"]
+
+    DepSort --> FilterEnabled{"Is plugin enabled?"}
+    FilterEnabled -- "No" --> Skipped(["Keep dormant in registry"])
+
+    FilterEnabled -- "Yes" --> RunMigrations["Run plugin migrations (if present)"]
+    RunMigrations --> CheckInstalled{"Is plugin already<br/>installed in DB?"}
+
+    CheckInstalled -- "No (First run)" --> RunInstallHooks["Execute onMigrate() & onEnable()<br/>Update installed = true in DB"]
+    CheckInstalled -- "Yes" --> RunInit
+
+    RunInstallHooks --> RunInit["Execute init()<br/>Bind listeners, morph aliases, ports"]
+    RunInit --> Ready(["Plugin Ready & Active"])
+```
+
 1. The CLI writes plugin imports into `lib/plugins.gen.ts` (`veap add`, `veap make:plugin`, `veap register`).
 2. The application builder passes the array to `.withPlugins(plugins)`.
 3. `PluginServiceProvider` registers every plugin into the `PluginRegistry` (nested `plugins` too), syncs their ids into the `plugins` DB table, loads enabled/installed state from the DB, and sorts by dependencies (system plugins first; circular dependencies throw).

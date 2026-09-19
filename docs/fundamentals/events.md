@@ -10,6 +10,34 @@ Veap provides an in-process publish/subscribe event bus designed for decoupled c
 
 The event bus coordinates operations within the current Node.js or browser runtime. It adheres to several core execution principles:
 
+The following diagram illustrates how events are published, dispatched concurrently across subscribers, and isolated from handler failures:
+
+```mermaid
+flowchart TD
+    Pub(["eventBus.publish(type, payload, source)"]) --> Env["Wrap into SystemEvent envelope<br/>{ type, payload, timestamp, source }"]
+    Env --> Lookup{"Subscribers registered<br/>for event type?"}
+
+    Lookup -- "No subscribers" --> Done(["Completed (No-op)"])
+    Lookup -- "Subscribers found" --> Concurrent["Execute handlers concurrently via Promise.all"]
+
+    Concurrent --> H1["Subscriber A"]
+    Concurrent --> H2["Subscriber B"]
+    Concurrent --> H3["Subscriber C"]
+
+    H1 --> Catch1{"Threw error?"}
+    H2 --> Catch2{"Threw error?"}
+    H3 --> Catch3{"Success"}
+
+    Catch1 -- "NEXT_REDIRECT" --> Rethrow1(["Rethrow error to trigger Next.js redirect"])
+    Catch1 -- "Standard Error" --> Log1["Log warning via ILogger<br/>(Does not abort sibling handlers)"]
+
+    Catch2 -- "Standard Error" --> Log2["Log warning via ILogger"]
+    Catch3 --> Complete(["All handlers settled"])
+
+    Log1 --> Complete
+    Log2 --> Complete
+```
+
 - **Idempotent subscription:** Calling `eventBus.subscribe(type, subscriberId, handler)` multiple times with the identical `subscriberId` for the same event type is a no-op. This avoids duplicated listeners during hot module reloading (HMR) or multi-pass plugin initializations.
 - **Concurrent handler execution:** Handlers execute concurrently via `Promise.all`. An unhandled rejection in one listener does not prevent subsequent listeners from executing; the error is caught and logged to the logger port.
 - **Next.js redirect support:** If a listener throws a Next.js navigation error (`NEXT_REDIRECT`), the bus preserves and rethrows it so server actions and router pipelines redirect as expected.
