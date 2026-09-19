@@ -280,6 +280,7 @@ console.log(post.tags); // Tag[]
 const comment = await Comment.query().with("commentable").first();
 
 console.log(comment.commentable); // Post or Video instance!
+```
 
 ### 4. Querying and filtering by relations
 

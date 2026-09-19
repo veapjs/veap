@@ -91,7 +91,7 @@ All mailables and `sendMail` calls route through your adapter. The same approach
 
 <!-- prettier-ignore -->
 > [!TIP]
-> For a full, copy-pasteable Resend and Postmark integration, see the [Custom service adapters guide](../guides/custom-adapters.md#2-custom-mail-transport-resend--postmark).
+> For a full, copy-pasteable Resend and Postmark integration, see the [Custom service adapters guide](../guides/custom-adapters.md#2-custom-mail-transport-resend-postmark).
 
 ## Environment variables
 

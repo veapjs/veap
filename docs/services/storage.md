@@ -70,7 +70,7 @@ storage.setDefaultProvider("s3"); // optional; first non-local registration beco
 
 <!-- prettier-ignore -->
 > [!TIP]
-> For a full, production-ready S3 and Cloudflare R2 implementation using `@aws-sdk/client-s3`, see the [Custom service adapters guide](../guides/custom-adapters.md#1-custom-storage-provider-s3--cloudflare-r2).
+> For a full, production-ready S3 and Cloudflare R2 implementation using `@aws-sdk/client-s3`, see the [Custom service adapters guide](../guides/custom-adapters.md#1-custom-storage-provider-s3-cloudflare-r2).
 
 ## The local provider
 
