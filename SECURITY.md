@@ -14,11 +14,11 @@ This Security Policy explains how to report security vulnerabilities affecting V
 
 Security fixes are generally provided for actively maintained versions of Veap.
 
-| Version | Security Support |
-| :--- | :--- |
-| Latest stable release | Supported |
+| Version                     | Security Support          |
+| :-------------------------- | :------------------------ |
+| Latest stable release       | Supported                 |
 | Previous maintained release | Supported when applicable |
-| Older releases | Not guaranteed |
+| Older releases              | Not guaranteed            |
 
 Users are encouraged to keep Veap and its dependencies up to date.
 

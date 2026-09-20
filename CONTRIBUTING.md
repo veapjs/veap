@@ -377,21 +377,27 @@ Pull requests should be focused and reviewable.
 A good pull request should explain:
 
 ### What changed?
+
 Describe the implementation.
 
 ### Why?
+
 Explain the problem being solved.
 
 ### How?
+
 Describe important implementation decisions.
 
 ### Testing
+
 Explain how the change was tested.
 
 ### Breaking changes
+
 Clearly identify any breaking changes.
 
 ### Related issues
+
 Link related issues or RFCs.
 
 Avoid submitting large pull requests containing unrelated changes.
