@@ -1,3 +1,12 @@
+---
+title: "Authentication & Security"
+description: "Sessions, users, roles & permissions (RBAC), and crypto ports built into the framework."
+status: "Stable"
+category: "Authentication & Security"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Authentication
 
 Veap ships a complete session-based authentication system in `@veap/core`. It covers sign-in/sign-up, sessions with server-side validation, email verification, password reset with recovery codes, RBAC (roles and permissions), and extension points that 2FA plugins use.

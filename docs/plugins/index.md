@@ -1,3 +1,12 @@
+---
+title: "Plugin Architecture"
+description: "Isolated, composable packages providing routes, widgets, models, migrations, and lifecycle hooks."
+status: "Stable"
+category: "Plugins & Templates"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Plugins
 
 A plugin is a package that adds a capability to a Veap application: routes, pages, widgets, navigation, models and migrations, translations, event handlers. Plugins are isolated packages; they do not import each other's internals. They interact through the public API of `@veap/core`, the event bus, and (deliberately) each other's public exports.

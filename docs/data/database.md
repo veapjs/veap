@@ -1,3 +1,12 @@
+---
+title: "Database Connection"
+description: "Knex query engine integration, SQLite and PostgreSQL drivers, and scoped connection management."
+status: "Stable"
+category: "Data & ORM"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Database overview
 
 Veap uses Knex as the query engine, with two client targets: `better-sqlite3` for SQLite and `pg` for PostgreSQL. On top of Knex it provides an ActiveRecord-style ORM (the `Model` class), a schema builder for migrations, and a scoped transaction mechanism.

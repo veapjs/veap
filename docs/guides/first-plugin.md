@@ -1,3 +1,12 @@
+---
+title: "Your First Plugin"
+description: "Step-by-step tutorial: scaffold, register routes, render widgets, and persist data."
+status: "New"
+category: "Guides & Cookbook"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Your first plugin
 
 This guide builds a working plugin step by step: scaffold it, register a route, render a page, add a widget, and persist data. It uses only APIs documented in the [plugins chapter](../plugins/index.md) and the [reference](../reference/entry-points.md).
@@ -107,7 +116,7 @@ Expose a widget that dashboard areas can render:
 ```tsx
 // plugins/notes-plugin/src/ui/recent-notes-widget.tsx
 export default async function RecentNotesWidget() {
-  return <section className="rounded border p-4">Latest notes</section>;
+  return <section className="p-4 border rounded">Latest notes</section>;
 }
 ```
 

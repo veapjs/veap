@@ -1,3 +1,12 @@
+---
+title: "Real-World Cookbook"
+description: "Production-ready recipes for gate plugins, custom storage adapters, multi-tenant isolation, and auditing."
+status: "Stable"
+category: "Guides & Cookbook"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Real-world cookbook
 
 The Veap cookbook provides production-ready recipes for common architecture, security, and infrastructure requirements. Each recipe includes tested, end-to-end code samples adhering to framework conventions.
@@ -82,7 +91,7 @@ export const middlewares = [SkipSecurity, EnsuredUser];
 export default function OnboardingPage() {
   return (
     <div className="mx-auto max-w-md p-8">
-      <h1 className="mb-4 text-2xl font-bold">Complete your account setup</h1>
+      <h1 className="text-2xl font-bold mb-4">Complete your account setup</h1>
       <p className="text-muted-foreground mb-6">
         Please enter your company name and role to finish setting up your
         workspace.
@@ -98,13 +107,13 @@ export default function OnboardingPage() {
             name="company"
             type="text"
             required
-            className="mt-1 w-full rounded border px-3 py-2"
+            className="w-full border rounded px-3 py-2 mt-1"
           />
         </div>
 
         <button
           type="submit"
-          className="bg-primary w-full rounded py-2 font-medium text-white"
+          className="w-full bg-primary text-white py-2 rounded font-medium"
         >
           Finish Onboarding
         </button>
@@ -540,7 +549,7 @@ import { BlogPost } from "../models/BlogPost";
 
 export function PostDetail({ post, comments, currentUserId }: any) {
   return (
-    <article className="mx-auto max-w-3xl py-8">
+    <article className="max-w-3xl mx-auto py-8">
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <div className="prose my-6">{post.content}</div>
 

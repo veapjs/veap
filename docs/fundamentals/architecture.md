@@ -1,3 +1,12 @@
+---
+title: "Architecture Overview"
+description: "How Veap integrates with Next.js App Router, manages lifecycle boot, and dispatches requests."
+status: "Stable"
+category: "Fundamentals"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Architecture
 
 Veap runs inside a Next.js App Router application. Next.js keeps doing what it does: static files, its own `app/` routes, React Server Components, Server Actions. Veap adds an application layer on top, in the request path and at boot time.

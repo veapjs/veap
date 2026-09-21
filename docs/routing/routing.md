@@ -1,3 +1,12 @@
+---
+title: "Virtual Routing System"
+description: "How Veap combines native Next.js App Router with a dynamic plugin route tree."
+status: "Stable"
+category: "Routing & Layouts"
+author: "Veap Core Team"
+lastUpdated: "2026-03"
+---
+
 # Routing
 
 Veap has two cooperating routing layers:
