@@ -175,7 +175,7 @@ export async function VeapRouter({
     }
   }
 
-  // 4. Prepend EnsuredAuth if any auth requirements exist — unless the route
+  // 4. Prepend EnsuredAuth if any auth requirements exist - unless the route
   //    explicitly opted out with SkipSecurity (marker middleware). This lets
   //    gate pages (onboarding, 2FA setup, ...) live under a protected layout
   //    without their own security requirement redirecting onto themselves.

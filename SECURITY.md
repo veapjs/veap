@@ -234,4 +234,4 @@ General: [hello@veap.dev](mailto:hello@veap.dev)
 
 Please use the security address for vulnerability reports rather than public GitHub issues.
 
-Veap — Open-source framework for modern web applications.
+Veap - Open-source framework for modern web applications.

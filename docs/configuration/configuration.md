@@ -32,7 +32,7 @@ Every option:
 | `intl.default`  | `string`   | `"en"`                                                                                                                    | fallback locale                                                                                                                      |
 | `intl.locales`  | `string[]` | `["en", "de", "fr", "es", "it", "ja", "ko", "pt", "ru", "zh"]` per the core type comment; the intl constants use `["en"]` | supported locales (see note below)                                                                                                   |
 | `intl.timeZone` | `string`   | `"UTC"`                                                                                                                   | default time zone for date and relative-time formatting                                                                              |
-| `debug`         | `boolean`  | —                                                                                                                         | declared for application use; the framework's own debug logging is driven by `NODE_ENV`/`DEBUG` instead                              |
+| `debug`         | `boolean`  | -                                                                                                                         | declared for application use; the framework's own debug logging is driven by `NODE_ENV`/`DEBUG` instead                              |
 
 Note on `intl.locales`: the default in `domain/config` documents a broad list, while the intl module's own `DEFAULT_INTL_CONFIG` uses `["en"]`. Because the merge is `{ ...DEFAULT_CONFIG, ...loadedConfig }` per key, always set `locales` explicitly in your config; do not rely on either default.
 

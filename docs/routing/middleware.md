@@ -108,7 +108,7 @@ export const permissions = ["posts:edit"]; // user must have all
 
 Collection rules: requirements from the whole layout chain and the matched node are merged (closest-to-leaf values win when the node defines its own). If anything is collected, `EnsuredAuth`/`ApiEnsuredAuth` is inserted automatically; you rarely add them by hand.
 
-The underlying check is `checkSecurity(session, user, roles, permissions, fallbackRedirect, path)` from `@veap/core/auth/server`, which also consults registered [security requirements](../auth/extensibility.md) (for example "2FA setup required" or "email not verified"). On failure it returns `{ satisfied: false, redirect }`, and the middleware redirects (pages) or returns 401 (API). Always forward the current path (`x-pathname` from the proxy) when calling `checkSecurity` from a layout component — path-blind call sites break path-aware requirements and can cause redirect loops. See [Gate plugins](../guides/gate-plugins.md) for the complete pattern.
+The underlying check is `checkSecurity(session, user, roles, permissions, fallbackRedirect, path)` from `@veap/core/auth/server`, which also consults registered [security requirements](../auth/extensibility.md) (for example "2FA setup required" or "email not verified"). On failure it returns `{ satisfied: false, redirect }`, and the middleware redirects (pages) or returns 401 (API). Always forward the current path (`x-pathname` from the proxy) when calling `checkSecurity` from a layout component - path-blind call sites break path-aware requirements and can cause redirect loops. See [Gate plugins](../guides/gate-plugins.md) for the complete pattern.
 
 ## Execution order summary
 

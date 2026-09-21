@@ -1,10 +1,10 @@
 # Gate plugins: blocking routes until a condition is met
 
-A gate is a plugin that blocks access to protected routes until the user satisfies some condition: completed onboarding, accepted terms, verified a second factor, paid an invoice. This guide assembles the pieces — security requirement, `SkipSecurity`, path exemption and lifecycle hooks — into one working pattern. For the underlying auth extension points see [Extending authentication](../auth/extensibility.md); for middleware semantics see [Middleware](../routing/middleware.md).
+A gate is a plugin that blocks access to protected routes until the user satisfies some condition: completed onboarding, accepted terms, verified a second factor, paid an invoice. This guide assembles the pieces - security requirement, `SkipSecurity`, path exemption and lifecycle hooks - into one working pattern. For the underlying auth extension points see [Extending authentication](../auth/extensibility.md); for middleware semantics see [Middleware](../routing/middleware.md).
 
 ## When to reach for a gate
 
-Use a gate when the condition is **account-level** (a property of the user, not of a specific page) and **transient** (once satisfied, it never applies again): onboarding, 2FA enrollment, terms acceptance. If the condition is page-specific ("this page requires a paid plan"), use `roles`/`permissions` or route middleware instead — do not model per-page logic as a global requirement.
+Use a gate when the condition is **account-level** (a property of the user, not of a specific page) and **transient** (once satisfied, it never applies again): onboarding, 2FA enrollment, terms acceptance. If the condition is page-specific ("this page requires a paid plan"), use `roles`/`permissions` or route middleware instead - do not model per-page logic as a global requirement.
 
 ## The four pieces
 
@@ -61,7 +61,7 @@ The requirement receives the request path as its third argument (`(session, user
 
 ## Step 2: exempt the gate pages from inherited protection
 
-Panel layouts usually declare `auth = true`, and `collectAuthRequirements` merges that into every nested route. A gate page nested under such a layout would inherit `EnsuredAuth` — and with an active gate that means redirecting onto itself. Opt out on the page module:
+Panel layouts usually declare `auth = true`, and `collectAuthRequirements` merges that into every nested route. A gate page nested under such a layout would inherit `EnsuredAuth` - and with an active gate that means redirecting onto itself. Opt out on the page module:
 
 ```tsx
 // app/[prefix]/onboarding/page.tsx
@@ -84,7 +84,7 @@ export default async function OnboardingPage() {
 
 ## Step 3: make path-blind call sites path-aware
 
-Any component that calls `checkSecurity` directly (typically a protected layout) is **path-blind** unless it forwards a path: the requirement then cannot recognize gate pages and redirects onto them — an infinite layout loop, because the layout renders for the target page too. Forward the proxy's `x-pathname` header:
+Any component that calls `checkSecurity` directly (typically a protected layout) is **path-blind** unless it forwards a path: the requirement then cannot recognize gate pages and redirects onto them - an infinite layout loop, because the layout renders for the target page too. Forward the proxy's `x-pathname` header:
 
 ```tsx
 // plugins/panel-plugin/src/app/[prefix]/layout.tsx
@@ -124,7 +124,7 @@ onDisable: async () => {
 },
 ```
 
-Subscribe to `system:auth:email-verified` (not only `system:auth:signup`) — OAuth signups skip the password signup event, and the gate should engage exactly when the user can actually sign in.
+Subscribe to `system:auth:email-verified` (not only `system:auth:signup`) - OAuth signups skip the password signup event, and the gate should engage exactly when the user can actually sign in.
 
 ## Landing the user on the gate after verification
 
@@ -148,7 +148,7 @@ hooks: [
 ],
 ```
 
-The handler receives the current target as the first argument and a context (`{ userId, email }`) as the second; return the target unchanged when the gate does not apply. Only enabled plugins' hooks run — keep the plugin enabled via the plugin manager for the hook to take effect.
+The handler receives the current target as the first argument and a context (`{ userId, email }`) as the second; return the target unchanged when the gate does not apply. Only enabled plugins' hooks run - keep the plugin enabled via the plugin manager for the hook to take effect.
 
 ## Checklist
 

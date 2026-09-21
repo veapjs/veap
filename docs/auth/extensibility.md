@@ -77,9 +77,9 @@ registerSessionAugmenter(async (session) => ({
 
 Plugins must not hash or encrypt ad hoc. Inject the ports:
 
-- `IPasswordHasher` (`PASSWORD_HASHER`): `hash`, `verify`, `validateStrength` — used by the action-confirm plugin to re-verify passwords.
+- `IPasswordHasher` (`PASSWORD_HASHER`): `hash`, `verify`, `validateStrength` - used by the action-confirm plugin to re-verify passwords.
 - `ITokenGenerator` (`TOKEN_GENERATOR`): `generateOtp`, `generateRecoveryCode`, `generateSessionToken`, `hashToken`.
-- `ISecretCipher` (`SECRET_CIPHER`): `encrypt` / `decryptToString` — used to store TOTP secrets and passkey material.
+- `ISecretCipher` (`SECRET_CIPHER`): `encrypt` / `decryptToString` - used to store TOTP secrets and passkey material.
 
 Resolve them with `app(IPasswordHasher)` etc., or register replacements for the whole application.
 
@@ -87,7 +87,7 @@ Resolve them with `app(IPasswordHasher)` etc., or register replacements for the 
 
 1. User enables 2FA; the plugin stores its secret encrypted via `SECRET_CIPHER`, registers a session augmenter and an auth validator.
 2. At login, the validator returns `CHALLENGE_REQUIRED` with its type and a `tempToken`.
-3. The plugin's challenge page verifies the code (its own API route), then calls `finalizeLogin(userId, flags)` — the exported auth action — which creates the session and publishes `system:auth:session-created`.
+3. The plugin's challenge page verifies the code (its own API route), then calls `finalizeLogin(userId, flags)` - the exported auth action - which creates the session and publishes `system:auth:session-created`.
 4. The session's flags let the security requirement allow subsequent requests.
 
 ## Registration timing

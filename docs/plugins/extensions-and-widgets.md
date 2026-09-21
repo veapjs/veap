@@ -41,10 +41,10 @@ extensions: [
 
 | Prop              | Type                | Default | Description                                                            |
 | ----------------- | ------------------- | ------- | ---------------------------------------------------------------------- |
-| `target`          | `string`            | —       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)   |
-| `point`           | `string`            | —       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`) |
-| `props`           | `any`               | —       | Context object spread into each injected extension component           |
-| `className`       | `string`            | —       | CSS class names applied to the container wrapper element               |
+| `target`          | `string`            | -       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)   |
+| `point`           | `string`            | -       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`) |
+| `props`           | `any`               | -       | Context object spread into each injected extension component           |
+| `className`       | `string`            | -       | CSS class names applied to the container wrapper element               |
 | `as`              | `React.ElementType` | `"div"` | Wrapper element (e.g. `"section"`, `"ul"`, `"nav"`)                    |
 | `fallback`        | `React.ReactNode`   | `null`  | Rendered when no extensions match or when the user fails RBAC checks   |
 | `includeDisabled` | `boolean`           | `false` | Whether to include extensions from disabled plugins                    |

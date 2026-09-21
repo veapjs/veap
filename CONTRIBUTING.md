@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to Veap.
 
-Veap is a free and open-source framework for building modern web applications. Contributions of all kinds are welcome — from bug fixes and documentation improvements to new features, modules, tooling, and architectural proposals.
+Veap is a free and open-source framework for building modern web applications. Contributions of all kinds are welcome - from bug fixes and documentation improvements to new features, modules, tooling, and architectural proposals.
 
 This guide explains how to contribute effectively and how the project is organized.
 
@@ -510,4 +510,4 @@ Whether you submit a small documentation fix, report a bug, improve performance,
 
 Thank you for contributing to Veap.
 
-Veap — Open-source framework for modern web applications.
+Veap - Open-source framework for modern web applications.
