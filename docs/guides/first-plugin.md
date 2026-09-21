@@ -116,7 +116,7 @@ Expose a widget that dashboard areas can render:
 ```tsx
 // plugins/notes-plugin/src/ui/recent-notes-widget.tsx
 export default async function RecentNotesWidget() {
-  return <section className="p-4 border rounded">Latest notes</section>;
+  return <section className="rounded border p-4">Latest notes</section>;
 }
 ```
 

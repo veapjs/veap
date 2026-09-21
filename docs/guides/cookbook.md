@@ -91,7 +91,7 @@ export const middlewares = [SkipSecurity, EnsuredUser];
 export default function OnboardingPage() {
   return (
     <div className="mx-auto max-w-md p-8">
-      <h1 className="text-2xl font-bold mb-4">Complete your account setup</h1>
+      <h1 className="mb-4 text-2xl font-bold">Complete your account setup</h1>
       <p className="text-muted-foreground mb-6">
         Please enter your company name and role to finish setting up your
         workspace.
@@ -107,13 +107,13 @@ export default function OnboardingPage() {
             name="company"
             type="text"
             required
-            className="w-full border rounded px-3 py-2 mt-1"
+            className="mt-1 w-full rounded border px-3 py-2"
           />
         </div>
 
         <button
           type="submit"
-          className="w-full bg-primary text-white py-2 rounded font-medium"
+          className="bg-primary w-full rounded py-2 font-medium text-white"
         >
           Finish Onboarding
         </button>
@@ -549,7 +549,7 @@ import { BlogPost } from "../models/BlogPost";
 
 export function PostDetail({ post, comments, currentUserId }: any) {
   return (
-    <article className="max-w-3xl mx-auto py-8">
+    <article className="mx-auto max-w-3xl py-8">
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <div className="prose my-6">{post.content}</div>
 
