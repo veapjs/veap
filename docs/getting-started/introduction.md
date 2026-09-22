@@ -26,8 +26,8 @@ Veap (`@veap/framework`) is a single npm package with several entry points. The 
 
 Because Veap distinguishes between server-only and client-safe code, the package exposes several entry points instead of one barrel. The ones you will use most:
 
-| Entry point        | Import path                                       | Use it for                                                   |
-| ------------------ | ------------------------------------------------- | ------------------------------------------------------------ |
+| Entry point        | Import path                                            | Use it for                                                   |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------------------------ |
 | Core (client-safe) | `@veap/framework/core`                                 | `AppError`, `eventBus`, logging helpers, config types        |
 | Core (server)      | `@veap/framework/core/server`                          | `Application`, `container`, `app()`, providers               |
 | Auth (client-safe) | `@veap/framework/auth`                                 | validation schemas, auth types, ports                        |

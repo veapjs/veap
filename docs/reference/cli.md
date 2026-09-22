@@ -12,10 +12,10 @@ npx veap <command> [options]
 
 ## Global options
 
-| Flag            | Description                                     |
-| --------------- | ----------------------------------------------- |
-| `-h, --help`    | Display help for the CLI or a specific command. |
-| `-v, --version` | Output the current version of `@veap/framework`.     |
+| Flag            | Description                                      |
+| --------------- | ------------------------------------------------ |
+| `-h, --help`    | Display help for the CLI or a specific command.  |
+| `-v, --version` | Output the current version of `@veap/framework`. |
 
 ## Commands
 

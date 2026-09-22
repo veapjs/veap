@@ -573,7 +573,11 @@ A standard Veap trait consists of three components:
 Here is how `@veap/commentable` implements the `Commentable` trait:
 
 ```ts
-import { Model, ModelQueryBuilder, type MorphMany } from "@veap/framework/database";
+import {
+  Model,
+  ModelQueryBuilder,
+  type MorphMany,
+} from "@veap/framework/database";
 import { Comment } from "../models/Comment";
 
 export type Constructor<T = {}> = new (...args: any[]) => T;

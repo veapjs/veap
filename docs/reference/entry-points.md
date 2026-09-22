@@ -4,8 +4,8 @@ This reference lists the public API of `@veap/framework` 0.11.x, organized by en
 
 ## Entry points
 
-| Import path                                                     | Safe in client components | Purpose                                                     |
-| --------------------------------------------------------------- | ------------------------- | ----------------------------------------------------------- |
+| Import path                                                          | Safe in client components | Purpose                                                     |
+| -------------------------------------------------------------------- | ------------------------- | ----------------------------------------------------------- |
 | `@veap/framework`                                                    | yes                       | client-safe core: errors, events, logging, config service   |
 | `@veap/framework/core`                                               | yes                       | alias of the root entry                                     |
 | `@veap/framework/core/server`                                        | no                        | server core: Application, container, providers, CLI service |
@@ -256,7 +256,11 @@ Engine (pure, testable):
 React:
 
 ```tsx
-import { VeapRouter, RouterErrorBoundary, withRouter } from "@veap/framework/router";
+import {
+  VeapRouter,
+  RouterErrorBoundary,
+  withRouter,
+} from "@veap/framework/router";
 ```
 
 API layer (server):

@@ -33,8 +33,8 @@ export default async function Page() {
 
 This matters more than in plain Next.js, because Veap's server entry points import `server-only` modules (the container, the ORM, adapters):
 
-| Needs                                                        | Import from                         |
-| ------------------------------------------------------------ | ----------------------------------- |
+| Needs                                                        | Import from                              |
+| ------------------------------------------------------------ | ---------------------------------------- |
 | Session, users, RBAC facades and actions                     | `@veap/framework/auth/server`            |
 | Types, validation schemas, ports (client-safe)               | `@veap/framework/auth`                   |
 | Navigation, registry facades, `ExtensionPoint`, `WidgetArea` | `@veap/framework/plugins/server`         |

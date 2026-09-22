@@ -1,5 +1,11 @@
 # @veap/framework
 
+## 0.11.4
+
+### Patch Changes
+
+- chore(deps): Patch dependencies
+
 ## 0.11.3
 
 ### Patch Changes

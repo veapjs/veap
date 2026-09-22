@@ -20,8 +20,8 @@ bun add @veap/framework
 
 The package ships several entry points so that client bundles never pull in server code:
 
-| Import path                                   | Purpose                                   |
-| --------------------------------------------- | ----------------------------------------- |
+| Import path                                        | Purpose                                   |
+| -------------------------------------------------- | ----------------------------------------- |
 | `@veap/framework`                                  | client-safe core: errors, events, logging |
 | `@veap/framework/core/server`                      | Application, container, providers, config |
 | `@veap/framework/auth`, `/auth/server`             | authentication, sessions, RBAC            |

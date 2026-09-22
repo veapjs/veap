@@ -49,7 +49,10 @@ import {
   COOKIE_STORE,
   REQUEST_CONTEXT,
 } from "@veap/framework/core/server";
-import type { ICookieStore, IHttpRequestContext } from "@veap/framework/core/server";
+import type {
+  ICookieStore,
+  IHttpRequestContext,
+} from "@veap/framework/core/server";
 
 export function createFakeCookieStore(
   initialCookies: Record<string, string> = {},
@@ -216,7 +219,10 @@ Veap route middlewares (`VeapMiddleware`) accept `VeapMiddlewareContext` and a `
 
 ```ts
 import { describe, it, expect, vi } from "vitest";
-import type { VeapMiddleware, VeapMiddlewareContext } from "@veap/framework/router";
+import type {
+  VeapMiddleware,
+  VeapMiddlewareContext,
+} from "@veap/framework/router";
 
 export const ensureAdmin: VeapMiddleware = async (context, next) => {
   if (!context.roles?.includes("admin")) {

@@ -208,7 +208,10 @@ Virtual router API routes (`api/[...catchAll]/route.ts`) support an array of `mi
 
 ```ts
 // plugins/blog-plugin/src/app/api/posts/route.ts
-import { ApiEnsuredAuth, type ApiMiddleware } from "@veap/framework/router/server";
+import {
+  ApiEnsuredAuth,
+  type ApiMiddleware,
+} from "@veap/framework/router/server";
 
 // Custom API middleware to enforce API tokens or custom permissions
 const requirePostScope: ApiMiddleware = async (request, context, next) => {

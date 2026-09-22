@@ -6,7 +6,10 @@ Every request-scoped value in Veap is read through ports bound by the framework 
 
 ```ts
 import { REQUEST_CONTEXT, COOKIE_STORE } from "@veap/framework/core/server";
-import type { IHttpRequestContext, ICookieStore } from "@veap/framework/core/server";
+import type {
+  IHttpRequestContext,
+  ICookieStore,
+} from "@veap/framework/core/server";
 ```
 
 `IHttpRequestContext` exposes:

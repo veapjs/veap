@@ -10,7 +10,10 @@ Layouts wrap pages and nested segments. Veap supports layouts in three places: t
 import { I18nProvider } from "@veap/framework/intl/server";
 import { ExtensionPoint, getPathPrefix } from "@veap/framework/plugins/server";
 import { AppProvider } from "@veap/framework/react";
-import { getCurrentSession, isSystemInstalled } from "@veap/framework/auth/server";
+import {
+  getCurrentSession,
+  isSystemInstalled,
+} from "@veap/framework/auth/server";
 import { initializeSystem } from "@/lib/veap";
 
 export const dynamic = "force-dynamic";
