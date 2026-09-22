@@ -64,7 +64,7 @@ describe("ejectPackage CLI", () => {
       JSON.stringify(
         {
           name: "@veap/custom-template",
-          repository: "https://github.com/the-veap/custom-template.git",
+          repository: "https://github.com/veapjs/custom-template.git",
           veap: {
             type: "template",
           },
@@ -79,7 +79,7 @@ describe("ejectPackage CLI", () => {
     // Expect git clone to have been called for templates/custom-template
     const expectedDest = path.join(tmpDir, "templates", "custom-template");
     expect(execSync).toHaveBeenCalledWith(
-      `git clone https://github.com/the-veap/custom-template.git "${expectedDest}"`,
+      `git clone https://github.com/veapjs/custom-template.git "${expectedDest}"`,
       { stdio: "ignore" },
     );
 
@@ -119,7 +119,7 @@ describe("ejectPackage CLI", () => {
         {
           name: "@veap/shop-plugin",
           repository: {
-            url: "git+https://github.com/the-veap/shop-plugin.git",
+            url: "git+https://github.com/veapjs/shop-plugin.git",
           },
           veap: {
             type: "plugin",
@@ -135,7 +135,7 @@ describe("ejectPackage CLI", () => {
     // Expect git clone to have been called for plugins/shop-plugin
     const expectedDest = path.join(tmpDir, "plugins", "shop-plugin");
     expect(execSync).toHaveBeenCalledWith(
-      `git clone https://github.com/the-veap/shop-plugin.git "${expectedDest}"`,
+      `git clone https://github.com/veapjs/shop-plugin.git "${expectedDest}"`,
       { stdio: "ignore" },
     );
 

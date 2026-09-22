@@ -8,7 +8,7 @@ An extension point renders all extensions registered for a `target` + `point` pa
 
 ```tsx
 // host component (your app or another plugin)
-import { ExtensionPoint } from "@veap/core/plugins/server";
+import { ExtensionPoint } from "@veap/framework/plugins/server";
 
 export function ArticleFooter() {
   return (
@@ -57,8 +57,8 @@ The host view can pass dynamic domain context (such as the active model or form 
 
 ```tsx
 // Host component: app/[prefix]/posts/[id]/page.tsx
-import { ExtensionPoint } from "@veap/core/plugins/server";
-import { Post } from "@veap/core/database";
+import { ExtensionPoint } from "@veap/framework/plugins/server";
+import { Post } from "@veap/framework/database";
 
 export default async function EditPostPage({
   params,
@@ -92,7 +92,7 @@ The plugin component simply receives `post` as a standard React prop:
 
 ```tsx
 // Plugin component: plugins/seo-plugin/src/ui/seo-sidebar-box.tsx
-import type { Post } from "@veap/core/database";
+import type { Post } from "@veap/framework/database";
 
 interface SeoSidebarProps {
   post: Post;
@@ -145,7 +145,7 @@ Extensions and widgets are sorted ascending by their `priority` number:
 Widgets are the dashboard-oriented variant: they live in named areas and carry layout hints.
 
 ```tsx
-import { WidgetArea } from "@veap/core/plugins/server";
+import { WidgetArea } from "@veap/framework/plugins/server";
 
 <WidgetArea area="dashboard-stats" className="grid grid-cols-4 gap-4" />;
 ```
@@ -165,16 +165,16 @@ widgets: [
 ],
 ```
 
-`WidgetArea` props mirror extension points (`area` instead of `target`/`point`). The `WidgetComposer` component (also from `@veap/core/plugins/server`) composes an area into a configurable grid with per-user drag-and-drop state persisted through the `user_widgets` table.
+`WidgetArea` props mirror extension points (`area` instead of `target`/`point`). The `WidgetComposer` component (also from `@veap/framework/plugins/server`) composes an area into a configurable grid with per-user drag-and-drop state persisted through the `user_widgets` table.
 
 ## Client components
 
-In interactive Client Components (marked with `"use client"`), use `ExtensionPointClient` from `@veap/core/plugins/client`:
+In interactive Client Components (marked with `"use client"`), use `ExtensionPointClient` from `@veap/framework/plugins/client`:
 
 ```tsx
 "use client";
 
-import { ExtensionPointClient } from "@veap/core/plugins/client";
+import { ExtensionPointClient } from "@veap/framework/plugins/client";
 
 export function RichTextEditorToolbar({ editor }: { editor: any }) {
   return (
@@ -202,7 +202,7 @@ If you need programmatic control over how extensions are structured or wrapped o
 ```tsx
 "use client";
 
-import { usePluginExtensions } from "@veap/core/plugins/client";
+import { usePluginExtensions } from "@veap/framework/plugins/client";
 
 export function CustomNavigationMenu() {
   const extensions = usePluginExtensions("navigation", "menu-items");

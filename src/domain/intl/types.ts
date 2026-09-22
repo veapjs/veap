@@ -16,7 +16,7 @@ declare global {
 /**
  * Extend VeapConfig from veap/core with intl-specific options.
  */
-declare module "@veap/core/core" {
+declare module "@veap/framework/core" {
   export interface VeapConfig {
     intl?: {
       /**

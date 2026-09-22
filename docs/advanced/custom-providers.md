@@ -5,7 +5,7 @@ Service providers are the extension mechanism of the composition root. A provide
 ## The ServiceProvider contract
 
 ```ts
-import type { ServiceProvider } from "@veap/core/core/server";
+import type { ServiceProvider } from "@veap/framework/core/server";
 
 export class MyServiceProvider implements ServiceProvider {
   register(container: Container): void {
@@ -23,7 +23,7 @@ export class MyServiceProvider implements ServiceProvider {
 
 ```ts
 // src/providers/search-provider.ts
-import { Container, type ServiceProvider } from "@veap/core/core/server";
+import { Container, type ServiceProvider } from "@veap/framework/core/server";
 import { SEARCH_CLIENT } from "../domain/ports/search-client";
 import { MeilisearchClient } from "../infrastructure/meilisearch-client";
 
@@ -67,7 +67,7 @@ Every framework service that touches the outside world does so through a port bo
 Bind before providers boot - the safest place is a custom provider listed in `withProviders`, or an explicit `container.register(...)` right after `Application.configure().create()` and before `bootstrap()`:
 
 ```ts
-import { PASSWORD_HASHER } from "@veap/core/auth";
+import { PASSWORD_HASHER } from "@veap/framework/auth";
 import { Argon2Hasher } from "./argon2-hasher";
 
 const application = Application.configure().withAuth().create();

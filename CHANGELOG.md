@@ -1,4 +1,4 @@
-# @veap/core
+# @veap/framework
 
 ## 0.11.3
 
@@ -20,7 +20,7 @@
   - **Exports & Bundler Safety**: Added missing `.` root export to `package.json` to resolve ESM `ERR_PACKAGE_PATH_NOT_EXPORTED`. Added `bin` directory to `package.json` `files` field.
   - **Turbopack Tracing**: Added `/*turbopackIgnore: true*/` annotation to SQLite filesystem path resolution in `connection.ts` to suppress Next.js build warnings.
   - **Server/Client Isolation**: Extracted `PathPrefixContext` into a dedicated client context module. Decoupled `auth-provider` and `app-provider` from server-side dependencies. Removed `import "server-only"` from internal application services (`registry.ts`, `templates.ts`, `facade.ts`, `email-verification.service.ts`), preserving it exclusively at server boundaries.
-  - **Clean Architecture (ADR-006)**: Replaced all 33 internal `@veap/core/...` self-imports with relative imports across `domain`, `application`, `infrastructure`, and `presentation`.
+  - **Clean Architecture (ADR-006)**: Replaced all 33 internal `@veap/framework/...` self-imports with relative imports across `domain`, `application`, `infrastructure`, and `presentation`.
   - **IoC Container Symbols**: Added typed domain symbols (`DATABASE`, `APP_PLUGINS`, `APP_TEMPLATES`, `APP_MIGRATIONS`, `CLI_SERVICE`) in `domain/contracts/token.ts` alongside string tokens for 100% backward compatibility.
   - **Test Suite Expansion**: Added comprehensive test suites for Router matching & segment classification, router middlewares (`SkipSecurity`, `EnsuredGuest`, `EnsuredUser`, `EnsuredAuth`), `PluginRegistry` topological sorting and hook filtering, and `transaction()` AsyncLocalStorage lifecycle (121/121 tests passing).
 
@@ -38,7 +38,7 @@
 
   - **Core**: Relocated ORM models from the centralized database module into their respective domain modules (auth, settings, plugins). The database module now acts strictly as an ORM and migration engine, devoid of business-specific model logic.
   - **Core (Database)**: Fixed a critical typo in the 0001_initial migration where the reset_sessions table incorrectly defined emailVerified (camelCase) instead of email_verified (snake_case). Added a 0006_fix_email_verified migration to safely rename the column in existing deployments, preventing a fatal crash during password reset workflows.
-  - **Plugins**: Updated all internal and cross-module imports across all plugins to resolve domain models from their new architectural locations (e.g., import { User } from "@veap/core/auth/models").
+  - **Plugins**: Updated all internal and cross-module imports across all plugins to resolve domain models from their new architectural locations (e.g., import { User } from "@veap/framework/auth/models").
 
 ## 0.10.1
 
@@ -68,7 +68,7 @@
 
 ### Minor Changes
 
-- `@veap/core`: Added the ability for native Next.js applications to run their own migrations. `ensureSystemInitialized` now accepts an `appMigrations` array and executes them securely before loading plugins.
+- `@veap/framework`: Added the ability for native Next.js applications to run their own migrations. `ensureSystemInitialized` now accepts an `appMigrations` array and executes them securely before loading plugins.
 
 ## 0.6.0
 
@@ -99,13 +99,13 @@
 
 ### Patch Changes
 
-- Align package imports with @veap/core
+- Align package imports with @veap/framework
 
 ## 0.5.0
 
 ### Minor Changes
 
-- 290ed45: Consolidate plugin and template manifests into `package.json`. The standalone `manifest.json` files have been removed - all metadata (`id`, `name`, `description`, `enabled`, `system`, `hasSetup`, `dependencies`, `extends`) now lives in the `veap` field of each package's `package.json`. A new helper `createManifestFromPackageJson()` and types `VeapPackageMetadata` / `VeapPackageJson` are exported from `@veap/core/plugins` for this purpose.
+- 290ed45: Consolidate plugin and template manifests into `package.json`. The standalone `manifest.json` files have been removed - all metadata (`id`, `name`, `description`, `enabled`, `system`, `hasSetup`, `dependencies`, `extends`) now lives in the `veap` field of each package's `package.json`. A new helper `createManifestFromPackageJson()` and types `VeapPackageMetadata` / `VeapPackageJson` are exported from `@veap/framework/plugins` for this purpose.
 
 ## 0.4.1
 

@@ -19,7 +19,7 @@ The zod env schema rejected something. Most often `ENCRYPTION_KEY` is missing or
 
 ### `Cannot open database because the directory does not exist`
 
-The SQLite path's parent directory was unwritable or missing. The current resolver creates parent directories automatically; if you still see this, you are on an old build of `@veap/core` or the path is on a read-only filesystem (serverless - use `/tmp`-backed PostgreSQL instead).
+The SQLite path's parent directory was unwritable or missing. The current resolver creates parent directories automatically; if you still see this, you are on an old build of `@veap/framework` or the path is on a read-only filesystem (serverless - use `/tmp`-backed PostgreSQL instead).
 
 ### `Failed to ensure migrations table` / migration failures at boot
 

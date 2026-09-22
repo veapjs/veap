@@ -9,13 +9,13 @@ lastUpdated: "2026-03"
 
 # Authentication
 
-Veap ships a complete session-based authentication system in `@veap/core`. It covers sign-in/sign-up, sessions with server-side validation, email verification, password reset with recovery codes, RBAC (roles and permissions), and extension points that 2FA plugins use.
+Veap ships a complete session-based authentication system in `@veap/framework`. It covers sign-in/sign-up, sessions with server-side validation, email verification, password reset with recovery codes, RBAC (roles and permissions), and extension points that 2FA plugins use.
 
 ## Mental model
 
 - **Identity**: `users`, `roles`, `permissions` tables with pivot tables `users_to_roles`, `users_to_permissions`, `roles_to_permissions`.
 - **Sessions**: opaque random tokens (Oslo base32) stored server-side; the raw token lives in a `session` cookie, the database stores its SHA-256-style hash. Validation hashes the cookie value and looks it up, checking expiry.
-- **Facades**: server-action wrappers over six application services (`AuthService`, `SessionService`, `UserService`, `RbacService`, `PasswordResetService`, `EmailVerificationService`), bound in `AuthServiceProvider` and exposed from `@veap/core/auth/server`.
+- **Facades**: server-action wrappers over six application services (`AuthService`, `SessionService`, `UserService`, `RbacService`, `PasswordResetService`, `EmailVerificationService`), bound in `AuthServiceProvider` and exposed from `@veap/framework/auth/server`.
 - **Crypto ports**: password hashing (`IPasswordHasher`, bcrypt adapter), token generation (`ITokenGenerator`, Oslo adapter) and secret-at-rest encryption (`ISecretCipher`, AES-GCM adapter with `ENCRYPTION_KEY`) are injectable ports.
 
 ## Where things live
@@ -34,13 +34,13 @@ Veap ships a complete session-based authentication system in `@veap/core`. It co
 | Validation schemas (client-safe) | `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `verifyEmailSchema`, ...                                                                            |
 | Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`                                                                                                                        |
 
-All of these come from `@veap/core/auth/server` unless marked client-safe (schemas and types also from `@veap/core/auth`).
+All of these come from `@veap/framework/auth/server` unless marked client-safe (schemas and types also from `@veap/framework/auth`).
 
 ## Reading the current session
 
 ```tsx
 // Server Component
-import { getCurrentSession } from "@veap/core/auth/server";
+import { getCurrentSession } from "@veap/framework/auth/server";
 
 export default async function Header() {
   const { user, session } = await getCurrentSession();
@@ -58,8 +58,8 @@ Use the built-in actions from a client component:
 ```tsx
 "use client";
 
-import { signIn } from "@veap/core/auth/server";
-import { loginSchema, type LoginInput } from "@veap/core/auth";
+import { signIn } from "@veap/framework/auth/server";
+import { loginSchema, type LoginInput } from "@veap/framework/auth";
 
 export function SignInForm() {
   async function onSubmit(formData: FormData) {

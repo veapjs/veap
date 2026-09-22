@@ -1,4 +1,4 @@
-import type { ITemplate } from "@veap/core/plugins";
+import type { ITemplate } from "@veap/framework/plugins";
 
 const template: ITemplate = {
   id: "{{name}}-template",

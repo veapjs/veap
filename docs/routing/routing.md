@@ -73,7 +73,7 @@ Plugins normally discover routes from their own `app/` directory at runtime:
 // plugins/my-plugin/src/index.ts
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { discoverRoutes } from "@veap/core/router";
+import { discoverRoutes } from "@veap/framework/router";
 
 const myPlugin: IPlugin = {
   manifest: createManifestFromPackageJson(pkg),
@@ -92,7 +92,7 @@ const myPlugin: IPlugin = {
 You can also build trees in code with the `RouteTree` class:
 
 ```ts
-import { RouteTree } from "@veap/core/router";
+import { RouteTree } from "@veap/framework/router";
 
 const tree = new RouteTree();
 tree.addTree({

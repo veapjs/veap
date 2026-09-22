@@ -1,7 +1,7 @@
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { discoverRoutes } from "@veap/core/router";
-import { createManifestFromPackageJson, type IPlugin } from "@veap/core/plugins";
+import { discoverRoutes } from "@veap/framework/router";
+import { createManifestFromPackageJson, type IPlugin } from "@veap/framework/plugins";
 import pkg from "../package.json" with { type: "json" };
 
 const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "app");
@@ -9,7 +9,7 @@ const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "app");
 const {{pascalName}}Plugin: IPlugin = {
   manifest: createManifestFromPackageJson(pkg),
   migrations: [],
-  
+
   init: async () => {
     console.log("[{{titleName}}] Initializing...");
   },
@@ -21,7 +21,7 @@ const {{pascalName}}Plugin: IPlugin = {
   onDisable: async () => {
     console.log("[{{titleName}}] Disabled.");
   },
-  
+
   routeTree: async () =>
     discoverRoutes(appDir, (relPath) => import(`./app/${relPath}`)),
 };

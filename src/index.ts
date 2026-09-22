@@ -1,5 +1,5 @@
 /**
- * Public, client-safe entry point of `@veap/core`.
+ * Public, client-safe entry point of `@veap/framework`.
  *
  * Exposes the framework primitives that are safe to import from both the
  * server and the browser: domain errors, event contracts, the event bus,

@@ -4,11 +4,11 @@ Veap uses a port-and-adapter architecture for services that interact with extern
 
 ## 1. Custom storage provider: S3 / Cloudflare R2
 
-The file storage subsystem delegates file operations to registered `IStorageProvider` instances. While `@veap/core` includes `LocalFileProvider` for local filesystem storage, production applications usually store user-uploaded assets in S3-compatible cloud buckets.
+The file storage subsystem delegates file operations to registered `IStorageProvider` instances. While `@veap/framework` includes `LocalFileProvider` for local filesystem storage, production applications usually store user-uploaded assets in S3-compatible cloud buckets.
 
 ### The `IStorageProvider` interface
 
-Defined in `@veap/core/storage`:
+Defined in `@veap/framework/storage`:
 
 ```ts
 export interface StorageData {
@@ -39,7 +39,7 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
-import type { IStorageProvider, StorageResult } from "@veap/core/storage";
+import type { IStorageProvider, StorageResult } from "@veap/framework/storage";
 
 export interface S3Config {
   bucket: string;
@@ -123,8 +123,8 @@ Create a custom `ServiceProvider` and register your provider with `StorageServic
 
 ```ts
 // src/providers/s3-storage.provider.ts
-import { ServiceProvider } from "@veap/core/core/server";
-import { StorageService } from "@veap/core/storage";
+import { ServiceProvider } from "@veap/framework/core/server";
+import { StorageService } from "@veap/framework/storage";
 import { S3StorageProvider } from "../infrastructure/storage/s3-storage.provider";
 
 export class CloudStorageServiceProvider extends ServiceProvider {
@@ -156,7 +156,7 @@ Veap separates message semantics (mailables) from the transmission mechanism (`I
 
 ### The `IMailer` interface
 
-Defined in `@veap/core/communication`:
+Defined in `@veap/framework/communication`:
 
 ```ts
 export interface IMailer {
@@ -171,7 +171,7 @@ The `MailMessage` DTO contains normalized fields: `to`, `subject`, `text`, `html
 ```ts
 // src/infrastructure/mail/resend.mailer.ts
 import { Resend } from "resend";
-import type { IMailer, MailMessage } from "@veap/core/communication";
+import type { IMailer, MailMessage } from "@veap/framework/communication";
 
 export class ResendMailService implements IMailer {
   private resend: Resend;
@@ -216,8 +216,8 @@ Register the adapter under `CUSTOM_MAILER` and enable it by setting `MAIL_TRANSP
 
 ```ts
 // src/providers/mail.provider.ts
-import { ServiceProvider } from "@veap/core/core/server";
-import { CUSTOM_MAILER } from "@veap/core/communication";
+import { ServiceProvider } from "@veap/framework/core/server";
+import { CUSTOM_MAILER } from "@veap/framework/communication";
 import { ResendMailService } from "../infrastructure/mail/resend.mailer";
 
 export class CustomMailServiceProvider extends ServiceProvider {
@@ -252,7 +252,7 @@ The kernel provides in-memory caching by default (`MemoryCacheProvider`). In mul
 
 ### The `ICacheProvider` interface
 
-Defined in `@veap/core`:
+Defined in `@veap/framework`:
 
 ```ts
 export interface ICacheProvider {
@@ -268,7 +268,7 @@ export interface ICacheProvider {
 ```ts
 // src/infrastructure/cache/redis-cache.provider.ts
 import Redis from "ioredis";
-import type { ICacheProvider } from "@veap/core";
+import type { ICacheProvider } from "@veap/framework";
 
 export class RedisCacheProvider implements ICacheProvider {
   private redis: Redis;
@@ -327,8 +327,8 @@ Register the custom provider under `CACHE_PROVIDER` before kernel services boot:
 
 ```ts
 // src/providers/redis-cache.provider.ts
-import { ServiceProvider } from "@veap/core/core/server";
-import { CACHE_PROVIDER } from "@veap/core";
+import { ServiceProvider } from "@veap/framework/core/server";
+import { CACHE_PROVIDER } from "@veap/framework";
 import { RedisCacheProvider } from "../infrastructure/cache/redis-cache.provider";
 
 export class RedisCacheServiceProvider extends ServiceProvider {
@@ -353,7 +353,7 @@ To activate your custom providers, add them using `.withProviders([...])` in the
 ```ts
 // lib/veap.ts
 import { cache } from "react";
-import { Application } from "@veap/core/core/server";
+import { Application } from "@veap/framework/core/server";
 import { appMigrations } from "../migrations";
 import { plugins } from "./plugins.gen";
 

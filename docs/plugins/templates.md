@@ -5,7 +5,7 @@ Templates are themes for the public side of the application. A template provides
 ## The ITemplate contract
 
 ```ts
-import type { ITemplate } from "@veap/core/plugins";
+import type { ITemplate } from "@veap/framework/plugins";
 
 const minimalTemplate: ITemplate = {
   id: "minimal",
@@ -54,7 +54,7 @@ import {
   setActiveTemplate,
   getTemplateConfig,
   updateTemplateConfig,
-} from "@veap/core/plugins/server";
+} from "@veap/framework/plugins/server";
 ```
 
 `getActiveTemplate()` and `getTemplateConfig(id)` are React-cached per request.
@@ -74,8 +74,8 @@ In `buildLayoutTree` (the render pipeline):
 ```tsx
 // templates/minimal/src/layout.tsx
 import Link from "next/link";
-import { getPluginNavigation } from "@veap/core/plugins/server";
-import type { BreadcrumbItem } from "@veap/core/plugins";
+import { getPluginNavigation } from "@veap/framework/plugins/server";
+import type { BreadcrumbItem } from "@veap/framework/plugins";
 
 export default function MinimalLayout({
   children,

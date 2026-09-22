@@ -1,4 +1,4 @@
-# @veap/core
+# @veap/framework
 
 The core framework of the Veap ecosystem: a modular application framework built on Next.js App Router and React Server Components. One package provides the plugin system with a virtual router, an ActiveRecord-style ORM over Knex, authentication with RBAC, a Laravel-inspired service provider architecture with dependency injection, an event bus, and the `veap` CLI.
 
@@ -13,7 +13,7 @@ bunx create-veap
 or add the package to an existing Next.js project:
 
 ```bash
-bun add @veap/core
+bun add @veap/framework
 ```
 
 ## Entry points
@@ -22,25 +22,25 @@ The package ships several entry points so that client bundles never pull in serv
 
 | Import path                                   | Purpose                                   |
 | --------------------------------------------- | ----------------------------------------- |
-| `@veap/core`                                  | client-safe core: errors, events, logging |
-| `@veap/core/core/server`                      | Application, container, providers, config |
-| `@veap/core/auth`, `/auth/server`             | authentication, sessions, RBAC            |
-| `@veap/core/auth/models`                      | User, Session, Role, Permission models    |
-| `@veap/core/plugins` (+ `/server`, `/client`) | plugin system, registry, widgets          |
-| `@veap/core/plugins/models`                   | SystemPlugin, SystemUserWidget models     |
-| `@veap/core/router` (+ `/server`)             | virtual router, middlewares               |
-| `@veap/core/intl` (+ `/server`, `/client`)    | internationalization                      |
-| `@veap/core/communication`                    | mail transports and facades               |
-| `@veap/core/database`                         | ORM, relations, transactions, migrations  |
-| `@veap/core/storage`, `/settings`             | file storage, key-value settings          |
-| `@veap/core/settings/models`                  | Setting model                             |
-| `@veap/core/react`                            | client providers and hooks                |
+| `@veap/framework`                                  | client-safe core: errors, events, logging |
+| `@veap/framework/core/server`                      | Application, container, providers, config |
+| `@veap/framework/auth`, `/auth/server`             | authentication, sessions, RBAC            |
+| `@veap/framework/auth/models`                      | User, Session, Role, Permission models    |
+| `@veap/framework/plugins` (+ `/server`, `/client`) | plugin system, registry, widgets          |
+| `@veap/framework/plugins/models`                   | SystemPlugin, SystemUserWidget models     |
+| `@veap/framework/router` (+ `/server`)             | virtual router, middlewares               |
+| `@veap/framework/intl` (+ `/server`, `/client`)    | internationalization                      |
+| `@veap/framework/communication`                    | mail transports and facades               |
+| `@veap/framework/database`                         | ORM, relations, transactions, migrations  |
+| `@veap/framework/storage`, `/settings`             | file storage, key-value settings          |
+| `@veap/framework/settings/models`                  | Setting model                             |
+| `@veap/framework/react`                            | client providers and hooks                |
 
 ## Minimal usage
 
 ```ts
 // lib/veap.ts - the composition root
-import { Application } from "@veap/core/core/server";
+import { Application } from "@veap/framework/core/server";
 
 const application = Application.configure()
   .withDatabase()

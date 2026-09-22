@@ -3,7 +3,7 @@
 ## Creating users
 
 ```ts
-import { createUser } from "@veap/core/auth/server";
+import { createUser } from "@veap/framework/auth/server";
 
 const user = await createUser(
   "jane@example.com",
@@ -60,7 +60,7 @@ Every user has one recovery code, generated at signup, encrypted at rest (AES-GC
 import {
   getUserRecoverCode,
   resetUserRecoveryCode,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 const code = await getUserRecoverCode(userId); // decrypts; null if absent
 const fresh = await resetUserRecoveryCode(userId); // regenerates, returns new plaintext
@@ -70,10 +70,10 @@ The plaintext recovery code is also the secret used during password reset verifi
 
 ## The User model
 
-The persistence model (`@veap/core/auth/models`) is an ORM model with relations you can eager-load:
+The persistence model (`@veap/framework/auth/models`) is an ORM model with relations you can eager-load:
 
 ```ts
-import { User } from "@veap/core/auth/models";
+import { User } from "@veap/framework/auth/models";
 
 const users = await User.query()
   .with("roles", "permissions", "sessions")

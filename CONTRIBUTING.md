@@ -10,10 +10,10 @@ This guide explains how to contribute effectively and how the project is organiz
 
 Before contributing, we recommend reading:
 
-- [README](https://github.com/the-veap/veap#readme)
+- [README](https://github.com/veapjs/veap#readme)
 - [Code of Conduct](./CODE_OF_CONDUCT.md)
 - [Security Policy](./SECURITY.md)
-- [License](https://github.com/the-veap/veap/blob/main/LICENSE.md)
+- [License](https://github.com/veapjs/veap/blob/main/LICENSE.md)
 
 For larger changes, please read the relevant documentation and existing implementation before opening a proposal.
 
@@ -71,7 +71,7 @@ Make sure you have a current version of Bun installed before working on the repo
 Clone the repository:
 
 ```bash
-git clone https://github.com/the-veap/veap.git
+git clone https://github.com/veapjs/veap.git
 cd veap
 ```
 

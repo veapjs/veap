@@ -5,8 +5,8 @@ Veap has a small IoC container inspired by Laravel's container. It maps tokens (
 ## Resolving services
 
 ```ts
-import { app } from "@veap/core/core/server";
-import { AuthService } from "@veap/core/auth/server";
+import { app } from "@veap/framework/core/server";
+import { AuthService } from "@veap/framework/auth/server";
 
 // app() with no arguments returns the Container
 const container = app();
@@ -33,7 +33,7 @@ Class tokens survive bundling in development because the container keys them by 
 Bindings are normally created by service providers (see [Service providers](./service-providers.md)), but any server code can register into the global container:
 
 ```ts
-import { container } from "@veap/core/core/server";
+import { container } from "@veap/framework/core/server";
 
 container.register({
   token: EVENT_BUS, // Token<IEventBus>
@@ -70,7 +70,7 @@ Provider definition shape (`ProviderDef`):
 Classes marked `@Injectable()` get their constructor parameter types read from `reflect-metadata` and resolved automatically:
 
 ```ts
-import { Injectable, Inject } from "@veap/core/core/server";
+import { Injectable, Inject } from "@veap/framework/core/server";
 
 @Injectable()
 export class MyService {
@@ -126,7 +126,7 @@ To replace an adapter, register your implementation under the same token in a pr
 ## Resolving in Server Components and Server Actions
 
 ```ts
-import { app } from "@veap/core/core/server";
+import { app } from "@veap/framework/core/server";
 
 export default async function Page() {
   const settings = await app(SettingsService);
@@ -140,6 +140,6 @@ In Server Actions the same works; Veap's own actions wrap services with `handleA
 ## What not to do
 
 - Do not call `app()` at module top level; resolve inside functions after boot.
-- Do not resolve services from client components; the container is server-only (`@veap/core/core/server`).
+- Do not resolve services from client components; the container is server-only (`@veap/framework/core/server`).
 - Do not use `container.clear()` in application code; it exists for tests and full reboots.
 - Prefer facades over raw container lookups. `getCurrentSession()` is the supported API for session access, not `app(SessionService).getCurrentSession()`.

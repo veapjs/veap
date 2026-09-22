@@ -31,7 +31,7 @@ bun veap make:migration create_tasks_table
 Fill in the generated file in `plugins/tasks-plugin/src/migrations/`:
 
 ```ts
-import type { Schema } from "@veap/core/database";
+import type { Schema } from "@veap/framework/database";
 
 export default {
   name: "create_tasks_table",
@@ -53,7 +53,7 @@ export default {
 Now the model, `plugins/tasks-plugin/src/models/Task.ts`:
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 
 export interface TaskAttributes {
   id: string;

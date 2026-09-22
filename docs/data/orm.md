@@ -5,7 +5,7 @@ Veap's ORM is ActiveRecord over Knex. A model maps to a table, instances map to 
 ## Defining a model
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 
 export interface PostAttributes {
   id: string;
@@ -114,7 +114,7 @@ Polymorphic relations allow a model to belong to more than one other model on a 
 Register polymorphic aliases at application or plugin initialization (e.g. in `init()` or `lib/veap.ts`), or define `static override morphAlias` on the model:
 
 ```ts
-import { MorphMap } from "@veap/core/database";
+import { MorphMap } from "@veap/framework/database";
 import { Post } from "./models/post";
 import { Video } from "./models/video";
 import { Comment } from "./models/comment";
@@ -152,7 +152,7 @@ await schema.createTable("comments", (table) => {
 The child model calls `this.morphTo(name)` using the polymorphic prefix (`commentable`):
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 
 export interface CommentAttributes {
   id: string;
@@ -176,7 +176,7 @@ export class Comment extends Model<CommentAttributes> {
 The parent models call `this.morphMany(RelatedModel, name)`:
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 import { Comment } from "./comment";
 
 export class Post extends Model<PostAttributes> {
@@ -233,7 +233,7 @@ await schema.createTable("taggables", (table) => {
 The parent models declare `this.morphToMany(Tag, name)`:
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 import { Tag } from "./tag";
 
 export class Post extends Model<PostAttributes> {
@@ -249,7 +249,7 @@ export class Post extends Model<PostAttributes> {
 The tag model declares `this.morphedByMany(TargetModel, name)`:
 
 ```ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 import { Post } from "./post";
 
 export class Tag extends Model<TagAttributes> {
@@ -332,7 +332,7 @@ for (const c of comments) {
 Veap models support declarative attribute casting via the `static casts` dictionary. This handles serialization when writing to the database and deserialization when reading into model instances across both SQLite and PostgreSQL.
 
 ```ts
-import { Model, type CastType } from "@veap/core/database";
+import { Model, type CastType } from "@veap/framework/database";
 
 export interface ProductAttributes {
   id: string;
@@ -524,10 +524,10 @@ Aliases supported: `beforeSave` / `afterSave`, `beforeCreate` / `afterCreate`, `
 
 ### Atomic transactions with AsyncLocalStorage
 
-Every database mutation in Veap should be executed inside `transaction()` from `@veap/core/database`. Node's `AsyncLocalStorage` implicitly propagates the active transaction context to all queries and model instances without manual parameter passing:
+Every database mutation in Veap should be executed inside `transaction()` from `@veap/framework/database`. Node's `AsyncLocalStorage` implicitly propagates the active transaction context to all queries and model instances without manual parameter passing:
 
 ```ts
-import { transaction } from "@veap/core/database";
+import { transaction } from "@veap/framework/database";
 import { Post } from "./models/post";
 import { Tag } from "./models/tag";
 
@@ -573,7 +573,7 @@ A standard Veap trait consists of three components:
 Here is how `@veap/commentable` implements the `Commentable` trait:
 
 ```ts
-import { Model, ModelQueryBuilder, type MorphMany } from "@veap/core/database";
+import { Model, ModelQueryBuilder, type MorphMany } from "@veap/framework/database";
 import { Comment } from "../models/Comment";
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
@@ -662,12 +662,12 @@ Because traits are standard higher-order functions, you can compose multiple beh
 For example, in `blog-plugin`, the `BlogPost` model composes commenting (`@veap/commentable`), categorizing (`@veap/categorizable`), tagging (`@veap/taggable`), and translations (`@veap/translatable`):
 
 ```ts
-import { Model, type CastType } from "@veap/core/database";
+import { Model, type CastType } from "@veap/framework/database";
 import { Commentable } from "@veap/commentable";
 import { Categorizable } from "@veap/categorizable";
 import { Taggable } from "@veap/taggable";
 import { TranslatableModel } from "@veap/translatable";
-import { User } from "@veap/core/auth/models";
+import { User } from "@veap/framework/auth/models";
 
 export interface BlogPostAttributes {
   id: string;
@@ -734,7 +734,7 @@ To create a new reusable trait for your own plugins (for example, a `Likeable` t
 
 ```ts
 // packages/my-plugin/src/traits/Likeable.ts
-import { Model, type MorphMany } from "@veap/core/database";
+import { Model, type MorphMany } from "@veap/framework/database";
 import { Like } from "../models/Like";
 
 export type Constructor<T = {}> = new (...args: any[]) => T;
@@ -784,7 +784,7 @@ export function Likeable<TBase extends Constructor<Model>>(Base: TBase) {
 ## Factories and seeders
 
 ```ts
-import { Factory } from "@veap/core/database";
+import { Factory } from "@veap/framework/database";
 
 export class PostFactory extends Factory<Post> {
   model = Post;

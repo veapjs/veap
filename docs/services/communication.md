@@ -4,7 +4,7 @@ Veap's mail system separates _what_ is sent from _how_ it is delivered, followin
 
 ## Sending mail: mailables
 
-Application code almost never constructs raw messages. Use the mailable helpers from `@veap/core/communication`:
+Application code almost never constructs raw messages. Use the mailable helpers from `@veap/framework/communication`:
 
 ```ts
 import {
@@ -13,7 +13,7 @@ import {
   sendResetPassword,
   sendRecoveryCode,
   send2FACode,
-} from "@veap/core/communication";
+} from "@veap/framework/communication";
 
 await sendVerifyEmail("user@example.com", "ABC123"); // localized verification mail
 await sendResetPassword("user@example.com", "XYZ789");
@@ -26,7 +26,7 @@ Mailables translate subject and body through the intl system (bound per send, so
 ## The MailMessage DTO
 
 ```ts
-import type { MailMessage } from "@veap/core/communication";
+import type { MailMessage } from "@veap/framework/communication";
 
 await sendMail({
   to: "user@example.com", // string | MailAddress | arrays
@@ -63,9 +63,9 @@ Selection happens in `CommunicationServiceProvider.boot()` from the `MAIL_TRANSP
 Implement the `IMailer` port and register it under `CUSTOM_MAILER` in a service provider:
 
 ```ts
-import type { IMailer, MailMessage } from "@veap/core/communication";
-import { CUSTOM_MAILER } from "@veap/core/communication";
-import { ServiceProvider } from "@veap/core/core/server";
+import type { IMailer, MailMessage } from "@veap/framework/communication";
+import { CUSTOM_MAILER } from "@veap/framework/communication";
+import { ServiceProvider } from "@veap/framework/core/server";
 
 export class SesMailService implements IMailer {
   async sendMail(message: MailMessage): Promise<void> {

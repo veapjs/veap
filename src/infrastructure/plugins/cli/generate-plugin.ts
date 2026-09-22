@@ -50,7 +50,7 @@ export async function generatePlugin(
       date,
     };
 
-    // Stubs live at the package root of the installed @veap/core.
+    // Stubs live at the package root of the installed @veap/framework.
     const stubsDir = stubPath("plugin");
 
     const spin = ora("Generating plugin files from stubs...").start();

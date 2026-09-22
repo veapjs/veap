@@ -69,7 +69,7 @@ body:
         that should provide the functionality.
       placeholder: |
         Area:
-        - @veap/core
+        - @veap/framework
         - CLI
         - Module
         - Plugin

@@ -7,10 +7,10 @@ Layouts wrap pages and nested segments. Veap supports layouts in three places: t
 `app/layout.tsx` is the real Next.js root layout and the boot seam of the application:
 
 ```tsx
-import { I18nProvider } from "@veap/core/intl/server";
-import { ExtensionPoint, getPathPrefix } from "@veap/core/plugins/server";
-import { AppProvider } from "@veap/core/react";
-import { getCurrentSession, isSystemInstalled } from "@veap/core/auth/server";
+import { I18nProvider } from "@veap/framework/intl/server";
+import { ExtensionPoint, getPathPrefix } from "@veap/framework/plugins/server";
+import { AppProvider } from "@veap/framework/react";
+import { getCurrentSession, isSystemInstalled } from "@veap/framework/auth/server";
 import { initializeSystem } from "@/lib/veap";
 
 export const dynamic = "force-dynamic";
@@ -89,7 +89,7 @@ When the URL is outside the private prefix and no plugin layout matched, the act
 A physical Next.js page can opt into the virtual router to inherit layouts, slots and protection:
 
 ```tsx
-import { withRouter } from "@veap/core/router";
+import { withRouter } from "@veap/framework/router";
 
 export default withRouter(async function CustomPage() {
   return <div>My Custom Physical Page</div>;

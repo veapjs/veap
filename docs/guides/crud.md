@@ -11,7 +11,7 @@ veap make:plugin tasks   # if the feature lives in a plugin; otherwise use app c
 
 ```ts
 // migrations: create_tasks_table
-import type { Knex } from "@veap/core/database";
+import type { Knex } from "@veap/framework/database";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("tasks", (table) => {
@@ -30,7 +30,7 @@ export async function down(knex: Knex): Promise<void> {
 
 ```ts
 // src/models/task.ts (app) or plugins/tasks-plugin/src/models/task.ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 
 export class Task extends Model {
   static table = "tasks";
@@ -78,9 +78,9 @@ export type CreateTaskInput = z.infer<typeof createTaskSchema>;
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { transaction } from "@veap/core/database";
-import { AppError } from "@veap/core/core/server";
-import { getCurrentUser } from "@veap/core/auth/server";
+import { transaction } from "@veap/framework/database";
+import { AppError } from "@veap/framework/core/server";
+import { getCurrentUser } from "@veap/framework/auth/server";
 import { Task } from "../../models/task";
 import { createTaskSchema } from "../validation/task";
 
@@ -135,9 +135,9 @@ Notes on the pattern:
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { transaction } from "@veap/core/database";
-import { AppError } from "@veap/core/core/server";
-import { getCurrentUser } from "@veap/core/auth/server";
+import { transaction } from "@veap/framework/database";
+import { AppError } from "@veap/framework/core/server";
+import { getCurrentUser } from "@veap/framework/auth/server";
 import { Task } from "../../models/task";
 
 export async function deleteTask(id: number) {

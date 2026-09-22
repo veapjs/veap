@@ -36,9 +36,9 @@ import { fileURLToPath } from "node:url";
 import {
   createManifestFromPackageJson,
   type IPlugin,
-} from "@veap/core/plugins";
-import { discoverRoutes } from "@veap/core/router";
-import { eventBus } from "@veap/core/core";
+} from "@veap/framework/plugins";
+import { discoverRoutes } from "@veap/framework/router";
+import { eventBus } from "@veap/framework/core";
 import pkg from "../package.json with { type: 'json' }";
 import { announceMigrations } from "./migrations";
 import { navigation } from "./navigation";

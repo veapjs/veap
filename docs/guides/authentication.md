@@ -17,12 +17,12 @@ Auth needs the database: the provider registers the user/session/role models' mi
 
 ## Sign-up and sign-in (Server Actions)
 
-Framework Server Actions are exported from `@veap/core/auth/server`:
+Framework Server Actions are exported from `@veap/framework/auth/server`:
 
 ```tsx
 "use server";
 
-import { loginAction, registerAction } from "@veap/core/auth/server";
+import { loginAction, registerAction } from "@veap/framework/auth/server";
 // call these directly from forms, or wrap them:
 ```
 
@@ -30,7 +30,7 @@ A minimal sign-in page:
 
 ```tsx
 // app or plugin page
-import { loginAction } from "@veap/core/auth/server";
+import { loginAction } from "@veap/framework/auth/server";
 
 export default function LoginPage() {
   return (
@@ -43,14 +43,14 @@ export default function LoginPage() {
 }
 ```
 
-Under the hood: zod validation schemas from `@veap/core/auth` validate credentials, `AuthService` verifies the password hash through the `PASSWORD_HASHER` port, `SessionService` creates a session and sets an httpOnly cookie through `COOKIE_STORE`.
+Under the hood: zod validation schemas from `@veap/framework/auth` validate credentials, `AuthService` verifies the password hash through the `PASSWORD_HASHER` port, `SessionService` creates a session and sets an httpOnly cookie through `COOKIE_STORE`.
 
 ## Reading the current user
 
 In Server Components and actions:
 
 ```tsx
-import { getCurrentUser, requireUser } from "@veap/core/auth/server";
+import { getCurrentUser, requireUser } from "@veap/framework/auth/server";
 
 export default async function ProfilePage() {
   const user = await getCurrentUser(); // AuthUser | null
@@ -72,7 +72,7 @@ In client components:
 ```tsx
 "use client";
 
-import { useUser } from "@veap/core/react";
+import { useUser } from "@veap/framework/react";
 
 export function UserBadge() {
   const user = useUser();
@@ -87,7 +87,7 @@ export function UserBadge() {
 
 Two layers are available:
 
-1. **Route middlewares** in the Veap pipeline - `EnsuredAuth`, `EnsuredGuest`, `EnsuredUser` from `@veap/core/router/server`. Attach them to plugin routes; they run before the page renders and redirect or reject early.
+1. **Route middlewares** in the Veap pipeline - `EnsuredAuth`, `EnsuredGuest`, `EnsuredUser` from `@veap/framework/router/server`. Attach them to plugin routes; they run before the page renders and redirect or reject early.
 2. **Facades in the page/action** - `requireUser()`, `requireRole("admin")`, `requirePermission("posts.edit")`. Throwing `AppError.Forbidden` renders the error boundary with the mapped status.
 
 Prefer middlewares for coarse area guards and facades for fine-grained checks inside the handler.
@@ -100,7 +100,7 @@ import {
   hasPermission,
   assignRole,
   revokeRole,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 // grant
 await assignRole(userId, "editor");
@@ -123,7 +123,7 @@ import {
   verifyEmail,
   sendPasswordResetEmail,
   resetPassword,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 ```
 
 - `sendVerificationEmail(email)` creates a token and sends the message through the configured mail transport (`MAIL_TRANSPORT=console` prints it locally instead of sending).
@@ -134,9 +134,9 @@ import {
 ## Sign-out
 
 ```ts
-import { logoutAction } from "@veap/core/auth/server";
+import { logoutAction } from "@veap/framework/auth/server";
 // or the facade:
-import { logout } from "@veap/core/auth/server";
+import { logout } from "@veap/framework/auth/server";
 ```
 
 `logout()` destroys the session row and clears the cookie through the port.

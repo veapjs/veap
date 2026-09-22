@@ -5,8 +5,8 @@ Veap's transaction helper uses Node's `AsyncLocalStorage`, so the active transac
 ## Basic usage
 
 ```ts
-import { transaction } from "@veap/core/database";
-import { User } from "@veap/core/auth/models";
+import { transaction } from "@veap/framework/database";
+import { User } from "@veap/framework/auth/models";
 
 await transaction(async () => {
   const user = await User.create({ email, name });
@@ -45,7 +45,7 @@ await transaction(async (trx) => {
 });
 ```
 
-`getActiveTransaction()` (from `@veap/core/database`) returns the current transaction or `undefined` for inspection in library code.
+`getActiveTransaction()` (from `@veap/framework/database`) returns the current transaction or `undefined` for inspection in library code.
 
 ## Rules and pitfalls
 

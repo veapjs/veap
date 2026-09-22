@@ -5,8 +5,8 @@ Every request-scoped value in Veap is read through ports bound by the framework 
 ## Ports involved
 
 ```ts
-import { REQUEST_CONTEXT, COOKIE_STORE } from "@veap/core/core/server";
-import type { IHttpRequestContext, ICookieStore } from "@veap/core/core/server";
+import { REQUEST_CONTEXT, COOKIE_STORE } from "@veap/framework/core/server";
+import type { IHttpRequestContext, ICookieStore } from "@veap/framework/core/server";
 ```
 
 `IHttpRequestContext` exposes:
@@ -28,8 +28,8 @@ The framework adapter binds these ports at the start of each request (Next.js `N
 
 ```tsx
 // inside a Server Component or route middleware
-import { app } from "@veap/core/core/server";
-import { REQUEST_CONTEXT } from "@veap/core/core/server";
+import { app } from "@veap/framework/core/server";
+import { REQUEST_CONTEXT } from "@veap/framework/core/server";
 
 export default async function Page() {
   const ctx = await app(REQUEST_CONTEXT);
@@ -46,8 +46,8 @@ export default async function Page() {
 ## Cookies
 
 ```ts
-import { app } from "@veap/core/core/server";
-import { COOKIE_STORE } from "@veap/core/core/server";
+import { app } from "@veap/framework/core/server";
+import { COOKIE_STORE } from "@veap/framework/core/server";
 
 // read
 const store = await app(COOKIE_STORE);
@@ -79,8 +79,8 @@ Route parameters come from the virtual router and are attached to the context (`
 
 The indirection exists for three reasons:
 
-1. **Testability.** Services depending on `REQUEST_CONTEXT` and `COOKIE_STORE` take fake implementations in unit tests; no Next.js runtime needed (the auth services in `@veap/core` are tested exactly this way).
-2. **Framework neutrality.** The domain and application layers of `@veap/core` do not reference Next.js; only the infrastructure adapter does. Swapping the adapter swaps the runtime.
+1. **Testability.** Services depending on `REQUEST_CONTEXT` and `COOKIE_STORE` take fake implementations in unit tests; no Next.js runtime needed (the auth services in `@veap/framework` are tested exactly this way).
+2. **Framework neutrality.** The domain and application layers of `@veap/framework` do not reference Next.js; only the infrastructure adapter does. Swapping the adapter swaps the runtime.
 3. **One binding point.** Session, password-reset and email-verification services share the same cookie abstraction, so cookie behavior (flags, name, deletion) is consistent framework-wide.
 
 ## Restrictions

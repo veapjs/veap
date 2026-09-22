@@ -5,7 +5,7 @@ Plugin routes come from the `routeTree` property. The standard implementation di
 ```ts
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { discoverRoutes } from "@veap/core/router";
+import { discoverRoutes } from "@veap/framework/router";
 
 routeTree: async () => {
   const appDir = path.join(
@@ -58,7 +58,7 @@ Everything App Router supports is honored per segment: `layout.tsx`, `loading.ts
 
 ## Homepage detection
 
-`getPluginsWithHomepage()` (from `@veap/core/router/server`) lists plugins whose tree matches `/` exactly. The framework uses it to decide which plugin owns the site root; a plugin page at `app/page.tsx` claims the homepage.
+`getPluginsWithHomepage()` (from `@veap/framework/router/server`) lists plugins whose tree matches `/` exactly. The framework uses it to decide which plugin owns the site root; a plugin page at `app/page.tsx` claims the homepage.
 
 ## Route cache invalidation
 
@@ -69,7 +69,7 @@ In production the merged tree is cached under `"router:tree"`. The router servic
 For fully code-defined trees:
 
 ```ts
-import { RouteTree } from "@veap/core/router";
+import { RouteTree } from "@veap/framework/router";
 
 routeTree: () => {
   const tree = new RouteTree();

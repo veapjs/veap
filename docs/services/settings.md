@@ -5,8 +5,8 @@ Settings are a persistent key/value store with JSON values and an in-memory cach
 ## API
 
 ```ts
-import { SettingsService } from "@veap/core/settings";
-import { app } from "@veap/core/core/server";
+import { SettingsService } from "@veap/framework/settings";
+import { app } from "@veap/framework/core/server";
 
 const settings = await app(SettingsService);
 
@@ -33,13 +33,13 @@ Keys are free-form strings; Veap's own keys use a `namespace:name` convention (`
 ## Template and plugin configuration
 
 - The active template is stored under `system:template` (see [Templates](../plugins/templates.md)); `TemplateService.setActive` writes it.
-- Plugin config is stored per plugin in the `plugins` table (`config` JSON), not in settings: use `getPluginConfig(id)` / `updatePluginConfig(id, config)` from `@veap/core/plugins/server`.
+- Plugin config is stored per plugin in the `plugins` table (`config` JSON), not in settings: use `getPluginConfig(id)` / `updatePluginConfig(id, config)` from `@veap/framework/plugins/server`.
 - Template config is stored in the `templates` table similarly, surfaced via `getTemplateConfig` / `updateTemplateConfig`.
 
 ## The Setting model
 
 ```ts
-import { Setting } from "@veap/core/settings/models";
+import { Setting } from "@veap/framework/settings/models";
 
 const rows = await Setting.query().whereLike("key", "blog:%").get();
 ```

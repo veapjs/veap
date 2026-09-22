@@ -29,10 +29,10 @@ The gate pattern relies on four components:
 Create the plugin file in `plugins/onboarding-gate/plugin.ts`:
 
 ```ts
-import type { IPlugin } from "@veap/core/plugins";
-import { registerSecurityRequirement } from "@veap/core/auth/server";
-import { getPathPrefix } from "@veap/core/plugins/server";
-import { User } from "@veap/core/auth";
+import type { IPlugin } from "@veap/framework/plugins";
+import { registerSecurityRequirement } from "@veap/framework/auth/server";
+import { getPathPrefix } from "@veap/framework/plugins/server";
+import { User } from "@veap/framework/auth";
 
 export const onboardingGatePlugin: IPlugin = {
   name: "onboarding-gate",
@@ -82,7 +82,7 @@ export default onboardingGatePlugin;
 Create the onboarding page in `plugins/onboarding-gate/app/onboarding/page.tsx`:
 
 ```tsx
-import { EnsuredUser, SkipSecurity } from "@veap/core/router/server";
+import { EnsuredUser, SkipSecurity } from "@veap/framework/router/server";
 import { completeOnboardingAction } from "./actions";
 
 // Opt out of inherited EnsuredAuth to allow rendering while gate is unsatisfied
@@ -130,9 +130,9 @@ Create the completion handler in `plugins/onboarding-gate/app/onboarding/actions
 ```ts
 "use server";
 
-import { getCurrentSession } from "@veap/core/auth/server";
-import { transaction } from "@veap/core/database";
-import { AppError } from "@veap/core";
+import { getCurrentSession } from "@veap/framework/auth/server";
+import { transaction } from "@veap/framework/database";
+import { AppError } from "@veap/framework";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -209,11 +209,11 @@ Create the upload Server Action in `src/actions/upload-avatar.ts`:
 ```ts
 "use server";
 
-import { getCurrentSession } from "@veap/core/auth/server";
-import { container } from "@veap/core/core/server";
-import { StorageService } from "@veap/core/storage";
-import { transaction } from "@veap/core/database";
-import { AppError } from "@veap/core";
+import { getCurrentSession } from "@veap/framework/auth/server";
+import { container } from "@veap/framework/core/server";
+import { StorageService } from "@veap/framework/storage";
+import { transaction } from "@veap/framework/database";
+import { AppError } from "@veap/framework";
 import { fileUploadSchema } from "../shared/upload-validator";
 
 export async function uploadAvatarAction(formData: FormData) {
@@ -352,9 +352,9 @@ When developing plugins, write automated integration tests using Vitest or Bun T
 
 ```ts
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
-import { initDatabase, transaction, Model } from "@veap/core/database";
-import { container } from "@veap/core/core/server";
-import { eventBus } from "@veap/core/core";
+import { initDatabase, transaction, Model } from "@veap/framework/database";
+import { container } from "@veap/framework/core/server";
+import { eventBus } from "@veap/framework/core";
 import type { Knex } from "knex";
 
 let knex: Knex;
@@ -490,10 +490,10 @@ Apply functional mixins sequentially and define `static override morphAlias`:
 
 ```ts
 // plugins/blog-plugin/src/models/BlogPost.ts
-import { Model, type CastType } from "@veap/core/database";
+import { Model, type CastType } from "@veap/framework/database";
 import { Commentable } from "@veap/commentable";
 import { Taggable } from "@veap/taggable";
-import { User } from "@veap/core/auth/models";
+import { User } from "@veap/framework/auth/models";
 
 export interface BlogPostAttributes {
   id: string;

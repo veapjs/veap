@@ -17,7 +17,7 @@ export default async function Page() {
 ## What a Server Component can do in Veap
 
 - `await initializeSystem()` if you are outside the standard layout/catch-all flow (the generated routes already do it; it is cached per request, so calling it again is free).
-- Read the session with `getCurrentSession()` from `@veap/core/auth/server`. It is wrapped in React `cache`, so multiple components in one request share one lookup.
+- Read the session with `getCurrentSession()` from `@veap/framework/auth/server`. It is wrapped in React `cache`, so multiple components in one request share one lookup.
 - Resolve services with `await app(Service)`.
 - Query the database directly with the ORM; there is no separate fetching layer.
 - Render other Server Components and pass plain, serializable props to Client Components.
@@ -35,15 +35,15 @@ This matters more than in plain Next.js, because Veap's server entry points impo
 
 | Needs                                                        | Import from                         |
 | ------------------------------------------------------------ | ----------------------------------- |
-| Session, users, RBAC facades and actions                     | `@veap/core/auth/server`            |
-| Types, validation schemas, ports (client-safe)               | `@veap/core/auth`                   |
-| Navigation, registry facades, `ExtensionPoint`, `WidgetArea` | `@veap/core/plugins/server`         |
-| `usePathPrefix`, client extension widgets                    | `@veap/core/plugins/client`         |
-| `I18nProvider` (server, auto-detects locale)                 | `@veap/core/intl/server`            |
-| `useTranslation` and other hooks                             | `@veap/core/intl` or `/intl/client` |
-| `Application`, `container`, `app()`                          | `@veap/core/core/server`            |
-| `AppError`, `eventBus`, logging, types                       | `@veap/core/core`                   |
-| `Model`, migrations, `transaction`                           | `@veap/core/database` (server only) |
+| Session, users, RBAC facades and actions                     | `@veap/framework/auth/server`            |
+| Types, validation schemas, ports (client-safe)               | `@veap/framework/auth`                   |
+| Navigation, registry facades, `ExtensionPoint`, `WidgetArea` | `@veap/framework/plugins/server`         |
+| `usePathPrefix`, client extension widgets                    | `@veap/framework/plugins/client`         |
+| `I18nProvider` (server, auto-detects locale)                 | `@veap/framework/intl/server`            |
+| `useTranslation` and other hooks                             | `@veap/framework/intl` or `/intl/client` |
+| `Application`, `container`, `app()`                          | `@veap/framework/core/server`            |
+| `AppError`, `eventBus`, logging, types                       | `@veap/framework/core`                   |
+| `Model`, migrations, `transaction`                           | `@veap/framework/database` (server only) |
 
 Importing a server entry into a client component fails at build time; prefer the client-safe entry or pass data down as props.
 

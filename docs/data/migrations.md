@@ -5,7 +5,7 @@ Migrations are versioned schema changes tracked in a `migrations` table. Veap ru
 ## Anatomy of a migration
 
 ```ts
-import type { Schema } from "@veap/core/database";
+import type { Schema } from "@veap/framework/database";
 
 export default {
   name: "20260916000000_create_projects_table",

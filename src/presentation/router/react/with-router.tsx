@@ -10,7 +10,7 @@ import { VeapRouter } from "./renderer";
  *
  * @example
  * ```tsx
- * import { withRouter } from "@veap/core/router";
+ * import { withRouter } from "@veap/framework/router";
  *
  * export default withRouter(async function CustomPage() {
  *    return <div>My Custom Physical Page</div>;

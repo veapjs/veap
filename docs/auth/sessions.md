@@ -14,7 +14,7 @@ import {
   generateSessionToken,
   createSession,
   setSessionTokenCookie,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 const token = await generateSessionToken();
 const session = await createSession(token, userId, {});
@@ -44,7 +44,7 @@ import {
   getUserSessions,
   invalidateSession,
   invalidateOtherSessions,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 const sessions = await getUserSessions(userId, currentSessionId);
 // UserSession: { id, createdAt, expiresAt, isCurrent }

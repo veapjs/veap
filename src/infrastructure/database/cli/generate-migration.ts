@@ -1,14 +1,14 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 
-const stub = `import type { Schema } from "@veap/core/database";
+const stub = `import type { Schema } from "@veap/framework/database";
 
 export default {
   name: "{{name}}",
   async up(_db: any, schema: Schema) {
     await schema.createTable("{{tableName}}", (table) => {
       table.increments("id");
-      
+
       table.timestamps();
     });
   },

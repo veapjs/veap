@@ -67,7 +67,7 @@ export function applyDockerfileForPackageManager(
 ): void {
   if (pm === "pnpm") return;
   try {
-    // Stubs live at the package root of the installed @veap/core.
+    // Stubs live at the package root of the installed @veap/framework.
     const variantPath = stubPath("docker", `Dockerfile.${pm}.stub`);
     const dockerfilePath = path.join(projectDir, "Dockerfile");
     if (!fs.existsSync(variantPath) || !fs.existsSync(dockerfilePath)) return;

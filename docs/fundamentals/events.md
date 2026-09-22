@@ -1,6 +1,6 @@
 # Event bus
 
-Veap provides an in-process publish/subscribe event bus designed for decoupled communication between kernel services, plugins, and domain entities. It is available as a global singleton on both client and server, exposed safely through `@veap/core/core` as `eventBus` and injectable server-side through the `IEventBus` port (`EVENT_BUS` token).
+Veap provides an in-process publish/subscribe event bus designed for decoupled communication between kernel services, plugins, and domain entities. It is available as a global singleton on both client and server, exposed safely through `@veap/framework/core` as `eventBus` and injectable server-side through the `IEventBus` port (`EVENT_BUS` token).
 
 <!-- prettier-ignore -->
 > [!NOTE]
@@ -44,7 +44,7 @@ flowchart TD
 - **Environment-aware logging:** In development mode (`NODE_ENV !== "production"`), every event dispatch logs debug details, except high-volume plugin lifecycle notifications. In production, dispatches run quietly.
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 
 // Subscribe: (eventType, subscriberId, handler)
 eventBus.subscribe("system:auth:signup", "analytics-plugin", async (event) => {
@@ -83,7 +83,7 @@ Kernel events track application bootstrap and environmental installation status.
 ### Example: Handling installation state
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 
 eventBus.subscribe(
   "system:not-installed",
@@ -115,8 +115,8 @@ Authentication events fire during login, registration, session management, and c
 ### Example: Welcome email on signup
 
 ```ts
-import { eventBus } from "@veap/core/core";
-import { MailService } from "@veap/core/communication";
+import { eventBus } from "@veap/framework/core";
+import { MailService } from "@veap/framework/communication";
 
 export function registerAuthListeners(mailer: MailService) {
   eventBus.subscribe("system:auth:signup", "welcome-mailer", async (event) => {
@@ -145,7 +145,7 @@ Plugin lifecycle events allow plugins and kernel managers to coordinate dependen
 ### Example: Invalidating caches on plugin toggle
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 
 eventBus.subscribe(
   "system:plugin:toggle",
@@ -172,7 +172,7 @@ The client-side confirmation protocol coordinates UI dialogs without tight coupl
 
 ## ORM model lifecycle events
 
-ActiveRecord models in `@veap/core/database` fire lifecycle events at key persistence phases. Every lifecycle phase broadcasts two distinct events on the bus: a table-specific event and a universal event.
+ActiveRecord models in `@veap/framework/database` fire lifecycle events at key persistence phases. Every lifecycle phase broadcasts two distinct events on the bus: a table-specific event and a universal event.
 
 ### Lifecycle event catalog
 
@@ -197,7 +197,7 @@ It is essential to understand the difference between instance hook methods and E
 2. **EventBus listeners:** Dispatched after instance hooks. They run asynchronously and cannot cancel the database operation. Use them for side effects like audit logs, metrics, notifications, and cache purges.
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 import { Post } from "./models/post";
 
 // Listen to all new posts created in the database
@@ -214,9 +214,9 @@ You can extend `SystemEventsMap` to gain type safety and autocompletion for your
 Create an ambient declaration file (for example, `src/types/events.d.ts`):
 
 ```ts
-import "@veap/core";
+import "@veap/framework";
 
-declare module "@veap/core/events" {
+declare module "@veap/framework/events" {
   interface SystemEventsMap {
     "invoice:generated": {
       invoiceId: string;
@@ -235,7 +235,7 @@ declare module "@veap/core/events" {
 Once declared, `eventBus.publish` and `eventBus.subscribe` will validate the event name and enforce the required payload structure:
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 
 // Typed subscription
 eventBus.subscribe("invoice:generated", "billing-notifier", async (event) => {

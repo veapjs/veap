@@ -61,7 +61,7 @@ Permission names are free-form strings; the convention used across Veap plugins 
 
 ## Managing roles and permissions
 
-All functions are server-side facades from `@veap/core/auth/server`:
+All functions are server-side facades from `@veap/framework/auth/server`:
 
 ```ts
 import {
@@ -76,7 +76,7 @@ import {
   assignPermissionToUser,
   revokePermissionFromUser,
   getUserRbacData,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 await createRole("editor", "Can edit content");
 await createPermission("post:create", "Allow creating posts");
@@ -102,7 +102,7 @@ The virtual router turns these into `EnsuredAuth`; failures redirect (pages) or 
 ## Checking in code
 
 ```ts
-import { getCurrentSession, checkSecurity } from "@veap/core/auth/server";
+import { getCurrentSession, checkSecurity } from "@veap/framework/auth/server";
 
 const { session, user } = await getCurrentSession();
 const result = await checkSecurity(session, user, ["admin"], ["settings:read"]);
@@ -129,8 +129,8 @@ import {
   getPermissions,
   getRoles,
   assignPermissionToRole,
-} from "@veap/core/auth/server";
-import type { IPlugin } from "@veap/core/plugins";
+} from "@veap/framework/auth/server";
+import type { IPlugin } from "@veap/framework/plugins";
 
 const blogPlugin: IPlugin = {
   // ...
@@ -172,9 +172,9 @@ Server Actions execute on the server and must independently verify user authenti
 ```ts
 "use server";
 
-import { getCurrentSession, checkSecurity } from "@veap/core/auth/server";
-import { AppError } from "@veap/core";
-import { transaction } from "@veap/core/database";
+import { getCurrentSession, checkSecurity } from "@veap/framework/auth/server";
+import { AppError } from "@veap/framework";
+import { transaction } from "@veap/framework/database";
 import { Post } from "../models/post";
 
 export async function deletePostAction(postId: string) {
@@ -208,7 +208,7 @@ Virtual router API routes (`api/[...catchAll]/route.ts`) support an array of `mi
 
 ```ts
 // plugins/blog-plugin/src/app/api/posts/route.ts
-import { ApiEnsuredAuth, type ApiMiddleware } from "@veap/core/router/server";
+import { ApiEnsuredAuth, type ApiMiddleware } from "@veap/framework/router/server";
 
 // Custom API middleware to enforce API tokens or custom permissions
 const requirePostScope: ApiMiddleware = async (request, context, next) => {

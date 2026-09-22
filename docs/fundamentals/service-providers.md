@@ -5,8 +5,8 @@ A service provider is the unit of framework wiring. Each provider registers bind
 ## The contract
 
 ```ts
-import { ServiceProvider } from "@veap/core/core/server";
-import { container } from "@veap/core/core/server";
+import { ServiceProvider } from "@veap/framework/core/server";
+import { container } from "@veap/framework/core/server";
 
 export class AnalyticsServiceProvider extends ServiceProvider {
   register(): void {
@@ -38,7 +38,7 @@ Execution order is: every `register()` in registration order, then every `boot()
 
 ```ts
 // lib/veap.ts
-import { Application } from "@veap/core/core/server";
+import { Application } from "@veap/framework/core/server";
 import { AnalyticsServiceProvider } from "@/providers/analytics";
 
 export const app = Application.configure()
@@ -88,4 +88,4 @@ The plugin and migration providers register `veap add`, `veap register`, `veap e
 - Keep `register()` free of side effects; the framework may instantiate providers more than once across workers.
 - In `boot()`, tolerate the database being empty on first run (Veap's own providers wrap first-run DB access in try/catch for this reason).
 - Bind ports, not concrete classes, for anything a host application might want to swap.
-- Never import from `@veap/core/<entry>` inside framework-layer code; that rule applies to plugins and hosts, providers included.
+- Never import from `@veap/framework/<entry>` inside framework-layer code; that rule applies to plugins and hosts, providers included.

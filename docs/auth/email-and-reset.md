@@ -15,7 +15,7 @@ import {
   getUserEmailVerificationRequestFromRequest,
   deleteUserEmailVerificationRequest,
   initEmailVerification,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 ```
 
 Flow:
@@ -39,7 +39,7 @@ import {
   invalidateUserPasswordResetSessions,
   sendPasswordResetEmail,
   setPasswordResetSessionAsEmailVerified,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 ```
 
 Flow:

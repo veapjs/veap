@@ -11,8 +11,8 @@
  * `Transport` vs `Mailable`.
  *
  * ```ts
- * import { container } from "@veap/core/core/server";
- * import { CUSTOM_MAILER } from "@veap/core/communication";
+ * import { container } from "@veap/framework/core/server";
+ * import { CUSTOM_MAILER } from "@veap/framework/communication";
  * import { CustomMailTransport } from "./custom-mail-transport";
  *
  * class MyServiceProvider extends ServiceProvider {
@@ -26,7 +26,7 @@
  * }
  * ```
  */
-import type { IMailer, MailMessage } from "@veap/core/communication";
+import type { IMailer, MailMessage } from "@veap/framework/communication";
 
 export class SesMailTransport implements IMailer {
   async sendMail(message: MailMessage): Promise<void> {

@@ -26,7 +26,7 @@ export async function initDockerConfig(targetDir?: string) {
     } catch (_) {}
   }
 
-  // Stubs live at the package root of the installed @veap/core.
+  // Stubs live at the package root of the installed @veap/framework.
   const stubsDir = stubPath("docker");
 
   const files = [

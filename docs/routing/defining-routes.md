@@ -103,13 +103,13 @@ export default async function SettingsPage() {
 
 Semantics after collection (`EnsuredAuth` middleware): unauthenticated users are redirected to `/signin`; authenticated users failing role/permission checks are redirected to the security check's redirect target (or `/signin`). API routes return `401` JSON instead of redirecting.
 
-`EnsuredGuest` (redirects signed-in users away) and `EnsuredUser` (session required, no RBAC) are exported from `@veap/core/router` for use in `middlewares` arrays.
+`EnsuredGuest` (redirects signed-in users away) and `EnsuredUser` (session required, no RBAC) are exported from `@veap/framework/router` for use in `middlewares` arrays.
 
 ## Custom middleware
 
 ```ts
 // any module; referenced from page/layout/route or node.middlewares
-import type { VeapMiddleware } from "@veap/core/plugins";
+import type { VeapMiddleware } from "@veap/framework/plugins";
 
 export const requestLogger: VeapMiddleware = async (ctx, next) => {
   const start = Date.now();

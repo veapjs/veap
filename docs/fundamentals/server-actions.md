@@ -27,7 +27,7 @@ Constraints come from Next.js/React: arguments and return values must be seriali
 Veap ships zod schemas for its own auth flows and exports them from the client-safe auth entry, so client components can reuse them:
 
 ```ts
-import { loginSchema, registerSchema } from "@veap/core/auth";
+import { loginSchema, registerSchema } from "@veap/framework/auth";
 ```
 
 For your own actions, parse input inside the action:
@@ -36,7 +36,7 @@ For your own actions, parse input inside the action:
 "use server";
 
 import { z } from "zod";
-import { AppError } from "@veap/core/core";
+import { AppError } from "@veap/framework/core";
 
 const createTaskSchema = z.object({ title: z.string().min(1).max(200) });
 
@@ -63,7 +63,7 @@ type Result<T> =
     };
 ```
 
-The built-in auth actions use it (`signIn`, `signUp`, `signOut`, `finalizeLogin` from `@veap/core/auth/server`), converting thrown errors through `handleActionError`:
+The built-in auth actions use it (`signIn`, `signUp`, `signOut`, `finalizeLogin` from `@veap/framework/auth/server`), converting thrown errors through `handleActionError`:
 
 - `AppError` becomes `{ success: false, error: { code, message, details } }`.
 - Unexpected `Error`s are logged and returned as `INTERNAL_SERVER_ERROR`.
@@ -74,9 +74,9 @@ Recommended shape for your actions:
 ```ts
 "use server";
 
-import { ok, type Result } from "@veap/core/core";
-import { handleActionError } from "@veap/core/core/server";
-import { AppError } from "@veap/core/core";
+import { ok, type Result } from "@veap/framework/core";
+import { handleActionError } from "@veap/framework/core/server";
+import { AppError } from "@veap/framework/core";
 import { Task } from "../models/Task";
 
 export async function toggleTask(id: string): Promise<Result<boolean>> {
@@ -99,8 +99,8 @@ A Server Action is an unauthenticated endpoint until you check. Veap gives you t
 ```ts
 "use server";
 
-import { getCurrentSession } from "@veap/core/auth/server";
-import { AppError } from "@veap/core/core";
+import { getCurrentSession } from "@veap/framework/auth/server";
+import { AppError } from "@veap/framework/core";
 
 export async function deleteTask(id: string) {
   const { user, session } = await getCurrentSession();
@@ -114,7 +114,7 @@ export async function deleteTask(id: string) {
 }
 ```
 
-For confirm-style flows (require the password again before a sensitive action), the client hook `useConfirmAction` from `@veap/core/react` drives the confirmation dialog protocol over the event bus, and your server code verifies with `verifyPasswordHash` from `@veap/core/auth/server`.
+For confirm-style flows (require the password again before a sensitive action), the client hook `useConfirmAction` from `@veap/framework/react` drives the confirmation dialog protocol over the event bus, and your server code verifies with `verifyPasswordHash` from `@veap/framework/auth/server`.
 
 ## Cookies, headers and redirects
 

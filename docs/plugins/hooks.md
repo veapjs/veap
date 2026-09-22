@@ -20,7 +20,7 @@ hooks: [
 
 ```ts
 // plugin B (or app code): run the pipeline
-import { applyPluginFilters } from "@veap/core/plugins/server";
+import { applyPluginFilters } from "@veap/framework/plugins/server";
 
 const prepared = await applyPluginFilters("blog:post:before_create", draftData);
 ```

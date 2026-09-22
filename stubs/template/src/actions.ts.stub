@@ -1,6 +1,6 @@
 "use server";
 
-import { signOut } from "@veap/core/auth/server";
+import { signOut } from "@veap/framework/auth/server";
 import { redirect } from "next/navigation";
 
 export async function logoutAction() {

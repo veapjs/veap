@@ -3,11 +3,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 /**
- * Locates the package-root `stubs/` directory of the installed @veap/core.
+ * Locates the package-root `stubs/` directory of the installed @veap/framework.
  *
  * Every stub-based CLI command (docker, make:plugin, make:template) resolves
  * its templates through this resolver instead of hard-coded relative walks.
- * It anchors on the nearest package.json belonging to @veap/core, so the
+ * It anchors on the nearest package.json belonging to @veap/framework, so the
  * result is correct regardless of how deep the calling module sits in `dist/`
  * and regardless of the package layout (npm, pnpm's .pnpm store, yarn, bun).
  *
@@ -25,7 +25,7 @@ export function findStubsDir(): string {
         const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8")) as {
           name?: string;
         };
-        if (pkg.name === "@veap/core") {
+        if (pkg.name === "@veap/framework") {
           return path.join(dir, "stubs");
         }
       } catch {
@@ -36,7 +36,7 @@ export function findStubsDir(): string {
     const parent = path.dirname(dir);
     if (parent === dir) {
       throw new Error(
-        "Unable to locate the @veap/core package root. The 'stubs' directory ships with the @veap/core package; reinstall it or run the CLI from a project that depends on it.",
+        "Unable to locate the @veap/framework package root. The 'stubs' directory ships with the @veap/framework package; reinstall it or run the CLI from a project that depends on it.",
       );
     }
     dir = parent;

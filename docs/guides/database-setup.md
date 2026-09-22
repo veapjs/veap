@@ -75,8 +75,8 @@ Because the encryption key encrypts secrets at rest (session tokens, plugin sett
 ## Verifying the setup
 
 ```ts
-import { app } from "@veap/core/core/server";
-import { Knex } from "@veap/core/database";
+import { app } from "@veap/framework/core/server";
+import { Knex } from "@veap/framework/database";
 
 const knex = await app(Knex);
 await knex.raw("select 1");

@@ -18,7 +18,7 @@ The global `container` stores singleton instances. To prevent state leakage acro
 
 ```ts
 import { describe, it, expect, beforeEach } from "vitest";
-import { container } from "@veap/core/core/server";
+import { container } from "@veap/framework/core/server";
 
 describe("MyService", () => {
   beforeEach(() => {
@@ -48,8 +48,8 @@ import {
   container,
   COOKIE_STORE,
   REQUEST_CONTEXT,
-} from "@veap/core/core/server";
-import type { ICookieStore, IHttpRequestContext } from "@veap/core/core/server";
+} from "@veap/framework/core/server";
+import type { ICookieStore, IHttpRequestContext } from "@veap/framework/core/server";
 
 export function createFakeCookieStore(
   initialCookies: Record<string, string> = {},
@@ -123,7 +123,7 @@ You can test ActiveRecord models and database transactions using an in-memory SQ
 
 ```ts
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { initDatabase, transaction, Model } from "@veap/core/database";
+import { initDatabase, transaction, Model } from "@veap/framework/database";
 import type { Knex } from "knex";
 
 let knex: Knex;
@@ -190,7 +190,7 @@ When testing event publication or plugin event listeners:
 
 ```ts
 import { describe, it, expect, vi } from "vitest";
-import { eventBus } from "@veap/core";
+import { eventBus } from "@veap/framework";
 
 describe("Event bus integration", () => {
   it("delivers events to subscribers", async () => {
@@ -216,7 +216,7 @@ Veap route middlewares (`VeapMiddleware`) accept `VeapMiddlewareContext` and a `
 
 ```ts
 import { describe, it, expect, vi } from "vitest";
-import type { VeapMiddleware, VeapMiddlewareContext } from "@veap/core/router";
+import type { VeapMiddleware, VeapMiddlewareContext } from "@veap/framework/router";
 
 export const ensureAdmin: VeapMiddleware = async (context, next) => {
   if (!context.roles?.includes("admin")) {

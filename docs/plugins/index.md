@@ -9,7 +9,7 @@ lastUpdated: "2026-03"
 
 # Plugins
 
-A plugin is a package that adds a capability to a Veap application: routes, pages, widgets, navigation, models and migrations, translations, event handlers. Plugins are isolated packages; they do not import each other's internals. They interact through the public API of `@veap/core`, the event bus, and (deliberately) each other's public exports.
+A plugin is a package that adds a capability to a Veap application: routes, pages, widgets, navigation, models and migrations, translations, event handlers. Plugins are isolated packages; they do not import each other's internals. They interact through the public API of `@veap/framework`, the event bus, and (deliberately) each other's public exports.
 
 ## What a plugin looks like
 
@@ -53,8 +53,8 @@ plugins/my-plugin/
 The plugin's `index.ts` turns that into a `PluginManifest` and declares everything else:
 
 ```ts
-import { createManifestFromPackageJson } from "@veap/core/plugins";
-import type { IPlugin } from "@veap/core/plugins";
+import { createManifestFromPackageJson } from "@veap/framework/plugins";
+import type { IPlugin } from "@veap/framework/plugins";
 import pkg from "../package.json with { type: 'json' }";
 
 const myPlugin: IPlugin = {

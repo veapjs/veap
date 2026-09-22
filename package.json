@@ -1,11 +1,11 @@
 {
-  "name": "@veap/core",
+  "name": "@veap/framework",
   "version": "0.11.3",
   "description": "Unified Veap framework",
-  "bugs": "https://github.com/the-veap/veap/issues",
+  "bugs": "https://github.com/veapjs/veap/issues",
   "repository": {
     "type": "git",
-    "url": "https://github.com/the-veap/veap.git"
+    "url": "https://github.com/veapjs/veap.git"
   },
   "type": "module",
   "license": "MIT",

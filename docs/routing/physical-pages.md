@@ -6,7 +6,7 @@ Most pages in a Veap application are virtual: they live in plugins and are rende
 
 ```tsx
 // app/landing/page.tsx (physical page)
-import { withRouter } from "@veap/core/router";
+import { withRouter } from "@veap/framework/router";
 
 export default withRouter(async function LandingPage() {
   return <div>Welcome</div>;

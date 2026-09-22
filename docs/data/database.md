@@ -32,13 +32,13 @@ DATABASE_URL="sqlite:./storage/veap.sqlite"
 DATABASE_URL="postgresql://user:pass@host:5432/veap?sslmode=require"
 ```
 
-You can also initialize a connection manually with `initDatabase({ client, connection })` from `@veap/core/database`, which accepts driver shortcuts (`"postgres" | "sqlite" | "mysql"`). Note that `mysql` support in `initDatabase` maps to `mysql2`, but migrations and tests target SQLite and PostgreSQL.
+You can also initialize a connection manually with `initDatabase({ client, connection })` from `@veap/framework/database`, which accepts driver shortcuts (`"postgres" | "sqlite" | "mysql"`). Note that `mysql` support in `initDatabase` maps to `mysql2`, but migrations and tests target SQLite and PostgreSQL.
 
 ## The three layers
 
 | Layer                  | Import                                                             | Use for                                                                        |
 | ---------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| [ORM models](./orm.md) | `Model`, `User`, ... from `@veap/core/database` and model packages | 95% of data access; ActiveRecord API with relations, casts, scopes, and traits |
+| [ORM models](./orm.md) | `Model`, `User`, ... from `@veap/framework/database` and model packages | 95% of data access; ActiveRecord API with relations, casts, scopes, and traits |
 | Query builder          | `Model.query()` returns `ModelQueryBuilder` (Knex underneath)      | everything the static helpers do not cover; `toKnex()` for raw escape hatch    |
 | Raw access             | `dbClient("users").where(...)`, `dbClient.raw(sql)`                | migrations, exotic queries                                                     |
 
@@ -47,7 +47,7 @@ You can also initialize a connection manually with `initDatabase({ client, conne
 All writes that must be atomic go through `transaction()`, which uses `AsyncLocalStorage` so any ORM call made inside the callback automatically joins the active transaction, including nested `transaction()` calls:
 
 ```ts
-import { transaction } from "@veap/core/database";
+import { transaction } from "@veap/framework/database";
 
 await transaction(async (trx) => {
   const user = await User.create({ email, name });
@@ -66,4 +66,4 @@ Migrations are plain objects `{ name, up(db, schema), down? }`, tracked per scop
 
 - Core owns `users`, `sessions`, `roles`, `permissions`, pivots, `password_reset_sessions`, `email_verification_sessions`, `plugins`, `templates`, `settings`, `user_widgets`.
 - Plugins own their own tables (created by their migrations) and their own models.
-- Models for core entities are exported from the models entries: `@veap/core/auth/models` (`User`, `Session`, `Role`, `Permission`, `PasswordResetSession`, `EmailVerification`), `@veap/core/plugins/models` (`SystemPlugin`, `SystemUserWidget`), `@veap/core/settings/models` (`Setting`).
+- Models for core entities are exported from the models entries: `@veap/framework/auth/models` (`User`, `Session`, `Role`, `Permission`, `PasswordResetSession`, `EmailVerification`), `@veap/framework/plugins/models` (`SystemPlugin`, `SystemUserWidget`), `@veap/framework/settings/models` (`Setting`).

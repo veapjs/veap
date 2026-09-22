@@ -33,11 +33,11 @@ Each plugin declares itself through `IPlugin`:
 // plugins/notes-plugin/src/index.ts
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
-import { discoverRoutes } from "@veap/core/router";
+import { discoverRoutes } from "@veap/framework/router";
 import {
   createManifestFromPackageJson,
   type IPlugin,
-} from "@veap/core/plugins";
+} from "@veap/framework/plugins";
 import pkg from "../package.json" with { type: "json" };
 
 const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "app");
@@ -137,7 +137,7 @@ Register the widget on the plugin definition:
 Any layout or page can render all registered widgets for an area using:
 
 ```tsx
-import { ExtensionPoint } from "@veap/core/plugins/server";
+import { ExtensionPoint } from "@veap/framework/plugins/server";
 
 <ExtensionPoint target="dashboard" point="dashboard-stats" />;
 ```
@@ -152,7 +152,7 @@ veap make:migration create_notes_table
 
 ```ts
 // the generated migration file
-import type { Knex } from "@veap/core/database";
+import type { Knex } from "@veap/framework/database";
 
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable("notes", (table) => {
@@ -173,7 +173,7 @@ Export migrations in your plugin's `migrations` array, or manage them at the app
 
 ```ts
 // plugins/notes-plugin/src/models/note.ts
-import { Model } from "@veap/core/database";
+import { Model } from "@veap/framework/database";
 
 export class Note extends Model {
   static table = "notes";
@@ -203,7 +203,7 @@ Write in a Server Action wrapped in a transaction:
 ```ts
 "use server";
 
-import { transaction } from "@veap/core/database";
+import { transaction } from "@veap/framework/database";
 import { Note } from "../models/note";
 
 export async function createNote(title: string, body: string) {
@@ -218,7 +218,7 @@ export async function createNote(title: string, body: string) {
 Subscribe to system events or publish custom events in `init()`:
 
 ```ts
-import { eventBus } from "@veap/core/core";
+import { eventBus } from "@veap/framework/core";
 
 // Inside init():
 init: async () => {

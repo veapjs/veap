@@ -7,7 +7,7 @@ Veap bundles an intl system with server-side locale detection, message loading f
 Intl options live in `veap.config.ts` under `intl`:
 
 ```ts
-import type { VeapConfig } from "@veap/core/core";
+import type { VeapConfig } from "@veap/framework/core";
 
 const config: VeapConfig = {
   intl: {
@@ -23,11 +23,11 @@ Environment variables override config values: `VEAPCONFIG_INTL_COOKIE`, `VEAPCON
 
 ## Server usage
 
-`I18nProvider` from `@veap/core/intl/server` is an async Server Component: it detects the locale (cookie first, then `Accept-Language` negotiation, then default), loads messages and renders the client provider:
+`I18nProvider` from `@veap/framework/intl/server` is an async Server Component: it detects the locale (cookie first, then `Accept-Language` negotiation, then default), loads messages and renders the client provider:
 
 ```tsx
 // app/layout.tsx (generated for you)
-import { I18nProvider } from "@veap/core/intl/server";
+import { I18nProvider } from "@veap/framework/intl/server";
 
 <I18nProvider>{children}</I18nProvider>;
 ```
@@ -35,7 +35,7 @@ import { I18nProvider } from "@veap/core/intl/server";
 For translations outside the React tree (Server Actions, route handlers, mailables):
 
 ```ts
-import { getTranslation } from "@veap/core/intl/server";
+import { getTranslation } from "@veap/framework/intl/server";
 
 const { t, date, relativeTime, locale } = await getTranslation();
 t("Welcome back, {name}", { name: user.name });
@@ -54,7 +54,7 @@ import {
   useTranslation,
   useLocale,
   useSupportedLocales,
-} from "@veap/core/intl";
+} from "@veap/framework/intl";
 
 export function Greeting() {
   const { t, date, relativeTime } = useTranslation();

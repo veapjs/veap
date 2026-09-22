@@ -5,7 +5,7 @@ Storage is provider-based: `StorageService` keeps a registry of `IStorageProvide
 ## Uploading and deleting
 
 ```ts
-import { StorageService } from "@veap/core/storage";
+import { StorageService } from "@veap/framework/storage";
 
 const storage = await app(StorageService);
 
@@ -43,7 +43,7 @@ await storage.delete(keyOrUrl, "vercel-blob"); // target a specific provider
 ## Providers
 
 ```ts
-import type { IStorageProvider } from "@veap/core/storage";
+import type { IStorageProvider } from "@veap/framework/storage";
 
 export class S3StorageProvider implements IStorageProvider {
   id = "s3";

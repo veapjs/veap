@@ -1,5 +1,5 @@
 /**
- * Server-only entry point of `@veap/core`.
+ * Server-only entry point of `@veap/framework`.
  *
  * Re-exports everything from the client-safe entry point plus the pieces that
  * require a Node/Server runtime: the composition root (`Application`), the

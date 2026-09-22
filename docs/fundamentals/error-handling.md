@@ -4,10 +4,10 @@ Veap standardizes on one error type, `AppError`, and one serialization shape for
 
 ## AppError
 
-`AppError` is a domain error carrying a transport-agnostic `ErrorCode`. It is client-safe and exported from `@veap/core/core`.
+`AppError` is a domain error carrying a transport-agnostic `ErrorCode`. It is client-safe and exported from `@veap/framework/core`.
 
 ```ts
-import { AppError } from "@veap/core/core";
+import { AppError } from "@veap/framework/core";
 
 throw AppError.NotFound("Task not found");
 throw AppError.Unauthorized(); // default message "Unauthorized"
@@ -37,8 +37,8 @@ Server Actions should not throw for expected failures, because the thrown messag
 ```ts
 "use server";
 
-import { ok, type Result } from "@veap/core/core";
-import { handleActionError } from "@veap/core/core/server";
+import { ok, type Result } from "@veap/framework/core";
+import { handleActionError } from "@veap/framework/core/server";
 
 export async function doWork(): Promise<Result<WorkOutput>> {
   try {
@@ -83,8 +83,8 @@ Veap's own flows throw `AppError.Validation(...)`. Zod schema failures inside ac
 ## Logging
 
 ```ts
-import { logger } from "@veap/core/core/server";
-import { error, warn, info, debug } from "@veap/core/core"; // function style
+import { logger } from "@veap/framework/core/server";
+import { error, warn, info, debug } from "@veap/framework/core"; // function style
 
 logger.error("my-plugin", "Something failed", err);
 ```

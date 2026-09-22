@@ -26,7 +26,7 @@
   },
   "peerDependencies": {
     "@veap/ui": "workspace:*",
-    "@veap/core": "workspace:*",
+    "@veap/framework": "workspace:*",
     "next": "^16",
     "react": "^19",
     "react-dom": "^19"

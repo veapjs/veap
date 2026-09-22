@@ -48,7 +48,7 @@ URLs that a physical Next.js page handles never reach the catch-all. Next.js has
 
 ## Clean Architecture layering
 
-The `@veap/core` codebase follows a strict Clean Architecture layout (documented in framework decision record [ADR-006](../advanced/custom-providers.md)). Dependencies point exclusively **inward**, ensuring that domain rules remain completely agnostic of HTTP transports, database engines, and UI frameworks:
+The `@veap/framework` codebase follows a strict Clean Architecture layout (documented in framework decision record [ADR-006](../advanced/custom-providers.md)). Dependencies point exclusively **inward**, ensuring that domain rules remain completely agnostic of HTTP transports, database engines, and UI frameworks:
 
 ```mermaid
 flowchart TD

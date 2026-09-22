@@ -7,7 +7,7 @@ Veap reads configuration from two places: environment variables (validated by zo
 Loaded from the project root (`veap.config.ts`, `veap.config.mjs` or `veap.config.js`), server only, jiti-based so TypeScript works without a build step. In production the result is cached in memory.
 
 ```ts
-import type { VeapConfig } from "@veap/core/core";
+import type { VeapConfig } from "@veap/framework/core";
 
 const config: VeapConfig = {
   privatePath: "/app",
@@ -81,15 +81,15 @@ Validated by `envSchema` (`ConfigService`) at first construction; a failing vali
 ## Accessing config in code
 
 ```ts
-import { app } from "@veap/core/core/server";
-import { ConfigService } from "@veap/core/core/server";
+import { app } from "@veap/framework/core/server";
+import { ConfigService } from "@veap/framework/core/server";
 
 // environment (validated, typed keys)
 const config = await app(ConfigService);
 const folder = config.get("FILE_STORAGE_FOLDER");
 
 // veap.config.ts
-import { getPathPrefix } from "@veap/core/plugins/server";
+import { getPathPrefix } from "@veap/framework/plugins/server";
 const prefix = await getPathPrefix(); // privatePath
 
 // or the port directly

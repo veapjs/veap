@@ -1,6 +1,6 @@
 # CLI Reference
 
-The `veap` command-line interface provides scaffolding, plugin management, database migration generation, and deployment utilities. It is distributed with `@veap/core` and runs via your package manager's runner.
+The `veap` command-line interface provides scaffolding, plugin management, database migration generation, and deployment utilities. It is distributed with `@veap/framework` and runs via your package manager's runner.
 
 ```bash
 bunx veap <command> [options]
@@ -15,7 +15,7 @@ npx veap <command> [options]
 | Flag            | Description                                     |
 | --------------- | ----------------------------------------------- |
 | `-h, --help`    | Display help for the CLI or a specific command. |
-| `-v, --version` | Output the current version of `@veap/core`.     |
+| `-v, --version` | Output the current version of `@veap/framework`.     |
 
 ## Commands
 

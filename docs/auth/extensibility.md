@@ -7,8 +7,8 @@ The auth system was designed for plugins like the bundled 2FA modules (TOTP, pas
 `registerAuthValidator(validator)` registers a check that runs after credentials verify but before the session is created. Returning an `AuthResponse` short-circuits login:
 
 ```ts
-import { registerAuthValidator } from "@veap/core/auth/server";
-import type { AuthResponse } from "@veap/core/auth";
+import { registerAuthValidator } from "@veap/framework/auth/server";
+import type { AuthResponse } from "@veap/framework/auth";
 
 registerAuthValidator(async (userId): Promise<AuthResponse | null> => {
   const settings = await totpSettings(userId);
@@ -30,7 +30,7 @@ This is exactly how the TOTP and passkey plugins inject their challenge. After t
 Validators decide _whether you get a session_; security requirements decide _whether an existing session may proceed_. They run inside `checkSecurity` on every protected route:
 
 ```ts
-import { registerSecurityRequirement } from "@veap/core/auth/server";
+import { registerSecurityRequirement } from "@veap/framework/auth/server";
 
 registerSecurityRequirement(async (session, user) => {
   if (!user.emailVerifiedAt) {
@@ -60,7 +60,7 @@ Augmenters attach plugin data to identities at session validation time:
 import {
   registerIdentityAugmenter,
   registerSessionAugmenter,
-} from "@veap/core/auth/server";
+} from "@veap/framework/auth/server";
 
 registerIdentityAugmenter(async (user) => ({
   profileCompletion: await computeProfileCompletion(user.id),

@@ -4,7 +4,7 @@ Veap is a framework for building modular full-stack applications on top of Next.
 
 ## What Veap provides
 
-Veap (`@veap/core`) is a single npm package with several entry points. The main capabilities are:
+Veap (`@veap/framework`) is a single npm package with several entry points. The main capabilities are:
 
 - **Application bootstrap and dependency injection.** A Laravel-style `Application` builder registers service providers, which populate an IoC container. Server code resolves services through `app(Service)` instead of constructing them by hand.
 - **A virtual router.** Your Next.js app contains one catch-all route. Plugins declare route trees (usually discovered from their own `app/` directory), and the Veap router merges those trees and renders pages, layouts, error boundaries and parallel slots at runtime.
@@ -28,21 +28,21 @@ Because Veap distinguishes between server-only and client-safe code, the package
 
 | Entry point        | Import path                                       | Use it for                                                   |
 | ------------------ | ------------------------------------------------- | ------------------------------------------------------------ |
-| Core (client-safe) | `@veap/core/core`                                 | `AppError`, `eventBus`, logging helpers, config types        |
-| Core (server)      | `@veap/core/core/server`                          | `Application`, `container`, `app()`, providers               |
-| Auth (client-safe) | `@veap/core/auth`                                 | validation schemas, auth types, ports                        |
-| Auth (server)      | `@veap/core/auth/server`                          | `getCurrentSession`, auth facades, server actions            |
-| Router             | `@veap/core/router`                               | `VeapRouter`, `discoverRoutes`, route tree types             |
-| Router (server)    | `@veap/core/router/server`                        | `buildRouteTree`, API middlewares                            |
-| Plugins            | `@veap/core/plugins`                              | `IPlugin`, `createManifestFromPackageJson`                   |
-| Plugins (server)   | `@veap/core/plugins/server`                       | registry facades, navigation, `ExtensionPoint`, `WidgetArea` |
-| Plugins (client)   | `@veap/core/plugins/client`                       | `usePathPrefix`, client extension components                 |
-| Database           | `@veap/core/database`                             | `Model`, `Schema`, migrations, `transaction`                 |
-| Communication      | `@veap/core/communication`                        | `sendMail`, mailables, mail DTOs                             |
-| Storage            | `@veap/core/storage`                              | `StorageService`, `LocalFileProvider`                        |
-| Settings           | `@veap/core/settings`                             | `SettingsService`                                            |
-| Intl               | `@veap/core/intl`, `/intl/server`, `/intl/client` | `I18nProvider`, `useTranslation`, `getTranslation`           |
-| React              | `@veap/core/react`                                | `AppProvider`, `useUser`, `useConfirmAction`                 |
+| Core (client-safe) | `@veap/framework/core`                                 | `AppError`, `eventBus`, logging helpers, config types        |
+| Core (server)      | `@veap/framework/core/server`                          | `Application`, `container`, `app()`, providers               |
+| Auth (client-safe) | `@veap/framework/auth`                                 | validation schemas, auth types, ports                        |
+| Auth (server)      | `@veap/framework/auth/server`                          | `getCurrentSession`, auth facades, server actions            |
+| Router             | `@veap/framework/router`                               | `VeapRouter`, `discoverRoutes`, route tree types             |
+| Router (server)    | `@veap/framework/router/server`                        | `buildRouteTree`, API middlewares                            |
+| Plugins            | `@veap/framework/plugins`                              | `IPlugin`, `createManifestFromPackageJson`                   |
+| Plugins (server)   | `@veap/framework/plugins/server`                       | registry facades, navigation, `ExtensionPoint`, `WidgetArea` |
+| Plugins (client)   | `@veap/framework/plugins/client`                       | `usePathPrefix`, client extension components                 |
+| Database           | `@veap/framework/database`                             | `Model`, `Schema`, migrations, `transaction`                 |
+| Communication      | `@veap/framework/communication`                        | `sendMail`, mailables, mail DTOs                             |
+| Storage            | `@veap/framework/storage`                              | `StorageService`, `LocalFileProvider`                        |
+| Settings           | `@veap/framework/settings`                             | `SettingsService`                                            |
+| Intl               | `@veap/framework/intl`, `/intl/server`, `/intl/client` | `I18nProvider`, `useTranslation`, `getTranslation`           |
+| React              | `@veap/framework/react`                                | `AppProvider`, `useUser`, `useConfirmAction`                 |
 
 The full list, with every export, is in the [Entry points reference](../reference/entry-points.md).
 

@@ -14,7 +14,7 @@ export { CommunicationServiceProvider } from "../infrastructure/communication/pr
 
 // Backwards compatibility: `MailService` was the concrete Nodemailer class
 // name before the multi-transport refactor. Plugins doing `app(MailService)`
-// or `import { MailService } from "@veap/core/communication"` keep working.
+// or `import { MailService } from "@veap/framework/communication"` keep working.
 export { NodemailerMailService as MailService } from "../infrastructure/communication/providers/nodemailer.provider";
 
 // Deprecated type alias: the port used to speak Nodemailer's vocabulary.

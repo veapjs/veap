@@ -41,7 +41,7 @@ export async function generateTemplate(
       pascalName,
     };
 
-    // Stubs live at the package root of the installed @veap/core.
+    // Stubs live at the package root of the installed @veap/framework.
     const stubsDir = stubPath("template");
 
     const spin = ora("Generating template files from stubs...").start();
