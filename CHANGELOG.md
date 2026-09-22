@@ -34,7 +34,7 @@
 
 ### Minor Changes
 
-- a0a8324: ### Domain-Driven Design (DDD) Models Refactor
+- a0a8324: Domain-Driven Design (DDD) Models Refactor
 
   - **Core**: Relocated ORM models from the centralized database module into their respective domain modules (auth, settings, plugins). The database module now acts strictly as an ORM and migration engine, devoid of business-specific model logic.
   - **Core (Database)**: Fixed a critical typo in the 0001_initial migration where the reset_sessions table incorrectly defined emailVerified (camelCase) instead of email_verified (snake_case). Added a 0006_fix_email_verified migration to safely rename the column in existing deployments, preventing a fatal crash during password reset workflows.
