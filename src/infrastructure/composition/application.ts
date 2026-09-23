@@ -127,6 +127,26 @@ export class Application {
 
     // 2. Return if already bootstrapped successfully
     if (g.__VEAP_BOOTSTRAPPED__) {
+      // In development, when a template/plugin source file changes, the
+      // bundler re-evaluates this Application instance with fresh module
+      // references — but the bootstrap guard above prevents full
+      // re-initialization. We only refresh the in-memory registries so
+      // the renderer picks up the new component references (layout,
+      // overrides, extensions, widgets, etc.).
+      if (process.env.NODE_ENV === "development") {
+        if (this.templates.length) {
+          const { registerTemplates } = await import(
+            "../../application/plugins/templates"
+          );
+          await registerTemplates(this.templates);
+        }
+        if (this.plugins.length) {
+          const { registerPlugins } = await import(
+            "../../application/plugins/facade"
+          );
+          await registerPlugins(this.plugins);
+        }
+      }
       return;
     }
 

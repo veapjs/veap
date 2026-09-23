@@ -17,7 +17,10 @@ Use a gate when the condition is **account-level** (a property of the user, not 
 
 ```ts
 import { eventBus } from "@veap/framework/core/server";
-import { registerSecurityRequirement } from "@veap/framework/auth/server";
+import {
+  registerSecurityRequirement,
+  unregisterSecurityRequirement,
+} from "@veap/framework/auth/server";
 import { getPathPrefix } from "@veap/framework/plugins/server";
 import type { IPlugin } from "@veap/framework/plugins";
 
@@ -26,7 +29,7 @@ const GATE_PAGES = ["onboarding"]; // last path segment(s) owned by the gate
 const gatePlugin: IPlugin = {
   // ...
   init: async () => {
-    registerSecurityRequirement(async (_session, user, path) => {
+    registerSecurityRequirement("my-gate", async (_session, user, path) => {
       try {
         if (!user) return { satisfied: true };
 
@@ -118,9 +121,10 @@ eventBus.subscribe("system:auth:email-verified", "my-gate-verified", async (even
   await eventBus.publish("my-gate:ready", { userId }, "my-gate-plugin");
 });
 
-// onDisable(): always clean up listeners
+// onDisable(): always clean up listeners and security requirements
 onDisable: async () => {
   eventBus.unsubscribe("system:auth:email-verified", "my-gate-verified");
+  unregisterSecurityRequirement("my-gate");
 },
 ```
 
@@ -152,9 +156,9 @@ The handler receives the current target as the first argument and a context (`{ 
 
 ## Checklist
 
-- [ ] Requirement registered in `init()`, path-exempt, role-exempt, **fail-open**.
+- [ ] Requirement registered in `init()` with a string ID, path-exempt, role-exempt, **fail-open**.
 - [ ] Gate pages export `middlewares = [SkipSecurity, EnsuredUser]` and carry their own session check plus a reverse guard.
 - [ ] Every protected layout that calls `checkSecurity` inline forwards `x-pathname`.
-- [ ] Pending state created idempotently on `system:auth:email-verified`; listeners removed in `onDisable()`.
+- [ ] Pending state created idempotently on `system:auth:email-verified`; listeners and security requirement unregistered in `onDisable()`.
 - [ ] Post-verification landing via the `auth:after_verify:redirect` hook (optional but expected UX).
 - [ ] Requirement returns a `requirement: "my-gate"` discriminator so other gates can coexist.

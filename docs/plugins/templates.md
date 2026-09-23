@@ -121,6 +121,16 @@ The CLI:
 2. Updates your root `package.json` dependency to `"workspace:*"`.
 3. Links the local template package via your package manager without registering it in `lib/plugins.gen.ts`.
 
+## Development and Hot Module Replacement (HMR)
+
+In local development, templates update seamlessly with Next.js Turbopack Fast Refresh.
+
+1. **Watch script**: The root monorepo script runs TypeScript watch mode for all workspace templates alongside packages and plugins:
+   ```bash
+   bun run dev:pkg
+   ```
+2. **Fast Refresh lifecycle**: When you edit a template layout or component override in `templates/<name>/src`, `tsc --watch` emits updated JavaScript to `dist/`. Next.js detects the module change, re-evaluates the application root, and `Application.bootstrap()` automatically refreshes in-memory template and plugin registries so the browser immediately reflects changes without a server restart.
+
 ## Relationship with plugins
 
 Templates restyle; plugins provide features. A template should not register widgets or extensions (it is not a plugin); the override map is its only way to change existing screens, and it keeps plugin behavior intact because only the presentation swaps.

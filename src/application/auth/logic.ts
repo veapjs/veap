@@ -8,12 +8,16 @@ import type {
   UserRole,
 } from "../../domain/auth/types";
 
+import { AuthCallbackRegistry } from "./registry";
 import {
   augmentSession,
   augmentUser,
   registerIdentityAugmenter,
   registerPasswordResetSessionAugmenter,
   registerSessionAugmenter,
+  unregisterIdentityAugmenter,
+  unregisterPasswordResetSessionAugmenter,
+  unregisterSessionAugmenter,
 } from "./augment";
 
 /**
@@ -50,24 +54,30 @@ export type EmailVerificationValidator = (
 ) => Promise<AuthResponse | null>;
 
 const globalForAuth = globalThis as unknown as {
-  __VEAP_AUTH_VALIDATORS__: Set<AuthValidator> | undefined;
-  __VEAP_SECURITY_REQUIREMENTS__: Set<SecurityRequirement> | undefined;
-  __VEAP_PASSWORD_RESET_VALIDATORS__: Set<PasswordResetValidator> | undefined;
+  __VEAP_AUTH_VALIDATORS__: AuthCallbackRegistry<AuthValidator> | undefined;
+  __VEAP_SECURITY_REQUIREMENTS__:
+    | AuthCallbackRegistry<SecurityRequirement>
+    | undefined;
+  __VEAP_PASSWORD_RESET_VALIDATORS__:
+    | AuthCallbackRegistry<PasswordResetValidator>
+    | undefined;
   __VEAP_EMAIL_VERIFICATION_VALIDATORS__:
-    Set<EmailVerificationValidator> | undefined;
+    | AuthCallbackRegistry<EmailVerificationValidator>
+    | undefined;
 };
 
 export const authValidators =
-  globalForAuth.__VEAP_AUTH_VALIDATORS__ ?? new Set<AuthValidator>();
+  globalForAuth.__VEAP_AUTH_VALIDATORS__ ??
+  new AuthCallbackRegistry<AuthValidator>();
 const securityRequirements =
   globalForAuth.__VEAP_SECURITY_REQUIREMENTS__ ??
-  new Set<SecurityRequirement>();
+  new AuthCallbackRegistry<SecurityRequirement>();
 const passwordResetValidators =
   globalForAuth.__VEAP_PASSWORD_RESET_VALIDATORS__ ??
-  new Set<PasswordResetValidator>();
+  new AuthCallbackRegistry<PasswordResetValidator>();
 const emailVerificationValidators =
   globalForAuth.__VEAP_EMAIL_VERIFICATION_VALIDATORS__ ??
-  new Set<EmailVerificationValidator>();
+  new AuthCallbackRegistry<EmailVerificationValidator>();
 
 globalForAuth.__VEAP_AUTH_VALIDATORS__ = authValidators;
 globalForAuth.__VEAP_SECURITY_REQUIREMENTS__ = securityRequirements;
@@ -75,20 +85,62 @@ globalForAuth.__VEAP_PASSWORD_RESET_VALIDATORS__ = passwordResetValidators;
 globalForAuth.__VEAP_EMAIL_VERIFICATION_VALIDATORS__ =
   emailVerificationValidators;
 
-export async function registerAuthValidator(validator: AuthValidator) {
-  authValidators.add(validator);
+export function registerAuthValidator(validator: AuthValidator): void;
+export function registerAuthValidator(
+  id: string,
+  validator: AuthValidator,
+): void;
+export function registerAuthValidator(
+  idOrValidator: string | AuthValidator,
+  validator?: AuthValidator,
+): void {
+  authValidators.register(idOrValidator, validator);
 }
 
-export async function registerPasswordResetValidator(
+export function unregisterAuthValidator(
+  idOrValidator: string | AuthValidator,
+): boolean {
+  return authValidators.unregister(idOrValidator);
+}
+
+export function registerPasswordResetValidator(
   validator: PasswordResetValidator,
-) {
-  passwordResetValidators.add(validator);
+): void;
+export function registerPasswordResetValidator(
+  id: string,
+  validator: PasswordResetValidator,
+): void;
+export function registerPasswordResetValidator(
+  idOrValidator: string | PasswordResetValidator,
+  validator?: PasswordResetValidator,
+): void {
+  passwordResetValidators.register(idOrValidator, validator);
 }
 
-export async function registerEmailVerificationValidator(
+export function unregisterPasswordResetValidator(
+  idOrValidator: string | PasswordResetValidator,
+): boolean {
+  return passwordResetValidators.unregister(idOrValidator);
+}
+
+export function registerEmailVerificationValidator(
   validator: EmailVerificationValidator,
-) {
-  emailVerificationValidators.add(validator);
+): void;
+export function registerEmailVerificationValidator(
+  id: string,
+  validator: EmailVerificationValidator,
+): void;
+export function registerEmailVerificationValidator(
+  idOrValidator: string | EmailVerificationValidator,
+  validator?: EmailVerificationValidator,
+): void {
+  emailVerificationValidators.register(idOrValidator, validator);
+}
+
+export function unregisterEmailVerificationValidator(
+  idOrValidator: string | EmailVerificationValidator,
+): boolean {
+  return emailVerificationValidators.unregister(idOrValidator);
 }
 
 export {
@@ -97,12 +149,29 @@ export {
   registerIdentityAugmenter,
   registerPasswordResetSessionAugmenter,
   registerSessionAugmenter,
+  unregisterIdentityAugmenter,
+  unregisterPasswordResetSessionAugmenter,
+  unregisterSessionAugmenter,
 };
 
-export async function registerSecurityRequirement(
+export function registerSecurityRequirement(
   requirement: SecurityRequirement,
-) {
-  securityRequirements.add(requirement);
+): void;
+export function registerSecurityRequirement(
+  id: string,
+  requirement: SecurityRequirement,
+): void;
+export function registerSecurityRequirement(
+  idOrRequirement: string | SecurityRequirement,
+  requirement?: SecurityRequirement,
+): void {
+  securityRequirements.register(idOrRequirement, requirement);
+}
+
+export function unregisterSecurityRequirement(
+  idOrRequirement: string | SecurityRequirement,
+): boolean {
+  return securityRequirements.unregister(idOrRequirement);
 }
 
 export async function runPasswordResetValidators(

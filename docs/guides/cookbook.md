@@ -30,7 +30,10 @@ Create the plugin file in `plugins/onboarding-gate/plugin.ts`:
 
 ```ts
 import type { IPlugin } from "@veap/framework/plugins";
-import { registerSecurityRequirement } from "@veap/framework/auth/server";
+import {
+  registerSecurityRequirement,
+  unregisterSecurityRequirement,
+} from "@veap/framework/auth/server";
 import { getPathPrefix } from "@veap/framework/plugins/server";
 import { User } from "@veap/framework/auth";
 
@@ -39,7 +42,7 @@ export const onboardingGatePlugin: IPlugin = {
   version: "1.0.0",
 
   init: async () => {
-    registerSecurityRequirement(async (_session, user, path) => {
+    registerSecurityRequirement("onboarding-gate", async (_session, user, path) => {
       // 1. Unauthenticated users are handled by standard route guards
       if (!user) {
         return { satisfied: true };
@@ -71,6 +74,10 @@ export const onboardingGatePlugin: IPlugin = {
 
       return { satisfied: true };
     });
+  },
+
+  onDisable: async () => {
+    unregisterSecurityRequirement("onboarding-gate");
   },
 };
 
