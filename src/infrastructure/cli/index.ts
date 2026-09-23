@@ -2,6 +2,7 @@
 import { container } from "../ioc/container.js";
 import { CliService } from "./service.js";
 import { CLI_SERVICE } from "../../domain/contracts/token.js";
+import { loadEnv } from "./env.js";
 import path from "node:path";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -9,6 +10,7 @@ import pkg from "../../../package.json" with { type: "json" };
 
 async function main() {
   process.env.VEAP_CLI = "1";
+  loadEnv();
   const cliService = new CliService();
   container.register({
     token: CLI_SERVICE,
@@ -70,9 +72,15 @@ async function main() {
       });
       const app = (await jiti.import(libVeapPath)) as any;
 
-      if (app.initializeSystem) {
+      if (typeof app.initializeSystem === "function") {
         // Run system initialization to trigger all boot() methods
         await app.initializeSystem();
+      } else if (typeof app.app?.bootstrap === "function") {
+        await app.app.bootstrap();
+      } else if (typeof app.bootstrap === "function") {
+        await app.bootstrap();
+      } else if (typeof app.default?.bootstrap === "function") {
+        await app.default.bootstrap();
       }
     } catch (e) {
       console.warn("Failed to boot Veap application:", e);

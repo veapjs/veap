@@ -1,5 +1,11 @@
 # @veap/framework
 
+## 0.11.10
+
+### Patch Changes
+
+- Fix CLI command discovery by loading environment variables and supporting all application bootstrap export formats
+
 ## 0.11.9
 
 ### Patch Changes
