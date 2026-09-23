@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { AppError } from "../../domain/errors/app-error";
+import { AppError } from "../../domain/errors/app-error.js";
 
 /**
  * A lightweight DI container for Veap Core.

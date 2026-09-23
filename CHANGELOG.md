@@ -1,5 +1,11 @@
 # @veap/framework
 
+## 0.11.9
+
+### Patch Changes
+
+- Fix CLI ESM module resolution by adding explicit .js extensions to IoC imports
+
 ## 0.11.8
 
 ### Patch Changes

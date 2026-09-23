@@ -1,6 +1,6 @@
 {
   "name": "@veap/framework",
-  "version": "0.11.8",
+  "version": "0.11.9",
   "description": "Unified Veap NEXT.js framework",
   "bugs": "https://github.com/veapjs/veap/issues",
   "repository": {
