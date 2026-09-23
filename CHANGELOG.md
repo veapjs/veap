@@ -1,5 +1,11 @@
 # @veap/framework
 
+## 0.11.12
+
+### Patch Changes
+
+- Update CLI reference and installation documentation with dynamic command discovery and package manager resilience
+
 ## 0.11.11
 
 ### Patch Changes

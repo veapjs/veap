@@ -5,7 +5,7 @@ This page walks from a fresh scaffold to a working page rendered through the vir
 ## 1. Create and boot the project
 
 ```bash
-bunx create-veap my-app
+bun create veap my-app
 cd my-app
 bun dev
 ```
