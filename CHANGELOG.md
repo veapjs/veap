@@ -1,5 +1,28 @@
 # @veap/framework
 
+## 0.11.5
+
+### Patch Changes
+
+- Fix Hot Module Replacement (HMR) for templates and plugins in development mode:
+  - Re-register in-memory template and plugin instances in `Application.bootstrap()` when already bootstrapped, refreshing stale component references across HMR re-evaluations.
+  - Ensures Next.js dev server updates template layouts, component overrides, widgets, and extensions seamlessly during local development.
+
+  Support explicit lifecycle teardown for auth extensions via string IDs:
+  - Introduce `AuthCallbackRegistry` supporting keyed registrations and explicit unregistration.
+  - Add `unregisterSecurityRequirement`, `unregisterAuthValidator`, `unregisterSessionAugmenter`, and related helpers to `@veap/framework/auth/server`.
+  - Update `auth-passkey-plugin` and `auth-totp-plugin` to register security requirements, auth validators, and session augmenters using their plugin IDs in `init` and explicitly unregister them in `onDisable`.
+  - Prevents disabled plugins from leaving stale security checks and session augmenters in memory.
+
+  Update documentation for templates HMR and auth extension lifecycle teardown:
+  - Document template development workflow, `dev:pkg` watch script, and Fast Refresh in `plugins/templates.md`.
+  - Document string ID registration and `onDisable()` teardown (`unregisterSecurityRequirement`, `unregisterAuthValidator`, `unregisterSessionAugmenter`, etc.) in `auth/extensibility.md`.
+  - Update plugin conventions and gate plugin examples in `plugins/creating-plugins.md`, `guides/gate-plugins.md`, and `guides/cookbook.md`.
+
+  Update package dependencies to use explicit package versions instead of workspace protocols for reliable version resolution and automated changeset releases.
+
+- chore(deps): Update package dependencies to use explicit package versions instead of workspace protocols for reliable version resolution and automated changeset releases.
+
 ## 0.11.4
 
 ### Patch Changes

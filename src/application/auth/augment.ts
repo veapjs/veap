@@ -5,6 +5,8 @@ import type {
   User,
 } from "../../domain/auth/types";
 
+import { AuthCallbackRegistry } from "./registry";
+
 /**
  * REGISTRIES FOR MODULAR EXTENSIONS
  */
@@ -16,37 +18,86 @@ type PasswordResetSessionAugmenter = (
 ) => Promise<Partial<PasswordResetSession>>;
 
 const globalForAugment = globalThis as unknown as {
-  __VEAP_IDENTITY_AUGMENTERS__: Set<IdentityAugmenter> | undefined;
-  __VEAP_SESSION_AUGMENTERS__: Set<SessionAugmenter> | undefined;
+  __VEAP_IDENTITY_AUGMENTERS__:
+    | AuthCallbackRegistry<IdentityAugmenter>
+    | undefined;
+  __VEAP_SESSION_AUGMENTERS__:
+    | AuthCallbackRegistry<SessionAugmenter>
+    | undefined;
   __VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__:
-    Set<PasswordResetSessionAugmenter> | undefined;
+    | AuthCallbackRegistry<PasswordResetSessionAugmenter>
+    | undefined;
 };
 
 const identityAugmenters =
-  globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ ?? new Set<IdentityAugmenter>();
+  globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ ??
+  new AuthCallbackRegistry<IdentityAugmenter>();
 const sessionAugmenters =
-  globalForAugment.__VEAP_SESSION_AUGMENTERS__ ?? new Set<SessionAugmenter>();
+  globalForAugment.__VEAP_SESSION_AUGMENTERS__ ??
+  new AuthCallbackRegistry<SessionAugmenter>();
 const passwordResetSessionAugmenters =
   globalForAugment.__VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__ ??
-  new Set<PasswordResetSessionAugmenter>();
+  new AuthCallbackRegistry<PasswordResetSessionAugmenter>();
 
 globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ = identityAugmenters;
 globalForAugment.__VEAP_SESSION_AUGMENTERS__ = sessionAugmenters;
 globalForAugment.__VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__ =
   passwordResetSessionAugmenters;
 
-export function registerIdentityAugmenter(augmenter: IdentityAugmenter) {
-  identityAugmenters.add(augmenter);
+export function registerIdentityAugmenter(augmenter: IdentityAugmenter): void;
+export function registerIdentityAugmenter(
+  id: string,
+  augmenter: IdentityAugmenter,
+): void;
+export function registerIdentityAugmenter(
+  idOrAugmenter: string | IdentityAugmenter,
+  augmenter?: IdentityAugmenter,
+): void {
+  identityAugmenters.register(idOrAugmenter, augmenter);
 }
 
-export function registerSessionAugmenter(augmenter: SessionAugmenter) {
-  sessionAugmenters.add(augmenter);
+export function unregisterIdentityAugmenter(
+  idOrAugmenter: string | IdentityAugmenter,
+): boolean {
+  return identityAugmenters.unregister(idOrAugmenter);
+}
+
+export function registerSessionAugmenter(augmenter: SessionAugmenter): void;
+export function registerSessionAugmenter(
+  id: string,
+  augmenter: SessionAugmenter,
+): void;
+export function registerSessionAugmenter(
+  idOrAugmenter: string | SessionAugmenter,
+  augmenter?: SessionAugmenter,
+): void {
+  sessionAugmenters.register(idOrAugmenter, augmenter);
+}
+
+export function unregisterSessionAugmenter(
+  idOrAugmenter: string | SessionAugmenter,
+): boolean {
+  return sessionAugmenters.unregister(idOrAugmenter);
 }
 
 export function registerPasswordResetSessionAugmenter(
   augmenter: PasswordResetSessionAugmenter,
-) {
-  passwordResetSessionAugmenters.add(augmenter);
+): void;
+export function registerPasswordResetSessionAugmenter(
+  id: string,
+  augmenter: PasswordResetSessionAugmenter,
+): void;
+export function registerPasswordResetSessionAugmenter(
+  idOrAugmenter: string | PasswordResetSessionAugmenter,
+  augmenter?: PasswordResetSessionAugmenter,
+): void {
+  passwordResetSessionAugmenters.register(idOrAugmenter, augmenter);
+}
+
+export function unregisterPasswordResetSessionAugmenter(
+  idOrAugmenter: string | PasswordResetSessionAugmenter,
+): boolean {
+  return passwordResetSessionAugmenters.unregister(idOrAugmenter);
 }
 
 /**

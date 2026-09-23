@@ -100,6 +100,7 @@ export default announcePlugin;
 - **Models, actions and UI stay inside the plugin.** Import them from the plugin's package entry when another plugin needs them; that export surface is the plugin's contract.
 - **Register `MorphMap` aliases in `init()`** if your models participate in polymorphic relations (see the blog plugin for a full example).
 - **Create permissions in `onEnable`** and clean them up in `onDisable`; the RBAC tables are the shared vocabulary across plugins.
+- **Clean up auth extensions in `onDisable`**: If your plugin registers security requirements, auth validators, or session augmenters via `@veap/framework/auth/server`, supply a string ID in `init()` and call the corresponding `unregister*(id)` in `onDisable()` (see [Extending authentication](../auth/extensibility.md)). This ensures deactivating your plugin cleanly removes security gates from memory.
 - **Every user-visible string goes through the locales system**, even if you ship only English; the intl loader merges plugin dictionaries automatically.
 - **Set `hasSetup: true`** if the plugin needs a setup dialog; the panel plugin renders setup dialogs for plugins that declare extensions on the `plugin-setup-dialogs` point.
 
