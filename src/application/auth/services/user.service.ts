@@ -65,7 +65,14 @@ export class UserService {
     });
 
     await this.assignDefaultRole(user.id);
-    await sendRecoveryCode(user.email, recoveryCode);
+    try {
+      await sendRecoveryCode(user.email, recoveryCode);
+    } catch (error: any) {
+      console.warn(
+        `[veap:auth] Failed to send recovery code email to ${user.email}:`,
+        error?.message || error,
+      );
+    }
 
     return user;
   }
@@ -124,7 +131,14 @@ export class UserService {
     const recoveryCode = this.tokens.generateRecoveryCode();
     await this.users.setRecoveryCode(userId, this.cipher.encrypt(recoveryCode));
 
-    await sendRecoveryCode(user.email, recoveryCode);
+    try {
+      await sendRecoveryCode(user.email, recoveryCode);
+    } catch (error: any) {
+      console.warn(
+        `[veap:auth] Failed to send recovery code email to ${user.email}:`,
+        error?.message || error,
+      );
+    }
 
     return recoveryCode;
   }

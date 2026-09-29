@@ -1,5 +1,12 @@
 # @veap/framework
 
+## 0.11.13
+
+### Patch Changes
+
+- - **Communication**: Add graceful fallback to `ConsoleMailService` when `MAIL_TRANSPORT` is unset and no SMTP credentials are configured, preventing crashes in development and fresh installations.
+  - **Auth**: Wrap `sendRecoveryCode` in `UserService.createUser()` and `UserService.generateNewRecoverCode()` with safe error handling so email delivery issues do not abort user creation or crash installation flows.
+
 ## 0.11.12
 
 ### Patch Changes

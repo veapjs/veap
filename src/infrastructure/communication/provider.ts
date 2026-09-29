@@ -86,7 +86,23 @@ export class CommunicationServiceProvider extends ServiceProvider {
       return new ConsoleMailService((line) => logger.info("veap:mail", line));
     }
 
-    // Default ("smtp" / unset): whatever register() wired - Nodemailer.
+    const hasSmtpCredentials =
+      Boolean(
+        config.get("GOOGLE_SMTP_APP_USERNAME") || config.get("MAIL_USERNAME"),
+      ) &&
+      Boolean(
+        config.get("GOOGLE_SMTP_APP_PASSWORD") || config.get("MAIL_PASSWORD"),
+      );
+
+    if (!transport && !hasSmtpCredentials) {
+      logger.warn(
+        "veap:communication",
+        "MAIL_TRANSPORT is not set and no SMTP credentials (MAIL_USERNAME/MAIL_PASSWORD) are configured. Defaulting to ConsoleMailService (emails will be logged to server console).",
+      );
+      return new ConsoleMailService((line) => logger.info("veap:mail", line));
+    }
+
+    // Default ("smtp" / unset with credentials): whatever register() wired - Nodemailer.
     return this.container.resolve<IMailer>(MAILER);
   }
 }
