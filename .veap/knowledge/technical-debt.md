@@ -12,4 +12,10 @@ The Event Bus is an in-memory class instance. While this is fast and simple, it 
 
 ## 3. Global Bootstrapping Promise in Dev Mode
 
-In Next.js development mode (HMR - Hot Module Replacement), the global variable `__VEAP_BOOTSTRAPPING_PROMISE__` can sometimes be cleared or misaligned when the server reloads, causing plugins to attempt re-initialization and throw locked database errors.
+In Next.js development mode (HMR - Hot Module Replacement), the global variable `__VEAP_BOOTSTRAPPING_PROMISE__` coordinates lazy initialization across concurrent requests.
+**Status**: Failure cleanup was introduced to reset the promise if a provider throws, allowing subsequent requests to retry initialization rather than being trapped in an uncaught rejection state. Full HMR cache-invalidation for dynamic module reloading remains an area for further refinement.
+
+## 4. CSRF Protection for Custom Route Handlers
+
+While session cookies specify `SameSite: "lax"` and Server Actions in Next.js automatically enforce `Origin` / `Host` verification, classic API Route Handlers (`app/api/...`) performing state-changing operations (`POST`, `PUT`, `DELETE`) rely on individual route logic.
+**Status**: Implemented `verifySameOrigin(request: Request)` helper exported from `@veap/framework/auth/server` that validates `Sec-Fetch-Site` and `Origin` / `Host` consistency. Further work can provide an optional higher-order route middleware wrapper for plug-and-play handler protection.

@@ -1,4 +1,4 @@
-import { addHours } from "date-fns";
+import { addMinutes } from "date-fns";
 import { sendResetPassword } from "../../communication/mail";
 import { augmentPasswordResetSession } from "../augment";
 import { performFullUserAugmentation } from "../logic";
@@ -19,14 +19,33 @@ import {
   PASSWORD_RESET_REPOSITORY,
   type IPasswordResetRepository,
 } from "../../../domain/auth/repositories/password-reset.repository";
+import {
+  CACHE_PROVIDER,
+  type ICacheProvider,
+} from "../../../domain/contracts/cache";
+
+interface DummyResetSession {
+  id: string;
+  email: string;
+  expiresAt: Date;
+  attempts: number;
+}
+
+const dummySessions = new Map<string, DummyResetSession>();
 
 @Injectable()
 export class PasswordResetService {
+  private inMemoryAttempts = new Map<
+    string,
+    { count: number; expiresAt: number }
+  >();
+
   constructor(
     @Inject(PASSWORD_RESET_REPOSITORY)
     private readonly sessions: IPasswordResetRepository,
     @Inject(TOKEN_GENERATOR) private readonly tokens: ITokenGenerator,
     @Inject(COOKIE_STORE) private readonly cookieStore: ICookieStore,
+    @Inject(CACHE_PROVIDER) private readonly cache?: ICacheProvider,
   ) {}
 
   async createPasswordResetSession(
@@ -40,9 +59,37 @@ export class PasswordResetService {
       id: sessionId,
       email,
       code: this.tokens.generateOtp(),
-      expiresAt: new Date(addHours(new Date(), 1)),
+      expiresAt: new Date(addMinutes(new Date(), 15)),
       userId,
     });
+  }
+
+  /**
+   * Creates an ephemeral dummy reset session for an unregistered email.
+   * This prevents user enumeration while providing an identical UX.
+   */
+  async createDummyPasswordResetSession(
+    token: string,
+    email: string,
+  ): Promise<PasswordResetSessionType> {
+    const sessionId = this.tokens.hashToken(token);
+    const expiresAt = new Date(addMinutes(new Date(), 15));
+    const session: PasswordResetSessionType = {
+      id: sessionId,
+      email,
+      code: "------",
+      expiresAt,
+      userId: "dummy",
+    };
+
+    dummySessions.set(sessionId, {
+      id: sessionId,
+      email,
+      expiresAt,
+      attempts: 0,
+    });
+
+    return session;
   }
 
   async validatePasswordResetSessionToken(
@@ -52,6 +99,32 @@ export class PasswordResetService {
 
     const record = await this.sessions.findWithUser(sessionId);
     if (!record) {
+      // Check for dummy session to prevent timing and existence leakage
+      const dummy = dummySessions.get(sessionId);
+      if (dummy && new Date() <= new Date(dummy.expiresAt)) {
+        return {
+          session: {
+            id: dummy.id,
+            email: dummy.email,
+            code: "------",
+            expiresAt: dummy.expiresAt,
+            userId: "dummy",
+          },
+          user: {
+            id: "dummy",
+            email: dummy.email,
+            name: "User",
+            roles: [],
+            permissions: [],
+            emailVerifiedAt: null,
+            createdAt: new Date(),
+            updatedAt: null,
+            recovery_code: null,
+            image: null,
+            password: null,
+          } as any,
+        };
+      }
       return { session: null, user: null };
     }
 
@@ -71,6 +144,78 @@ export class PasswordResetService {
     );
 
     return { session, user };
+  }
+
+  /**
+   * Verifies the OTP code for a password reset session.
+   * Enforces a maximum of 5 failed attempts before terminating the session.
+   */
+  async verifyResetCode(
+    sessionId: string,
+    code: string,
+  ): Promise<{ valid: boolean; error?: string }> {
+    // Handle dummy session
+    const dummy = dummySessions.get(sessionId);
+    if (dummy) {
+      dummy.attempts += 1;
+      if (dummy.attempts >= 5 || new Date() > new Date(dummy.expiresAt)) {
+        dummySessions.delete(sessionId);
+        await this.deletePasswordResetSessionTokenCookie();
+        return {
+          valid: false,
+          error:
+            "Too many failed attempts. Password reset request has been cancelled.",
+        };
+      }
+      return { valid: false, error: "Incorrect code" };
+    }
+
+    const record = await this.sessions.findWithUser(sessionId);
+    if (!record) {
+      return { valid: false, error: "Invalid or expired session" };
+    }
+
+    if (new Date() > new Date(record.session.expiresAt)) {
+      await this.sessions.remove(sessionId);
+      await this.deletePasswordResetSessionTokenCookie();
+      return { valid: false, error: "Password reset code has expired" };
+    }
+
+    // Check attempts limit
+    const attemptKey = `pw_reset_attempts:${sessionId}`;
+    let attempts = 0;
+    if (this.cache) {
+      attempts = ((await this.cache.get<number>(attemptKey)) || 0) + 1;
+      await this.cache.set(attemptKey, attempts, 15 * 60);
+    } else {
+      const rec = this.inMemoryAttempts.get(sessionId);
+      attempts = (rec && Date.now() <= rec.expiresAt ? rec.count : 0) + 1;
+      this.inMemoryAttempts.set(sessionId, {
+        count: attempts,
+        expiresAt: Date.now() + 15 * 60 * 1000,
+      });
+    }
+
+    if (attempts >= 5) {
+      await this.sessions.remove(sessionId);
+      await this.deletePasswordResetSessionTokenCookie();
+      if (this.cache) await this.cache.delete(attemptKey);
+      this.inMemoryAttempts.delete(sessionId);
+      return {
+        valid: false,
+        error:
+          "Too many failed attempts. Password reset request has been cancelled.",
+      };
+    }
+
+    if (record.session.code !== code) {
+      return { valid: false, error: "Incorrect code" };
+    }
+
+    if (this.cache) await this.cache.delete(attemptKey);
+    this.inMemoryAttempts.delete(sessionId);
+    await this.sessions.setEmailVerified(sessionId);
+    return { valid: true };
   }
 
   async setPasswordResetSessionAsEmailVerified(

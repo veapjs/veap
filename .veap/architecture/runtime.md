@@ -5,6 +5,9 @@
 1. Next.js starts and handles the first request (e.g., to `app/layout.tsx`).
 2. `initializeSystem()` is called (cached by React).
 3. `app.bootstrap()` runs and initializes the configured Service Providers.
+   - If any provider throws during `register()` or `boot()`, the critical error is logged and re-thrown (failing fast instead of silently leaving the system in a half-initialized state).
+   - Next.js control flow exceptions (`NEXT_REDIRECT`, `NEXT_NOT_FOUND`) are re-thrown cleanly without logging.
+   - The bootstrapping promise is cleared on failure, allowing subsequent requests to attempt self-healing initialization.
 4. Core migrations are executed and `system:start` event is published.
 5. `PluginServiceProvider` fetches activation states from the DB, sorts plugins topologically by dependencies, and runs `migrations` -> `onMigrate` -> `onEnable` -> `init`.
 6. Templates are registered and the system is ready.

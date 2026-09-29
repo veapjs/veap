@@ -132,4 +132,65 @@ describe("Database Transaction (AsyncLocalStorage)", () => {
     const rows = await db("test_items").select("*");
     expect(rows).toHaveLength(0);
   });
+
+  describe("Savepoints (options.savepoint = true)", () => {
+    it("creates a separate savepoint transaction when savepoint: true", async () => {
+      let outerTrx: Knex.Transaction | undefined;
+      let innerTrx: Knex.Transaction | undefined;
+
+      await transaction(async (outer) => {
+        outerTrx = outer;
+
+        await transaction(
+          async (inner) => {
+            innerTrx = inner;
+            // With savepoint: true, inner is a savepoint transaction, distinct from outer
+            expect(inner).not.toBe(outer);
+
+            const currentKnex = getKnex();
+            await currentKnex("test_items").insert({ name: "savepoint-item" });
+          },
+          { savepoint: true },
+        );
+      });
+
+      expect(outerTrx).toBeDefined();
+      expect(innerTrx).toBeDefined();
+
+      const rows = await db("test_items").select("*");
+      expect(rows).toHaveLength(1);
+      expect(rows[0].name).toBe("savepoint-item");
+    });
+
+    it("rolls back ONLY inner changes to the savepoint when inner throws and outer catches", async () => {
+      await transaction(async () => {
+        const currentKnex = getKnex();
+        await currentKnex("test_items").insert({ name: "outer-preserved" });
+
+        try {
+          await transaction(
+            async () => {
+              const spKnex = getKnex();
+              await spKnex("test_items").insert({ name: "inner-aborted" });
+              throw new Error("Savepoint failure");
+            },
+            { savepoint: true },
+          );
+        } catch (err: any) {
+          expect(err.message).toBe("Savepoint failure");
+        }
+
+        // Outer transaction continues and inserts another item
+        await currentKnex("test_items").insert({ name: "outer-subsequent" });
+      });
+
+      // Verify that outer items were committed, but inner savepoint item was rolled back
+      const rows = await db("test_items").select("*").orderBy("id", "asc");
+      expect(rows).toHaveLength(2);
+      expect(rows.map((r) => r.name)).toEqual([
+        "outer-preserved",
+        "outer-subsequent",
+      ]);
+    });
+  });
 });

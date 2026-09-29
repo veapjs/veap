@@ -16,7 +16,11 @@ Veap uses Knex as the query engine, with two client targets: `better-sqlite3` fo
 `DatabaseServiceProvider` (registered by `.withDatabase()`) creates the Knex instance from `DATABASE_URL` at boot:
 
 - URLs starting with `sqlite:` / `file:` or ending in `.sqlite` / `.db` select `better-sqlite3`. All prefix forms (`sqlite:./storage/veap.sqlite`, `sqlite://...`, `file:...`) are understood, and the parent directory is created automatically.
-- Anything else selects `pg`, with SSL enabled automatically in production (unless the URL contains `sslmode=disable`).
+- Anything else selects `pg`. In production (`NODE_ENV=production`), SSL/TLS is enabled automatically with certificate verification enforced (`rejectUnauthorized: true`), protecting connections from Man-in-the-Middle (MITM) attacks.
+  - To connect to self-signed databases or legacy environments without valid certificates, set `DATABASE_SSL_REJECT_UNAUTHORIZED=false` in `.env`, or append `?sslmode=no-verify` / `?rejectUnauthorized=false` to `DATABASE_URL`.
+  - To provide a custom CA bundle, set `DATABASE_SSL_CA` in `.env` to the PEM certificate string.
+  - To disable SSL completely, append `?sslmode=disable` to `DATABASE_URL`.
+  - In development, SSL can be enabled by appending `?sslmode=require` or `?ssl=true` to `DATABASE_URL`.
 
 <!-- prettier-ignore -->
 > [!NOTE]

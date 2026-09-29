@@ -45,6 +45,75 @@ export function isSqliteDatabase(url?: string): boolean {
   );
 }
 
+export interface PostgresSslOptions {
+  databaseUrl: string;
+  isProd: boolean;
+  rejectUnauthorizedEnv?: string;
+  caCert?: string;
+}
+
+export type PostgresSslConfig =
+  | false
+  | {
+      rejectUnauthorized: boolean;
+      ca?: string;
+    };
+
+/**
+ * Resolves PostgreSQL TLS/SSL configuration based on environment, connection string parameters,
+ * and security settings.
+ *
+ * Rules:
+ * - If `sslmode=disable` is present in `databaseUrl`, TLS is disabled (`false`).
+ * - TLS is enabled if `isProd` is true, or if `databaseUrl` explicitly requests it (`sslmode=require`, `ssl=true`, `sslmode=no-verify`).
+ * - Certificate verification (`rejectUnauthorized`):
+ *   - Defaults to `true` in production (secure by default, protecting against MITM attacks).
+ *   - Can be explicitly disabled via `DATABASE_SSL_REJECT_UNAUTHORIZED="false"` (or `"0"`),
+ *     or via URL parameters: `sslmode=no-verify` or `rejectUnauthorized=false`.
+ * - Custom CA bundle can be passed via `caCert` (e.g. from `DATABASE_SSL_CA`).
+ */
+export function resolvePostgresSslConfig(
+  options: PostgresSslOptions,
+): PostgresSslConfig {
+  const { databaseUrl, isProd, rejectUnauthorizedEnv, caCert } = options;
+
+  if (databaseUrl.includes("sslmode=disable")) {
+    return false;
+  }
+
+  const isSslRequested =
+    isProd ||
+    databaseUrl.includes("sslmode=require") ||
+    databaseUrl.includes("ssl=true") ||
+    databaseUrl.includes("sslmode=no-verify");
+
+  if (!isSslRequested) {
+    return false;
+  }
+
+  let rejectUnauthorized = true;
+
+  if (rejectUnauthorizedEnv !== undefined) {
+    rejectUnauthorized =
+      rejectUnauthorizedEnv !== "false" && rejectUnauthorizedEnv !== "0";
+  } else if (
+    databaseUrl.includes("sslmode=no-verify") ||
+    databaseUrl.includes("rejectUnauthorized=false")
+  ) {
+    rejectUnauthorized = false;
+  }
+
+  const sslConfig: { rejectUnauthorized: boolean; ca?: string } = {
+    rejectUnauthorized,
+  };
+
+  if (caCert) {
+    sslConfig.ca = caCert;
+  }
+
+  return sslConfig;
+}
+
 /**
  * Resolves SQLite database filename, automatically redirecting to /tmp on serverless (Vercel/Lambda)
  * where the root deployment filesystem is read-only.
@@ -168,16 +237,44 @@ export const dbClient: Knex = new Proxy((() => {}) as any, {
   },
 });
 
+export interface TransactionOptions {
+  /**
+   * When true and called inside an existing transaction, creates a SAVEPOINT
+   * instead of reusing the outer transaction directly. This allows catching
+   * errors in the inner transaction without aborting the outer transaction.
+   *
+   * @default false (Propagation: REQUIRED - reuses outer transaction)
+   */
+  savepoint?: boolean;
+}
+
 /**
- * Executes a callback within a database transaction.
+ * Executes a callback within a database transaction managed via AsyncLocalStorage.
  * Automatically commits if callback succeeds, and rolls back if an error is thrown.
+ *
+ * Propagation semantics:
+ * - By default (options.savepoint = false), nested calls participate in the outer
+ *   transaction (Propagation: REQUIRED). Any unhandled error rolls back the entire transaction.
+ * - When options.savepoint = true and an outer transaction exists, a database SAVEPOINT is
+ *   created. Errors caught around the inner transaction only roll back to that SAVEPOINT,
+ *   allowing the outer transaction to continue.
  */
 export async function transaction<T>(
   callback: (trx: Knex.Transaction) => Promise<T>,
+  options?: TransactionOptions,
 ): Promise<T> {
   const currentTrx = getActiveTransaction();
   if (currentTrx) {
-    // Nested transaction support: reuse current transaction
+    if (options?.savepoint) {
+      // Nested savepoint support: creates a SAVEPOINT on the active transaction
+      return await currentTrx.transaction(async (spTrx) => {
+        return await transactionStorage.run(spTrx, async () => {
+          return await callback(spTrx);
+        });
+      });
+    }
+
+    // Default: Propagation REQUIRED (reuse current transaction)
     return await callback(currentTrx);
   }
 

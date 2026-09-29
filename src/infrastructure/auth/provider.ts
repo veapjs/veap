@@ -27,6 +27,7 @@ import {
   SECRET_CIPHER,
   TOKEN_GENERATOR,
 } from "../../domain/auth/ports";
+import { ConfigService } from "../config/config.service";
 import { BcryptPasswordHasher } from "./adapters/bcrypt-password-hasher";
 import { OsloTokenGenerator } from "./adapters/oslo-token-generator";
 import { AesSecretCipher } from "./adapters/aes-secret-cipher";
@@ -36,7 +37,14 @@ export class AuthServiceProvider extends ServiceProvider {
     // Cryptographic ports → concrete adapters
     this.container.register({
       token: PASSWORD_HASHER,
-      useClass: BcryptPasswordHasher,
+      useFactory: (config: ConfigService) => {
+        const roundsRaw = config.get("AUTH_BCRYPT_ROUNDS");
+        const minLengthRaw = config.get("AUTH_PASSWORD_MIN_LENGTH");
+        const rounds = roundsRaw ? parseInt(roundsRaw, 10) : undefined;
+        const minLength = minLengthRaw ? parseInt(minLengthRaw, 10) : undefined;
+        return new BcryptPasswordHasher(rounds, minLength);
+      },
+      inject: [ConfigService],
       singleton: true,
     });
 

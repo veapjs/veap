@@ -112,8 +112,9 @@ import {
 } from "@veap/framework/core/server";
 ```
 
-- `eventBus.publish(event)` - fire-and-forget typed publish. The payload is validated against the registered schema for the event name.
-- `eventBus.subscribe(name, handler)` - register a handler; returns an unsubscribe function.
+- `eventBus.publish(type, payload, source?, options?)` - typed publish with concurrent dispatch and handler fault isolation (errors logged via `logger.error`). Pass `{ strict: true }` in options to rethrow handler failures.
+- `eventBus.publishStrict(type, payload, source?)` - convenience method for strict publish (rethrows `Error` or `AggregateError` on failure).
+- `eventBus.subscribe(type, subscriberId, handler)` - register an idempotent handler (safe against HMR duplicate bindings); returns an unsubscribe function.
 - System events (`system:auth:*`, `system:plugins:*`, `system:settings:*`) have schemas in `SystemEventSchemas`; plugin events extend the map via `declare module` augmentation.
 - Client-safe events are re-exported from `@veap/framework` (no server imports required to publish from a Server Action).
 
@@ -159,7 +160,10 @@ import {
   sendVerificationEmail,
   verifyEmail,
   sendPasswordResetEmail,
+  createDummyPasswordResetSession,
+  verifyResetCode,
   resetPassword,
+  verifySameOrigin,
 } from "@veap/framework/auth/server";
 ```
 
@@ -371,7 +375,7 @@ import {
 ```
 
 - Models declare `static table = "name"` (the old `static tableName` is gone; see the ORM chapter for the full contract).
-- All writes must run inside `transaction(async (trx) => { ... })`.
+- All writes must run inside `transaction(async (trx) => { ... }, options?)` (uses `AsyncLocalStorage`; supports `{ savepoint: true }` for nested savepoints).
 - Full usage is documented in the Data chapter: [ORM](../data/orm.md), [Transactions](../data/transactions.md), [Migrations](../data/migrations.md).
 
 ## `@veap/framework/auth/models`, `@veap/framework/plugins/models`, `@veap/framework/settings/models`

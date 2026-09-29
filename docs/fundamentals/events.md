@@ -10,11 +10,11 @@ Veap provides an in-process publish/subscribe event bus designed for decoupled c
 
 The event bus coordinates operations within the current Node.js or browser runtime. It adheres to several core execution principles:
 
-The following diagram illustrates how events are published, dispatched concurrently across subscribers, and isolated from handler failures:
+The following diagram illustrates how events are published, dispatched concurrently across subscribers, and handled in standard vs. strict mode:
 
 ```mermaid
 flowchart TD
-    Pub(["eventBus.publish(type, payload, source)"]) --> Env["Wrap into SystemEvent envelope<br/>{ type, payload, timestamp, source }"]
+    Pub(["eventBus.publish(type, payload, source, options?)"]) --> Env["Wrap into SystemEvent envelope<br/>{ type, payload, timestamp, source }"]
     Env --> Lookup{"Subscribers registered<br/>for event type?"}
 
     Lookup -- "No subscribers" --> Done(["Completed (No-op)"])
@@ -28,19 +28,23 @@ flowchart TD
     H2 --> Catch2{"Threw error?"}
     H3 --> Catch3{"Success"}
 
-    Catch1 -- "NEXT_REDIRECT" --> Rethrow1(["Rethrow error to trigger Next.js redirect"])
-    Catch1 -- "Standard Error" --> Log1["Log warning via ILogger<br/>(Does not abort sibling handlers)"]
+    Catch1 -- "NEXT_REDIRECT / NEXT_NOT_FOUND" --> RethrowCtrl(["Rethrow Next.js navigation control error"])
+    Catch1 -- "Standard Error" --> Log1["Log error via ILogger.error<br/>(Recorded in failure collector)"]
 
-    Catch2 -- "Standard Error" --> Log2["Log warning via ILogger"]
-    Catch3 --> Complete(["All handlers settled"])
+    Catch2 -- "Standard Error" --> Log2["Log error via ILogger.error<br/>(Recorded in failure collector)"]
+    Catch3 --> CompleteCheck{"options.strict === true?"}
 
-    Log1 --> Complete
-    Log2 --> Complete
+    Log1 --> CompleteCheck
+    Log2 --> CompleteCheck
+
+    CompleteCheck -- "No (default)" --> Complete(["All handlers settled (fault isolation)"])
+    CompleteCheck -- "Yes & errors occurred" --> RethrowStrict(["Rethrow Error / AggregateError"])
 ```
 
 - **Idempotent subscription:** Calling `eventBus.subscribe(type, subscriberId, handler)` multiple times with the identical `subscriberId` for the same event type is a no-op. This avoids duplicated listeners during hot module reloading (HMR) or multi-pass plugin initializations.
-- **Concurrent handler execution:** Handlers execute concurrently via `Promise.all`. An unhandled rejection in one listener does not prevent subsequent listeners from executing; the error is caught and logged to the logger port.
-- **Next.js redirect support:** If a listener throws a Next.js navigation error (`NEXT_REDIRECT`), the bus preserves and rethrows it so server actions and router pipelines redirect as expected.
+- **Concurrent handler execution and fault isolation:** Handlers execute concurrently via `Promise.all`. In default mode, an unhandled rejection in one listener does not prevent subsequent listeners from executing; the error is caught and logged at error level (`logger.error`) for APM and monitoring systems.
+- **Next.js control flow support:** If a listener throws a Next.js navigation error (`NEXT_REDIRECT` or `NEXT_NOT_FOUND`), the bus immediately preserves and rethrows it so server actions and router pipelines redirect or render 404 views as expected.
+- **Strict mode for critical operations:** For operations where subscriber failures must abort the flow (such as security checks, audit logging, or billing workflows), specify `{ strict: true }` in `publish()` or call `eventBus.publishStrict()`. In strict mode, all listeners still complete concurrently, but all encountered errors are re-thrown (wrapped in an `AggregateError` if multiple listeners fail).
 - **Environment-aware logging:** In development mode (`NODE_ENV !== "production"`), every event dispatch logs debug details, except high-volume plugin lifecycle notifications. In production, dispatches run quietly.
 
 ```ts
@@ -52,8 +56,13 @@ eventBus.subscribe("system:auth:signup", "analytics-plugin", async (event) => {
   console.log(`New user registered: ${user.email} (Source: ${event.source})`);
 });
 
-// Publish: (eventType, payload, source?)
+// Standard publish (fault-tolerant: errors in subscribers are logged without aborting caller)
 await eventBus.publish("system:auth:signup", { user, session }, "auth-service");
+
+// Strict publish (throws AggregateError if any subscriber fails)
+await eventBus.publishStrict("system:plugin:toggle", { pluginId: "billing", enabled: true });
+// Or equivalently:
+await eventBus.publish("system:plugin:toggle", { pluginId: "billing", enabled: true }, "admin", { strict: true });
 
 // Unsubscribe by event type and subscriber ID
 eventBus.unsubscribe("system:auth:signup", "analytics-plugin");

@@ -8,8 +8,8 @@ The Event Bus (`packages/veap/src/application/events/event-bus.ts`) provides asy
 - It is a fully Dependency Injected class decorated with `@Injectable()`.
 - The pre-created global singleton (`eventBus`) is exposed in the IoC container by `KernelServiceProvider` under the domain token `EVENT_BUS`; the `EventBus` class token remains as a backwards-compatibility alias to the same instance. Its logger is injected via the composition-root hook `EventBus.setLogger(ILogger)`.
 - Events are strictly typed via the `SystemEventsMap` interface.
-- **Execution:** Publishing an event executes all listeners in parallel using `Promise.all()`.
-- **Error Handling:** Errors in listeners are caught and logged as warnings, ensuring they do not crash the publisher (except for Next.js `NEXT_REDIRECT` errors, which are re-thrown to allow server-side redirects).
+- **Error Handling:** Errors in listeners are caught and logged as errors (`logger.error`), ensuring they do not crash the publisher (fault isolation). Next.js control-flow exceptions (`NEXT_REDIRECT` and `NEXT_NOT_FOUND`) are re-thrown to allow server-side redirects and not-found handling.
+- **Strict Mode:** For critical operations that require all handlers to succeed, callers can specify `{ strict: true }` in `publish()` or use `eventBus.publishStrict()`. In strict mode, all listeners still run, and any failure is re-thrown (multiple failures are wrapped into an `AggregateError`).
 
 ## Usage Examples
 

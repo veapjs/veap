@@ -28,9 +28,9 @@ Veap ships a complete session-based authentication system in `@veap/framework`. 
 | Cookie helpers                   | `setSessionTokenCookie`, `deleteSessionTokenCookie`                                                                                                                                 |
 | Users                            | `createUser`, `createOAuthUser`, `getUserById`, `getUserFromEmail`, `updateUserPassword`, `updateUserName`, `updateUserAwatar` (sic, kept for compatibility), recovery code helpers |
 | Email verification               | `initEmailVerification`, `createEmailVerificationRequest`, `sendVerificationEmail`, `getUserEmailVerificationRequestFromRequest`, cookie helpers                                    |
-| Password reset                   | `createPasswordResetSession`, `validatePasswordResetSessionToken`, `getCurrentPasswordResetSession`, `sendPasswordResetEmail`, cookie helpers                                       |
+| Password reset                   | `createPasswordResetSession`, `createDummyPasswordResetSession`, `validatePasswordResetSessionToken`, `verifyResetCode`, `getCurrentPasswordResetSession`, `sendPasswordResetEmail`, cookie helpers |
 | RBAC                             | `getRoles`, `createRole`, `getPermissions`, `createPermission`, `assignPermissionToRole`, `assignRoleToUser`, ...                                                                   |
-| Security checks                  | `checkSecurity(session, user, roles, permissions)`                                                                                                                                  |
+| Security checks                  | `checkSecurity(session, user, roles, permissions)`, `verifySameOrigin(request)`                                                                                                     |
 | Validation schemas (client-safe) | `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `verifyEmailSchema`, ...                                                                            |
 | Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`                                                                                                                        |
 
@@ -89,6 +89,8 @@ export function SignInForm() {
 ```
 
 `AuthResponse` is a discriminated union: `SUCCESS` (with session and user), `CHALLENGE_REQUIRED` (2FA plugins intercept here and redirect into their own flow), or `ERROR` (message). Signing out is `signOut()`.
+
+`signIn` automatically enforces dual IP and email-based rate limiting (maximum 5 failed attempts per 15-minute window). Additionally, attempts against non-existent email addresses execute a dummy bcrypt hash verification to equalize response timing, mitigating account enumeration via timing attacks.
 
 ## Auth events
 

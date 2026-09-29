@@ -8,11 +8,15 @@ export const envSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   DATABASE_URL: z.string().url().optional(),
+  DATABASE_SSL_REJECT_UNAUTHORIZED: z.string().optional(),
+  DATABASE_SSL_CA: z.string().optional(),
   /**
    * Base64 key decoding to 16, 24 or 32 bytes (AES-128/192/256). No default:
    * a missing key fails validation here, before any encryption is attempted.
    */
   ENCRYPTION_KEY: z.string().min(1),
+  AUTH_BCRYPT_ROUNDS: z.string().optional(),
+  AUTH_PASSWORD_MIN_LENGTH: z.string().optional(),
   FILE_STORAGE_FOLDER: z.string().default("public/storage"),
 
   // Mail

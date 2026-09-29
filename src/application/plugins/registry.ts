@@ -81,12 +81,31 @@ export class PluginRegistry {
       this.logger.info("PluginRegistry", `"${id}" step: ${update.lastStep}`);
     }
 
+    const isStateTransition =
+      update.enabled !== undefined || update.installed !== undefined;
+
     try {
       await this.repository.upsertStatus(id, update, {
         system: this.plugins.get(id)?.manifest.system ?? false,
       });
     } catch (e) {
-      this.logger.warn("PluginRegistry", `DB status sync failed for ${id}:`, e);
+      if (isStateTransition) {
+        // Rollback in-memory state on DB failure to avoid split-brain
+        this.pluginStatus.set(id, current);
+        this.logger.error(
+          "PluginRegistry",
+          `Critical: DB status sync failed for plugin "${id}". Rolling back in-memory state:`,
+          e,
+        );
+        throw e;
+      } else {
+        // Ephemeral progress steps (lastStep) can safely fail without aborting
+        this.logger.warn(
+          "PluginRegistry",
+          `DB step sync failed for "${id}":`,
+          e,
+        );
+      }
     }
   }
 

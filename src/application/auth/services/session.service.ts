@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import { Inject, Injectable } from "../../../domain/contracts/ioc";
 import {
   COOKIE_STORE,
@@ -35,10 +36,28 @@ export class SessionService {
   ) {}
 
   /**
-   * Returns the user's IP address.
+   * Returns the user's validated IP address, checking trusted proxy headers first.
    */
   public async getIPAddress(): Promise<string | null> {
-    return this.requestContext.getHeader("x-forwarded-for");
+    const directHeaders = ["cf-connecting-ip", "x-real-ip", "x-client-ip"];
+    for (const header of directHeaders) {
+      const val = await this.requestContext.getHeader(header);
+      if (val && isIP(val.trim())) {
+        return val.trim();
+      }
+    }
+
+    const forwarded = await this.requestContext.getHeader("x-forwarded-for");
+    if (forwarded) {
+      const ips = forwarded.split(",").map((ip) => ip.trim());
+      for (const ip of ips) {
+        if (isIP(ip)) {
+          return ip;
+        }
+      }
+    }
+
+    return null;
   }
 
   /**

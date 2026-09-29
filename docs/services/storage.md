@@ -77,8 +77,10 @@ storage.setDefaultProvider("s3"); // optional; first non-local registration beco
 `LocalFileProvider` (registered automatically on first boot when the system is installed):
 
 - Writes into `FILE_STORAGE_FOLDER` (default `public/storage`), creating it if needed.
-- Names files `<slug>-<random>.<ext>`.
+- Enforces a security blocklist rejecting dangerous executable or web-interpretable extensions (`.html`, `.htm`, `.xhtml`, `.svg`, `.xml`, `.php`, `.phtml`, `.exe`, `.sh`, `.js`, etc.) to prevent Stored XSS and remote code execution.
+- Sanitizes file names (`path.basename`, strips null bytes `\0`, restricts basename characters to `[a-zA-Z0-9_-]`) and formats them as `<clean-basename>-<timestamp>-<random>.<ext>`.
 - Returns `url` as `/storage/<name>` (the `public` prefix stripped).
+- Validates relative paths strictly in `delete()` using `path.relative` to prevent directory traversal attacks targeting files outside `FILE_STORAGE_FOLDER`.
 - Serves files through the host route `app/storage/[...path]/route.ts`, which sets long-lived immutable cache headers and rejects traversal outside the storage root.
 
 ## Configuration

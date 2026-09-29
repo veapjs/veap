@@ -76,9 +76,13 @@ Route-level `error` components on `RouteNode`s are wrapped in `RouterErrorBounda
 
 Veap's own flows throw `AppError.Validation(...)`. Zod schema failures inside actions should be converted (see the example in [Server Actions](./server-actions.md)); the schema objects themselves (for example `loginSchema`) are client-safe so client components can pre-validate.
 
-## Redirects as errors
+## Next.js control flow exceptions (redirects and notFound)
 
-`redirect()` from `next/navigation` works by throwing. Veap explicitly re-throws redirect digest errors in three places: the action error handler, the event bus, and the bootstrap error boundary, so a `redirect()` inside a middleware, event handler or action behaves normally. Never catch bare `Error`s around `redirect()` calls without re-throwing digest errors.
+`redirect()` and `notFound()` from `next/navigation` work by throwing internal control-flow exceptions (with digests `NEXT_REDIRECT` and `NEXT_NOT_FOUND`). Veap explicitly preserves and re-throws these exceptions across the framework: in the Server Action error handler, the event bus, and the application bootstrap process. Never catch bare `Error`s around `redirect()` or `notFound()` calls without re-throwing these digest errors.
+
+## Bootstrap failures
+
+`Application.bootstrap()` logs critical initialization failures and re-throws the error to prevent silent partial boots. If a Service Provider fails during `register()` or `boot()`, the global bootstrapping promise is cleaned up so subsequent requests can attempt recovery rather than being permanently stuck on a rejected state.
 
 ## Logging
 

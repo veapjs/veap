@@ -7,24 +7,80 @@ import type {
 } from "../../../domain/storage/types";
 import { ConfigService } from "../../../infrastructure/config/config.service";
 
+const DANGEROUS_EXTENSIONS = new Set([
+  ".html",
+  ".htm",
+  ".xhtml",
+  ".shtml",
+  ".svg",
+  ".xml",
+  ".php",
+  ".phtml",
+  ".php3",
+  ".php4",
+  ".php5",
+  ".phps",
+  ".asp",
+  ".aspx",
+  ".jsp",
+  ".jspx",
+  ".cgi",
+  ".pl",
+  ".py",
+  ".sh",
+  ".bash",
+  ".exe",
+  ".dll",
+  ".bat",
+  ".cmd",
+  ".ps1",
+  ".vbs",
+  ".js",
+  ".mjs",
+  ".cjs",
+  ".jsx",
+  ".ts",
+  ".tsx",
+  ".phar",
+  ".htaccess",
+  ".env",
+  ".config",
+]);
+
 export class LocalFileProvider implements IStorageProvider {
   public id = "local";
   public name = "Local Filesystem";
 
   constructor(private config: ConfigService) {}
 
-  private generateUniqueImageName(name: string) {
-    const cleanName = name.replace(/\s+/g, "-").toLowerCase();
-    const suffix = Math.floor(Math.random() * Date.now()).toString(36);
-    const index = cleanName.lastIndexOf(".");
+  private generateUniqueImageName(originalName: string) {
+    const rawName = path.basename(originalName || "file").replace(/\0/g, "");
+    const ext = path.extname(rawName).toLowerCase();
+    const baseWithoutExt = path
+      .basename(rawName, ext)
+      .replace(/[^a-zA-Z0-9_-]/g, "_")
+      .toLowerCase();
+    const cleanBase = baseWithoutExt || "file";
+    const suffix = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
 
-    return index < 0
-      ? `${cleanName}-${suffix}`
-      : `${cleanName.slice(0, index)}-${suffix}${cleanName.slice(index)}`;
+    return `${cleanBase}-${suffix}${ext}`;
   }
 
   public async upload(file: File): Promise<StorageResult> {
     try {
+      const rawName = path.basename(file.name || "file").replace(/\0/g, "");
+      const ext = path.extname(rawName).toLowerCase();
+
+      if (!ext || DANGEROUS_EXTENSIONS.has(ext)) {
+        warn(
+          "veap:storage",
+          `Blocked file upload with disallowed or dangerous extension: "${ext}"`,
+        );
+        return {
+          error: `File type "${ext}" is not allowed for security reasons`,
+        };
+      }
+
       const storageFolder = this.config.get("FILE_STORAGE_FOLDER");
 
       if (!fs.existsSync(/*turbopackIgnore: true*/ storageFolder)) {
@@ -33,7 +89,7 @@ export class LocalFileProvider implements IStorageProvider {
         });
       }
 
-      const name = this.generateUniqueImageName(file.name);
+      const name = this.generateUniqueImageName(rawName);
       const filePath = path.join(/*turbopackIgnore: true*/ storageFolder, name);
       const buffer = await file.arrayBuffer();
       fs.writeFileSync(/*turbopackIgnore: true*/ filePath, Buffer.from(buffer));
@@ -82,8 +138,9 @@ export class LocalFileProvider implements IStorageProvider {
         /*turbopackIgnore: true*/ storageFolder,
       );
 
-      // Security check: ensure filePath is inside the storage folder to avoid directory traversal
-      if (!absolutePath.startsWith(absoluteStorageFolder)) {
+      // Security check: ensure filePath is strictly inside the storage folder to prevent directory traversal
+      const relative = path.relative(absoluteStorageFolder, absolutePath);
+      if (relative.startsWith("..") || path.isAbsolute(relative)) {
         warn(
           "veap:storage",
           `Directory traversal attempt blocked: ${absolutePath}`,

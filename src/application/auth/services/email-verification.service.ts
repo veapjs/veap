@@ -1,4 +1,4 @@
-import { addHours } from "date-fns";
+import { addMinutes } from "date-fns";
 import { sendVerifyEmail } from "../../communication/mail";
 import { registerSecurityRequirement } from "../logic";
 import { SessionService } from "./session.service";
@@ -67,7 +67,7 @@ export class EmailVerificationService {
       userId,
       code: this.tokens.generateOtp(),
       email,
-      expiresAt: new Date(addHours(new Date(), 1)),
+      expiresAt: new Date(addMinutes(new Date(), 15)),
     });
   }
 

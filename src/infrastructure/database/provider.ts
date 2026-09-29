@@ -6,6 +6,7 @@ import {
   setKnex,
   isSqliteDatabase,
   resolveSqliteFilename,
+  resolvePostgresSslConfig,
 } from "./orm/connection";
 import knex from "knex";
 import { debug } from "../../infrastructure/logging/console-logger";
@@ -30,16 +31,20 @@ export class DatabaseServiceProvider extends ServiceProvider {
         `Auto-initializing Knex from DATABASE_URL with client: ${client}`,
       );
 
+      const ssl = resolvePostgresSslConfig({
+        databaseUrl,
+        isProd,
+        rejectUnauthorizedEnv: config.get("DATABASE_SSL_REJECT_UNAUTHORIZED"),
+        caCert: config.get("DATABASE_SSL_CA"),
+      });
+
       const instance = knex({
         client,
         connection: isSqlite
           ? { filename: resolveSqliteFilename(databaseUrl) }
           : {
               connectionString: databaseUrl,
-              ssl:
-                isProd && !databaseUrl.includes("sslmode=disable")
-                  ? { rejectUnauthorized: false }
-                  : false,
+              ssl,
             },
         useNullAsDefault: true,
       });

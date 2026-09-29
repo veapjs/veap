@@ -64,3 +64,20 @@ export async function sendPasswordResetEmail(
 ): Promise<void> {
   return authContext().passwordReset.sendPasswordResetEmail(email, code);
 }
+
+export async function createDummyPasswordResetSession(
+  token: string,
+  email: string,
+): Promise<PasswordResetSessionType> {
+  return authContext().passwordReset.createDummyPasswordResetSession(
+    token,
+    email,
+  );
+}
+
+export async function verifyResetCode(
+  sessionId: string,
+  code: string,
+): Promise<{ valid: boolean; error?: string }> {
+  return authContext().passwordReset.verifyResetCode(sessionId, code);
+}

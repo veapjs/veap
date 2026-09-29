@@ -67,7 +67,10 @@ describe("PluginRegistry", () => {
     };
     eventBus = {
       publish: vi.fn(async () => {}),
+      publishStrict: vi.fn(async () => {}),
       subscribe: vi.fn(() => () => {}),
+      unsubscribe: vi.fn(),
+      clearAll: vi.fn(),
     };
     logger = {
       info: vi.fn(),
@@ -319,6 +322,86 @@ describe("PluginRegistry", () => {
         },
       );
       expect(privilegedExts).toHaveLength(3);
+    });
+  });
+
+  describe("Plugin Status DB Synchronization & Resilience", () => {
+    it("rolls back in-memory state and re-throws when DB upsertStatus fails during togglePlugin", async () => {
+      const plugin: IPlugin = {
+        manifest: { id: "faulty-plugin", name: "Faulty Plugin" },
+      };
+
+      registry.register(plugin);
+      await registry.init();
+
+      // Ensure initially disabled
+      const initialStatus = await registry.getPluginStatus("faulty-plugin");
+      expect(initialStatus?.enabled).toBe(false);
+
+      // Simulate database failure on upsertStatus
+      const dbError = new Error("Database deadlock / write failure");
+      vi.spyOn(repository, "upsertStatus").mockRejectedValue(dbError);
+
+      // togglePlugin should reject
+      await expect(
+        registry.togglePlugin("faulty-plugin", true),
+      ).rejects.toThrow("Database deadlock / write failure");
+
+      // In-memory status must be rolled back to false (no split-brain)
+      const afterStatus = await registry.getPluginStatus("faulty-plugin");
+      expect(afterStatus?.enabled).toBe(false);
+
+      // Event bus must NOT have published the toggle event
+      expect(eventBus.publish).not.toHaveBeenCalledWith(
+        "system:plugin:toggle",
+        expect.anything(),
+      );
+
+      // Error must be logged as error
+      expect(logger.error).toHaveBeenCalledWith(
+        "PluginRegistry",
+        expect.stringContaining("Critical: DB status sync failed"),
+        dbError,
+      );
+    });
+
+    it("tolerates DB failure during ephemeral progress step updates without crashing", async () => {
+      const plugin: IPlugin = {
+        manifest: { id: "progress-plugin", name: "Progress Plugin" },
+      };
+
+      registry.register(plugin);
+      await registry.init();
+
+      // Fail ONLY when update only contains lastStep, but allow enabled/installed transitions
+      const originalUpsert = repository.upsertStatus.bind(repository);
+      vi.spyOn(repository, "upsertStatus").mockImplementation(
+        async (id, update, meta) => {
+          if (
+            update.lastStep !== undefined &&
+            update.enabled === undefined &&
+            update.installed === undefined
+          ) {
+            throw new Error("Ephemeral step DB write timeout");
+          }
+          return originalUpsert(id, update, meta);
+        },
+      );
+
+      // togglePlugin should still succeed even if progress steps failed to persist to DB
+      await expect(
+        registry.togglePlugin("progress-plugin", true),
+      ).resolves.toBeUndefined();
+
+      const finalStatus = await registry.getPluginStatus("progress-plugin");
+      expect(finalStatus?.enabled).toBe(true);
+
+      // Ephemeral step failure is logged as a warning, not fatal
+      expect(logger.warn).toHaveBeenCalledWith(
+        "PluginRegistry",
+        expect.stringContaining("DB step sync failed"),
+        expect.any(Error),
+      );
     });
   });
 });

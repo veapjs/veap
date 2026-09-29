@@ -1,5 +1,22 @@
 # @veap/framework
 
+## 0.11.14
+
+### Patch Changes
+
+- ### Security Hardening & Architectural Fixes
+  - **File Upload Security & Path Traversal (VULN-05)**: Added dangerous extension blocklist (`.html`, `.svg`, `.php`, `.exe`, `.sh`, `.js`, etc.) and filename sanitization in `LocalFileProvider` to prevent Stored XSS and server-side script execution. Hardened `delete()` against path traversal using normalized relative path validation.
+  - **Password Reset OTP & Security (SEC-01 & VULN-06)**: Reduced OTP TTL from 1 hour to 15 minutes in `PasswordResetService` and `EmailVerificationService`, added attempt tracking (max 5 failed attempts per session before invalidation), and introduced `createDummyPasswordResetSession` and `verifyResetCode` facades in `@veap/framework/auth/server` for user enumeration and brute-force protection.
+  - **Login Brute-Force & Timing Attacks (SEC-02)**: Added IP and email-based rate limiting (max 5 failed attempts per 15 minutes) and dummy password hash verification to `AuthService.signIn()` in `@veap/framework`.
+  - **PostgreSQL TLS (SEC-04)**: Enforced secure-by-default TLS certificate verification (`rejectUnauthorized: true`) for PostgreSQL in production to prevent Man-in-the-Middle (MITM) vulnerabilities. Allow opt-out via `DATABASE_SSL_REJECT_UNAUTHORIZED=false`, `?sslmode=no-verify`, or `?rejectUnauthorized=false`. Support custom CA bundles via `DATABASE_SSL_CA`, and support development TLS when requested in `DATABASE_URL` (`?sslmode=require` or `?ssl=true`).
+  - **CSRF & Origin Verification (SEC-05)**: Added `verifySameOrigin(request)` helper to `@veap/framework/auth/server` verifying `Sec-Fetch-Site` and `Origin`/`Host` consistency on state-changing requests.
+  - **IP Spoofing (SEC-06)**: Hardened `getIPAddress()` in `SessionService` to validate IPv4/IPv6 format with `node:net.isIP()` and respect trusted proxy headers (`cf-connecting-ip`, `x-real-ip`, `x-client-ip`).
+  - **EventBus Error Handling (SEC-08)**: Upgraded unhandled handler logging from warning to `logger.error` for better observability in APM/monitoring. Re-throw Next.js `NEXT_NOT_FOUND` alongside `NEXT_REDIRECT`. Added opt-in strict mode (`{ strict: true }` option and `publishStrict()` convenience method) that collects and re-throws handler errors (wrapped in `AggregateError` when multiple fail) while preserving default fault isolation for standard pub/sub events.
+  - **Bootstrap Fail-Closed (SEC-09)**: Fix error propagation in `Application.bootstrap()` to prevent silent initialization failures. Re-throw caught errors after logging, preserve Next.js control flow exceptions (`NEXT_REDIRECT`, `NEXT_NOT_FOUND`), and clean up the bootstrapping promise on failure for transient self-healing.
+  - **Database Savepoints**: Documented nested transaction semantics (`Propagation: REQUIRED` by default reusing existing outer transaction via `AsyncLocalStorage`) and added opt-in savepoints support via `transaction(fn, { savepoint: true })` for partial rollback isolation without failing the outer transaction.
+  - **Auth Cryptography**: Made bcrypt salt rounds and password minimum length configurable via `AUTH_BCRYPT_ROUNDS` (default: 10) and `AUTH_PASSWORD_MIN_LENGTH` (default: 8), allowing higher security costs in production and fast execution in tests without changing source code.
+  - **Plugin Status Split-Brain**: Prevent split-brain state in `PluginRegistry.updateStatus()` by rolling back in-memory state and re-throwing errors when database persistence fails during plugin state transitions (`enabled`/`installed`), while allowing ephemeral UI progress steps (`lastStep`) to safely degrade without crashing.
+
 ## 0.11.13
 
 ### Patch Changes

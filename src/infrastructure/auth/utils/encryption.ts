@@ -3,13 +3,13 @@ import { DynamicBuffer } from "@oslojs/binary";
 import { decodeBase64 } from "@oslojs/encoding";
 
 /**
- * AES-128-GCM secret encryption for at-rest data (recovery codes, TOTP
- * secrets). The key is read once from the environment, base64-decoded and
- * validated at module load - an invalid configuration fails fast on boot
+ * AES-GCM (128, 192, or 256-bit based on key length) secret encryption for at-rest
+ * data (recovery codes, TOTP secrets). The key is read once from the environment,
+ * base64-decoded and validated at module load - an invalid configuration fails fast on boot
  * instead of surfacing as a cryptic `Invalid key length` on first use.
  *
  * The decoded key must be exactly 16, 24 or 32 bytes (AES-128/192/256).
- * Generate one with: `openssl rand -base64 16`
+ * Generate one with: `openssl rand -base64 16` (or 24 / 32)
  */
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
@@ -37,7 +37,7 @@ const ALGORITHM =
       : "aes-256-gcm";
 
 /**
- * Encrypts data using AES-128-GCM.
+ * Encrypts data using AES-GCM.
  * @param data Data to be encrypted.
  * @returns Encrypted data including IV and auth tag.
  */
@@ -63,7 +63,7 @@ export function encryptString(data: string): Uint8Array {
 }
 
 /**
- * Decrypts data using AES-128-GCM.
+ * Decrypts data using AES-GCM.
  * @param encrypted Encrypted data (IV + content + auth tag).
  * @returns Decrypted data.
  */

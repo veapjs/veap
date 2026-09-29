@@ -4,7 +4,10 @@ import type {
   SystemEvent,
   SystemEventsMap,
 } from "../../domain/events/types";
-import type { IEventBus } from "../../domain/contracts/event-bus";
+import type {
+  IEventBus,
+  PublishOptions,
+} from "../../domain/contracts/event-bus";
 import { Injectable } from "../../domain/contracts/ioc";
 
 /**
@@ -83,6 +86,7 @@ export class EventBus implements IEventBus {
     eventType: K | (string & {}),
     payload: SystemEventsMap[K],
     source: string = "system",
+    options?: PublishOptions,
   ): Promise<void> {
     const type = eventType as string;
     const eventHandlers = this.handlers.get(type);
@@ -108,23 +112,49 @@ export class EventBus implements IEventBus {
       source,
     };
 
+    const errors: any[] = [];
+
     await Promise.all(
       handlers.map(async (handler) => {
         try {
           await handler(event);
         } catch (error: any) {
-          // Re-throw Next.js redirect errors to allow them to work
-          if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+          // Re-throw Next.js control flow exceptions to allow them to work
+          if (
+            error?.digest?.startsWith("NEXT_REDIRECT") ||
+            error?.digest?.startsWith("NEXT_NOT_FOUND")
+          ) {
             throw error;
           }
-          this.log.warn(
+          this.log.error(
             "veap:event",
             `Handler Error for ${String(eventType)}:`,
             error,
           );
+          if (options?.strict) {
+            errors.push(error);
+          }
         }
       }),
     );
+
+    if (errors.length > 0) {
+      if (errors.length === 1) {
+        throw errors[0];
+      }
+      throw new AggregateError(
+        errors,
+        `Multiple handler errors (${errors.length}) occurred for event "${String(eventType)}"`,
+      );
+    }
+  }
+
+  public async publishStrict<K extends keyof SystemEventsMap>(
+    eventType: K | (string & {}),
+    payload: SystemEventsMap[K],
+    source: string = "system",
+  ): Promise<void> {
+    return this.publish(eventType, payload, source, { strict: true });
   }
 }
 

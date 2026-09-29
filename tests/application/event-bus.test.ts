@@ -129,7 +129,7 @@ describe("EventBus", () => {
 
     expect(failing).toHaveBeenCalledTimes(1);
     expect(healthy).toHaveBeenCalledTimes(1);
-    expect(logger.warn).toHaveBeenCalledTimes(1);
+    expect(logger.error).toHaveBeenCalledTimes(1);
   });
 
   it("re-throws Next.js redirect signals instead of swallowing them", async () => {
@@ -146,6 +146,84 @@ describe("EventBus", () => {
         user: { id: "u" } as never,
       }),
     ).rejects.toBe(redirectError);
+  });
+
+  it("re-throws Next.js not-found signals (NEXT_NOT_FOUND) instead of swallowing them", async () => {
+    const notFoundError = Object.assign(new Error("NEXT_NOT_FOUND"), {
+      digest: "NEXT_NOT_FOUND",
+    });
+    bus.subscribe("system:auth:login", "notfound", () => {
+      throw notFoundError;
+    });
+
+    await expect(
+      bus.publish("system:auth:login", {
+        session: { id: "s" } as never,
+        user: { id: "u" } as never,
+      }),
+    ).rejects.toBe(notFoundError);
+  });
+
+  describe("strict mode", () => {
+    it("throws handler error when publish is called with { strict: true }", async () => {
+      const failing = vi.fn().mockRejectedValue(new Error("critical error"));
+      bus.subscribe("system:auth:login", "failing", failing);
+
+      await expect(
+        bus.publish(
+          "system:auth:login",
+          {
+            session: { id: "s" } as never,
+            user: { id: "u" } as never,
+          },
+          "system",
+          { strict: true },
+        ),
+      ).rejects.toThrow("critical error");
+    });
+
+    it("throws handler error when publishStrict convenience method is used", async () => {
+      const failing = vi.fn().mockRejectedValue(new Error("strict error"));
+      bus.subscribe("system:auth:login", "failing", failing);
+
+      await expect(
+        bus.publishStrict("system:auth:login", {
+          session: { id: "s" } as never,
+          user: { id: "u" } as never,
+        }),
+      ).rejects.toThrow("strict error");
+    });
+
+    it("executes all handlers and collects all errors in an AggregateError when multiple fail", async () => {
+      const firstError = new Error("first failure");
+      const secondError = new Error("second failure");
+      const firstFailing = vi.fn().mockRejectedValue(firstError);
+      const secondFailing = vi.fn().mockRejectedValue(secondError);
+      const healthy = vi.fn().mockResolvedValue(undefined);
+
+      bus.subscribe("system:auth:login", "fail1", firstFailing);
+      bus.subscribe("system:auth:login", "fail2", secondFailing);
+      bus.subscribe("system:auth:login", "good", healthy);
+
+      let caughtError: any;
+      try {
+        await bus.publishStrict("system:auth:login", {
+          session: { id: "s" } as never,
+          user: { id: "u" } as never,
+        });
+      } catch (err) {
+        caughtError = err;
+      }
+
+      expect(firstFailing).toHaveBeenCalledTimes(1);
+      expect(secondFailing).toHaveBeenCalledTimes(1);
+      expect(healthy).toHaveBeenCalledTimes(1);
+
+      expect(caughtError).toBeInstanceOf(AggregateError);
+      expect(caughtError.errors).toHaveLength(2);
+      expect(caughtError.errors).toContain(firstError);
+      expect(caughtError.errors).toContain(secondError);
+    });
   });
 
   it("clearAll removes every subscription", async () => {

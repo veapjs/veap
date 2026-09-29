@@ -3,6 +3,17 @@ import type { Token } from "./token";
 import type { EventHandler, SystemEventsMap } from "../events/types";
 
 /**
+ * Options for publishing events.
+ */
+export interface PublishOptions {
+  /**
+   * If true, errors thrown by event handlers are re-thrown instead of
+   * swallowed. If multiple handlers fail, an AggregateError is thrown.
+   */
+  strict?: boolean;
+}
+
+/**
  * Event bus port (publish/subscribe).
  *
  * Consumers depend on this contract instead of the concrete in-memory bus,
@@ -20,6 +31,13 @@ export interface IEventBus {
   clearAll(): void;
 
   publish<K extends keyof SystemEventsMap>(
+    eventType: K | (string & {}),
+    payload: SystemEventsMap[K],
+    source?: string,
+    options?: PublishOptions,
+  ): Promise<void>;
+
+  publishStrict<K extends keyof SystemEventsMap>(
     eventType: K | (string & {}),
     payload: SystemEventsMap[K],
     source?: string,

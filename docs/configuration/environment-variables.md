@@ -25,8 +25,20 @@ DATABASE_URL="sqlite:./storage/veap.sqlite"
 
 - Prefixes `sqlite:`, `sqlite://`, `file:`, `file://`, or a `.sqlite`/`.db` suffix select better-sqlite3; the parent directory is created automatically. `:memory:` works everywhere except serverless.
 - On Vercel/Lambda the filesystem is read-only outside `/tmp`, so SQLite files are redirected to `/tmp/<basename>` with a warning that the data is ephemeral. Use PostgreSQL for serverless production.
-- PostgreSQL connections enable SSL automatically when `NODE_ENV=production`.
+- PostgreSQL connections enable SSL/TLS automatically when `NODE_ENV=production` with certificate validation enforced (`rejectUnauthorized: true`).
 - If `DATABASE_URL` is unset the database provider registers no engine and `transaction()` fails at call time.
+
+| Variable                           | Notes                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | `true` (default in production) or `false`. Setting to `false` disables TLS certificate verification (useful for self-signed certificates or legacy staging databases).         |
+| `DATABASE_SSL_CA`                  | Custom CA bundle in PEM format for validating self-signed or internal PostgreSQL certificates.                                                                                 |
+
+## Auth and security
+
+| Variable                   | Notes                                                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AUTH_BCRYPT_ROUNDS`       | Number of salt rounds for bcrypt password hashing (default: `10`). Increase to `12`+ in high-security production deployments; lower in test pipelines. |
+| `AUTH_PASSWORD_MIN_LENGTH` | Minimum required password character length (default: `8`).                                                                                               |
 
 ## Mail
 

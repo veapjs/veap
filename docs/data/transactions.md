@@ -17,20 +17,46 @@ await transaction(async () => {
 
 Inside the callback, `getKnex()` (used by every model query, the schema builder and repositories) returns the active transaction instead of the pool. That is the entire mechanism: all ORM and repository calls in the async context join the transaction without any parameter threading.
 
-## Nesting
+## Nesting and propagation
 
-Nested `transaction()` calls reuse the outer transaction instead of creating savepoints:
+Veap uses a `Propagation: REQUIRED` strategy by default: nested `transaction()` calls detect and reuse the active outer transaction rather than creating new database transactions.
 
 ```ts
 await transaction(async () => {
   await transferFunds();
   await transaction(async () => {
-    await auditLog(); // same trx as above
+    await auditLog(); // reuses outer transaction
   });
 });
 ```
 
-If the inner callback throws, the exception propagates and the outer transaction rolls back as usual.
+If the inner callback throws, the exception propagates and the entire outer transaction rolls back as usual.
+
+### Isolated nested transactions (savepoints)
+
+When you need partial rollback semantics—attempting an operation that might fail, catching the error, and continuing the rest of the outer transaction without rolling back prior work—pass `{ savepoint: true }`:
+
+```ts
+await transaction(async () => {
+  const order = await Order.create({ userId, total });
+
+  try {
+    // Isolated savepoint: failure here does not abort the outer transaction
+    await transaction(async () => {
+      await PaymentGateway.charge(order);
+    }, { savepoint: true });
+  } catch (error) {
+    // Only PaymentGateway queries were rolled back to the savepoint
+    // The outer transaction remains valid and uncorrupted
+    await Order.update({ id: order.id, status: "payment_failed" });
+  }
+});
+```
+
+When `{ savepoint: true }` is enabled:
+- If called inside an active transaction, Veap creates a nested transaction savepoint via Knex's `trx.transaction()`.
+- If an error is thrown within the callback, Knex issues a `ROLLBACK TO SAVEPOINT`. The outer transaction remains active, allowing your code to catch the error and proceed.
+- If called outside an active transaction, Veap initializes a standard root transaction.
 
 ## Accessing the transaction object
 

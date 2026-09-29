@@ -206,7 +206,10 @@ export class Application {
         logger.info("veap:bootstrap", "System initialized successfully.");
         g.__VEAP_BOOTSTRAPPED__ = true;
       } catch (error: any) {
-        if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+        if (
+          error?.digest?.startsWith("NEXT_REDIRECT") ||
+          error?.digest?.startsWith("NEXT_NOT_FOUND")
+        ) {
           throw error;
         }
         logger.error(
@@ -214,6 +217,7 @@ export class Application {
           "Critical error during system initialization:",
           error,
         );
+        throw error;
       } finally {
         g.__VEAP_BOOTSTRAPPING_PROMISE__ = null;
       }

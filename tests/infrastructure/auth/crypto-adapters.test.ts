@@ -12,6 +12,10 @@ vi.hoisted(() => {
 import { BcryptPasswordHasher } from "../../../src/infrastructure/auth/adapters/bcrypt-password-hasher";
 import { OsloTokenGenerator } from "../../../src/infrastructure/auth/adapters/oslo-token-generator";
 import { AesSecretCipher } from "../../../src/infrastructure/auth/adapters/aes-secret-cipher";
+import { Container } from "../../../src/infrastructure/ioc/container";
+import { ConfigService } from "../../../src/infrastructure/config/config.service";
+import { AuthServiceProvider } from "../../../src/infrastructure/auth/provider";
+import { PASSWORD_HASHER } from "../../../src/domain/auth/ports/password-hasher";
 
 /**
  * Cryptographic adapters - the concrete implementations behind the
@@ -47,11 +51,59 @@ describe("BcryptPasswordHasher", () => {
     expect(a).not.toBe(b);
   });
 
-  it("enforces the strength policy (8–255 chars)", async () => {
+  it("enforces the strength policy (8–255 chars by default)", async () => {
     await expect(hasher.validateStrength("short")).resolves.toBe(false);
     await expect(hasher.validateStrength("12345678")).resolves.toBe(true);
     await expect(hasher.validateStrength("x".repeat(255))).resolves.toBe(true);
     await expect(hasher.validateStrength("x".repeat(256))).resolves.toBe(false);
+  });
+
+  it("supports configurable bcrypt cost (salt rounds)", async () => {
+    const fastHasher = new BcryptPasswordHasher(4);
+    expect(fastHasher.rounds).toBe(4);
+
+    const hash = await fastHasher.hash("password");
+    // Bcrypt hash with cost 4 starts with $2a$04$ or $2b$04$
+    expect(hash).toMatch(/^\$2[ab]\$04\$/);
+    await expect(fastHasher.verify(hash, "password")).resolves.toBe(true);
+  });
+
+  it("falls back to cost 10 when invalid or out-of-bounds rounds are provided", () => {
+    expect(new BcryptPasswordHasher(2).rounds).toBe(10);
+    expect(new BcryptPasswordHasher(35).rounds).toBe(10);
+    expect(new BcryptPasswordHasher(NaN).rounds).toBe(10);
+  });
+
+  it("supports configurable minimum password length", async () => {
+    const strictHasher = new BcryptPasswordHasher(undefined, 12);
+    expect(strictHasher.minLength).toBe(12);
+
+    await expect(strictHasher.validateStrength("12345678")).resolves.toBe(false);
+    await expect(strictHasher.validateStrength("123456789012")).resolves.toBe(true);
+  });
+
+  it("reads configuration from process.env when arguments are omitted", () => {
+    const originalRounds = process.env.AUTH_BCRYPT_ROUNDS;
+    const originalMinLength = process.env.AUTH_PASSWORD_MIN_LENGTH;
+    try {
+      process.env.AUTH_BCRYPT_ROUNDS = "6";
+      process.env.AUTH_PASSWORD_MIN_LENGTH = "10";
+
+      const envHasher = new BcryptPasswordHasher();
+      expect(envHasher.rounds).toBe(6);
+      expect(envHasher.minLength).toBe(10);
+    } finally {
+      if (originalRounds !== undefined) {
+        process.env.AUTH_BCRYPT_ROUNDS = originalRounds;
+      } else {
+        delete process.env.AUTH_BCRYPT_ROUNDS;
+      }
+      if (originalMinLength !== undefined) {
+        process.env.AUTH_PASSWORD_MIN_LENGTH = originalMinLength;
+      } else {
+        delete process.env.AUTH_PASSWORD_MIN_LENGTH;
+      }
+    }
   });
 });
 
@@ -117,5 +169,24 @@ describe("AesSecretCipher", () => {
 
   it("rejects truncated payloads", () => {
     expect(() => cipher.decryptToString(new Uint8Array(10))).toThrow();
+  });
+});
+
+describe("AuthServiceProvider PASSWORD_HASHER binding", () => {
+  it("resolves PASSWORD_HASHER from Container with configured rounds and length", async () => {
+    const container = new Container();
+    const config = new ConfigService();
+    container.register({
+      token: ConfigService,
+      useValue: config,
+    });
+
+    const provider = new AuthServiceProvider(container);
+    provider.register();
+
+    const hasher = await container.resolve<BcryptPasswordHasher>(PASSWORD_HASHER);
+    expect(hasher).toBeInstanceOf(BcryptPasswordHasher);
+    expect(hasher.rounds).toBe(10);
+    expect(hasher.minLength).toBe(8);
   });
 });
