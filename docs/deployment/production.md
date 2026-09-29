@@ -47,7 +47,7 @@ The full list with behavior notes is in [Environment variables](../configuration
 
 ### Node server
 
-`next start` on any Node 22+ host behind a reverse proxy. Set `NODE_ENV=production`; SSL for PostgreSQL is enabled automatically in production when the driver supports it.
+`next start` on any Node 22+ host behind a reverse proxy. Set `NODE_ENV=production`. SSL for PostgreSQL is enabled automatically in production with strict certificate validation (`rejectUnauthorized: true`). Provide `DATABASE_SSL_CA` pointing to your CA bundle if connecting to managed databases with private or cloud-specific certificate authorities.
 
 ## Runtime behavior to expect
 
@@ -59,8 +59,9 @@ The full list with behavior notes is in [Environment variables](../configuration
 
 ## Pre-deploy checklist
 
-1. `ENCRYPTION_KEY` set and stable across deploys.
-2. `DATABASE_URL` reachable; migrations strategy decided (boot-time or release step).
-3. `next build` passes without `Context is not bound` (means the force-dynamic contract is intact).
-4. Mail transport configured and testable (`MAIL_TRANSPORT=console` in staging first).
-5. `public/` assets and any persistent storage volume accounted for.
+1. `ENCRYPTION_KEY` set and stable across deploys (must decode to 16, 24 or 32 bytes).
+2. `DATABASE_URL` reachable; PostgreSQL SSL certificate configured (`DATABASE_SSL_CA` provided if using custom CAs); migrations strategy decided.
+3. Reverse proxy configured to forward client headers (`Host`, `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`) for safe IP throttling and Same-Origin validation.
+4. `next build` passes without `Context is not bound` (verifies the force-dynamic contract is intact).
+5. Mail transport configured and verified (`MAIL_TRANSPORT=console` in staging first).
+6. File storage accounted for: persistent volume mounted for `public/storage` or a cloud provider (S3 / R2 / Vercel Blob) bound for serverless environments.

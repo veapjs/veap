@@ -43,7 +43,7 @@ export default function LoginPage() {
 }
 ```
 
-Under the hood: zod validation schemas from `@veap/framework/auth` validate credentials, `AuthService` verifies the password hash through the `PASSWORD_HASHER` port, `SessionService` creates a session and sets an httpOnly cookie through `COOKIE_STORE`.
+Under the hood: zod validation schemas from `@veap/framework/auth` validate credentials, `AuthService` verifies the password hash through the `PASSWORD_HASHER` port, protects against timing attacks using dummy hash verification, enforces brute-force throttling (5 attempts per 15-minute window), and `SessionService` creates a session and sets an httpOnly cookie through `COOKIE_STORE`.
 
 ## Reading the current user
 
@@ -122,13 +122,17 @@ import {
   sendVerificationEmail,
   verifyEmail,
   sendPasswordResetEmail,
+  verifyResetCode,
   resetPassword,
 } from "@veap/framework/auth/server";
 ```
 
 - `sendVerificationEmail(email)` creates a token and sends the message through the configured mail transport (`MAIL_TRANSPORT=console` prints it locally instead of sending).
 - `verifyEmail(email, code)` confirms the address.
-- `sendPasswordResetEmail(email)` + `resetPassword(token, newPassword)` complete recovery.
+- **Password reset (OTP flow):**
+  1. `await sendPasswordResetEmail(email)` creates a 6-character OTP (15-minute TTL), writes a signed `veap_reset_session` cookie, and dispatches the email. If the account does not exist, a dummy session is generated to prevent user enumeration.
+  2. `const verifiedToken = await verifyResetCode(code)` validates the code from the user input against the session cookie. It permits up to 5 attempts before locking the session.
+  3. `await resetPassword(verifiedToken, newPassword)` changes the password, invalidates active user sessions, and clears the reset cookie.
 - Messages are built by the auth mailables and sent through the `IMailer` port; see [Email and reset](../auth/email-and-reset.md).
 
 ## Sign-out

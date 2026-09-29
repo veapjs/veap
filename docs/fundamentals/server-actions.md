@@ -94,27 +94,50 @@ export async function toggleTask(id: string): Promise<Result<boolean>> {
 
 ## Authentication and authorization in actions
 
-A Server Action is an unauthenticated endpoint until you check. Veap gives you two layers:
+A Server Action is an unauthenticated public POST endpoint until you check caller identity. Always verify authentication and permissions using Veap's auth facades:
 
 ```ts
 "use server";
 
-import { getCurrentSession } from "@veap/framework/auth/server";
+import { requireUser, requireRole, requirePermission } from "@veap/framework/auth/server";
 import { AppError } from "@veap/framework/core";
+import { Task } from "../models/Task";
 
 export async function deleteTask(id: string) {
-  const { user, session } = await getCurrentSession();
-  if (!user || !session) {
-    throw AppError.Unauthorized();
+  // Enforces authentication; throws AppError.Unauthorized() if guest
+  const user = await requireUser();
+
+  // Enforces role-based or permission-based authorization; throws AppError.Forbidden()
+  await requireRole("admin");
+  // Alternatively: await requirePermission("tasks.delete");
+
+  const task = await Task.find(id);
+  if (!task) {
+    throw AppError.NotFound("Task not found");
   }
-  if (!user.roles?.includes("admin")) {
-    throw AppError.Forbidden();
-  }
-  // ...
+
+  await task.delete();
 }
 ```
 
 For confirm-style flows (require the password again before a sensitive action), the client hook `useConfirmAction` from `@veap/framework/react` drives the confirmation dialog protocol over the event bus, and your server code verifies with `verifyPasswordHash` from `@veap/framework/auth/server`.
+
+## Same-Origin and CSRF protection
+
+Next.js automatically enforces Origin headers on Server Actions. When building custom Route Handlers (`app/api/.../route.ts`) or hybrid endpoints that perform state-changing mutations, validate request provenance with `verifySameOrigin`:
+
+```ts
+import { verifySameOrigin } from "@veap/framework/auth/server";
+import { NextResponse, type NextRequest } from "next/server";
+
+export async function POST(request: NextRequest) {
+  // Checks Origin, Host, and Sec-Fetch-Site headers; throws AppError.Forbidden if cross-origin
+  verifySameOrigin(request);
+
+  // ... process mutation safely
+  return NextResponse.json({ success: true });
+}
+```
 
 ## Cookies, headers and redirects
 
@@ -122,7 +145,7 @@ Inside actions (like in RSC), use Next.js primitives or Veap's port-backed helpe
 
 - Session cookie handling is part of the session facade: `setSessionTokenCookie`, `deleteSessionTokenCookie`.
 - `redirect("/somewhere")` from `next/navigation` works and is recognized by the error handler.
-- Reading headers: `(await headers()).get("x-forwarded-for")` or `getIPAddress()` from the session facade.
+- Reading headers: `(await headers()).get("x-forwarded-for")` or `getIPAddress()` from the session facade (which safely validates IP formatting and resolves trusted proxy headers).
 
 ## Revalidation
 

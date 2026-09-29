@@ -25,9 +25,33 @@ The SQLite path's parent directory was unwritable or missing. The current resolv
 
 `DATABASE_URL` points at an unreachable server, wrong credentials, or a read-only filesystem. Fix the connection string first; the migration runner retries on the next boot.
 
+### `self-signed certificate in certificate chain` / `DEPTH_ZERO_SELF_SIGNED_CERT`
+
+In production (`NODE_ENV=production`), Veap enables SSL certificate validation (`rejectUnauthorized: true`) by default for PostgreSQL connections. If your database provider (such as AWS RDS, Supabase, or a private cluster) uses a custom certificate authority, specify the CA path using `DATABASE_SSL_CA`:
+
+```bash
+DATABASE_SSL_CA=/path/to/server-ca.pem
+```
+
+For staging environments that lack valid certificate chains, you can explicitly disable certificate validation with `DATABASE_SSL_REJECT_UNAUTHORIZED=false`.
+
 ### No database engine registered / `transaction()` throws
 
 `DATABASE_URL` is unset. Add it to the environment; the provider registers no engine without it by design.
+
+## Authentication and security
+
+### `Too many sign-in attempts` / Rate limit error on login
+
+`AuthService.signIn()` enforces brute-force protection: a maximum of 5 failed attempts per 15-minute window for any given IP address and email combination. Exceeding this threshold returns an error and rejects further sign-in attempts until the 15-minute window resets.
+
+### Password reset session expired or locked
+
+Password reset OTP codes expire after 15 minutes and allow up to 5 verification attempts. Submitting 5 invalid codes invalidates the reset session immediately to prevent online brute-force guessing. If a session is locked or expired, request a new password reset email.
+
+### 403 Forbidden / Cross-origin request rejected
+
+Protected endpoints using `verifySameOrigin(request)` compare the request `Origin` header against the expected `Host` and `X-Forwarded-Host`. Verify that your reverse proxy forwards headers correctly and that cross-origin scripts are not calling state-changing endpoints.
 
 ## Plugins and facades
 
@@ -60,6 +84,10 @@ A physical `app/page.tsx` and the optional catch-all both claim `/`. Next.js rej
 ### Files not served
 
 The local provider serves `FILE_STORAGE_FOLDER` (default `public/storage`) through `/storage/[...path]`. If the built-in route was removed from `app/storage/`, restore it, or bind a custom `IStorageProvider`.
+
+### Upload rejected with "File type not allowed"
+
+`LocalFileProvider` blocks dangerous extensions (`.html`, `.htm`, `.xhtml`, `.svg`, `.xml`, `.php`, `.phtml`, `.exe`, `.sh`, `.js`, etc.) to defend against Stored XSS and remote code execution. If your application must accept SVG or HTML assets, sanitize their contents explicitly or use an external cloud storage provider (like Amazon S3 or Cloudflare R2) served under an isolated domain with `Content-Disposition: attachment`.
 
 ## Where to look next
 
