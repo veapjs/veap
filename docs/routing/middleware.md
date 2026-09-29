@@ -79,6 +79,7 @@ Built-ins from `@veap/framework/router`:
 | `EnsuredAuth`  | session required; RBAC check via `checkSecurity`; redirects to `/signin` or the security redirect target |
 | `EnsuredUser`  | session required only; redirects to `/signin`                                                            |
 | `EnsuredGuest` | signed-in users are redirected away (referer or `/`)                                                     |
+| `SameOrigin`   | verifies request provenance on mutations; throws `AppError.Forbidden` if cross-origin or untrusted        |
 | `SkipSecurity` | marker that suppresses the automatic `EnsuredAuth` injection for the route; pair with `EnsuredUser`      |
 
 ## 3. API middleware
@@ -94,7 +95,10 @@ export const rateLimit: ApiMiddleware = async (request, context, next) => {
 };
 ```
 
-`ApiEnsuredAuth` (exported from `@veap/framework/router/server`) is the API counterpart of `EnsuredAuth` and returns `401` JSON bodies instead of redirecting. The generated API catch-all wires it automatically when `auth`/`roles`/`permissions` are declared.
+Built-in API middlewares from `@veap/framework/router/server`:
+
+- `ApiEnsuredAuth`: the API counterpart of `EnsuredAuth`, returning `401` JSON bodies instead of redirecting. The generated API catch-all wires it automatically when `auth`/`roles`/`permissions` are declared.
+- `ApiSameOrigin`: guards API routes against Cross-Site Request Forgery (CSRF). It inspects Fetch Metadata (`sec-fetch-site`) and compares `Origin` against `Host` / `X-Forwarded-Host` on mutating requests (POST, PUT, PATCH, DELETE), returning `403` JSON bodies on mismatch while allowing safe methods (GET, HEAD, OPTIONS).
 
 ## Route protection
 

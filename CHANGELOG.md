@@ -1,5 +1,11 @@
 # @veap/framework
 
+## 0.11.15
+
+### Patch Changes
+
+- Add `SameOrigin` (`VeapMiddleware`) and `ApiSameOrigin` (`ApiMiddleware`) in `@veap/framework/router` and `@veap/framework/router/server` for declarative CSRF and Same-Origin protection on page routes and API handlers.
+
 ## 0.11.14
 
 ### Patch Changes

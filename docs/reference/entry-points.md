@@ -274,7 +274,9 @@ import {
   handleVeapApiRequest, // adapter from a Next.js route handler to the pipeline
   EnsuredAuth, // pipeline middleware: requires an authenticated user
   EnsuredGuest, // pipeline middleware: requires a guest
-  EnsuredUser, // pipeline middleware: requires a specific user
+  EnsuredUser, // pipeline middleware: requires an authenticated session without gate checks
+  SameOrigin, // pipeline middleware: enforces same-origin on mutations
+  ApiSameOrigin, // API middleware: returns 403 on untrusted cross-origin mutations
 } from "@veap/framework/router/server";
 ```
 

@@ -15,9 +15,11 @@ export { withRouter } from "../presentation/router/react/with-router";
 // --- API & Middlewares ---
 export { handleVeapApiRequest } from "../presentation/router/api/handler";
 export {
+  ApiSameOrigin,
   EnsuredAuth,
   EnsuredGuest,
   EnsuredUser,
+  SameOrigin,
   SkipSecurity,
 } from "../presentation/router/api/middlewares";
 

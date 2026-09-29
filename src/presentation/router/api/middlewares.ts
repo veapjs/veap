@@ -2,6 +2,8 @@ import { checkSecurity } from "../../../application/auth/logic";
 import { getCurrentSession } from "../../../application/auth/facades/session";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { AppError } from "../../../domain/errors/app-error";
+import { verifySameOrigin } from "../../../infrastructure/http/next-request-context";
 import type {
   ApiMiddleware,
   VeapMiddleware,
@@ -102,6 +104,43 @@ export const ApiEnsuredAuth: ApiMiddleware = async (
       }),
       {
         status: 401,
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+  }
+
+  return await next();
+};
+
+/**
+ * Route middleware enforcing same-origin requests for state-changing operations.
+ * Throws AppError.Forbidden if request originates from an untrusted origin.
+ */
+export const SameOrigin: VeapMiddleware = async (_ctx, next) => {
+  const headersList = await headers();
+  const origin = headersList.get("origin");
+  const secFetchSite = headersList.get("sec-fetch-site");
+  const secFetchMode = headersList.get("sec-fetch-mode");
+
+  if (origin || (secFetchSite && secFetchMode !== "navigate")) {
+    if (!verifySameOrigin({ headers: headersList, method: "POST" })) {
+      throw AppError.Forbidden("Cross-origin request rejected");
+    }
+  }
+
+  return await next();
+};
+
+/**
+ * API route middleware enforcing same-origin requests for state-changing operations.
+ * Returns a 403 JSON Response if request originates from an untrusted origin.
+ */
+export const ApiSameOrigin: ApiMiddleware = async (request, _context, next) => {
+  if (!verifySameOrigin(request)) {
+    return new Response(
+      JSON.stringify({ error: "Forbidden: Cross-origin request rejected" }),
+      {
+        status: 403,
         headers: { "Content-Type": "application/json" },
       },
     );

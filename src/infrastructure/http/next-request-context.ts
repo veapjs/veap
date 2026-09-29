@@ -49,13 +49,18 @@ export class NextRequestContext implements IHttpRequestContext {
   }
 }
 
+export interface RequestLike {
+  headers: Headers | { get(name: string): string | null };
+  method?: string;
+}
+
 /**
  * Verifies that a state-changing HTTP request originates from the same origin.
  * Checks the Sec-Fetch-Site and Origin headers against Host / X-Forwarded-Host.
  * Safe HTTP methods (GET, HEAD, OPTIONS) always pass.
  */
-export function verifySameOrigin(request: Request): boolean {
-  const method = request.method.toUpperCase();
+export function verifySameOrigin(request: Request | RequestLike): boolean {
+  const method = (request.method || "GET").toUpperCase();
   if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
     return true;
   }
@@ -82,3 +87,4 @@ export function verifySameOrigin(request: Request): boolean {
 
   return true;
 }
+

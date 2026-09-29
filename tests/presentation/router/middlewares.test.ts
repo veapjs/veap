@@ -1,9 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ApiEnsuredAuth,
+  ApiSameOrigin,
   EnsuredAuth,
   EnsuredGuest,
   EnsuredUser,
+  SameOrigin,
   SkipSecurity,
   runApiPipeline,
   runPipeline,
@@ -300,6 +302,161 @@ describe("Router Middlewares", () => {
 
       expect(response.status).toBe(200);
       expect(next).toHaveBeenCalledOnce();
+    });
+  });
+
+  describe("SameOrigin", () => {
+    it("allows page requests with no origin or with navigation mode", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "sec-fetch-mode") return "navigate";
+        if (header === "sec-fetch-site") return "cross-site";
+        return null;
+      });
+
+      const ctx: VeapMiddlewareContext = {
+        path: "/profile",
+        params: {},
+        searchParams: {},
+      };
+      const next = vi.fn(async () => "profile-page");
+
+      const result = await SameOrigin(ctx, next);
+
+      expect(result).toBe("profile-page");
+      expect(next).toHaveBeenCalledOnce();
+    });
+
+    it("allows requests where origin matches host", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "origin") return "https://example.com";
+        if (header === "host") return "example.com";
+        return null;
+      });
+
+      const ctx: VeapMiddlewareContext = {
+        path: "/profile",
+        params: {},
+        searchParams: {},
+      };
+      const next = vi.fn(async () => "profile-page");
+
+      const result = await SameOrigin(ctx, next);
+
+      expect(result).toBe("profile-page");
+      expect(next).toHaveBeenCalledOnce();
+    });
+
+    it("throws AppError.Forbidden when sec-fetch-site is cross-site for non-navigation", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "sec-fetch-site") return "cross-site";
+        if (header === "sec-fetch-mode") return "cors";
+        return null;
+      });
+
+      const ctx: VeapMiddlewareContext = {
+        path: "/profile",
+        params: {},
+        searchParams: {},
+      };
+      const next = vi.fn();
+
+      await expect(SameOrigin(ctx, next)).rejects.toThrow(
+        "Cross-origin request rejected",
+      );
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it("throws AppError.Forbidden when origin host does not match host header", async () => {
+      mockHeadersGet.mockImplementation((header: string) => {
+        if (header === "origin") return "https://attacker.com";
+        if (header === "host") return "example.com";
+        return null;
+      });
+
+      const ctx: VeapMiddlewareContext = {
+        path: "/profile",
+        params: {},
+        searchParams: {},
+      };
+      const next = vi.fn();
+
+      await expect(SameOrigin(ctx, next)).rejects.toThrow(
+        "Cross-origin request rejected",
+      );
+      expect(next).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("ApiSameOrigin", () => {
+    it("allows safe GET requests even with cross-origin headers", async () => {
+      const req = new Request("https://example.com/api/data", {
+        method: "GET",
+        headers: {
+          origin: "https://external.com",
+          "sec-fetch-site": "cross-site",
+        },
+      });
+      const ctx = {};
+      const next = vi.fn(async () => new Response("ok"));
+
+      const res = await ApiSameOrigin(req, ctx, next);
+
+      expect(res.status).toBe(200);
+      expect(next).toHaveBeenCalledOnce();
+    });
+
+    it("allows POST request when origin matches host", async () => {
+      const req = new Request("https://example.com/api/data", {
+        method: "POST",
+        headers: {
+          origin: "https://example.com",
+          host: "example.com",
+        },
+      });
+      const ctx = {};
+      const next = vi.fn(async () => new Response("created", { status: 201 }));
+
+      const res = await ApiSameOrigin(req, ctx, next);
+
+      expect(res.status).toBe(201);
+      expect(next).toHaveBeenCalledOnce();
+    });
+
+    it("returns 403 when sec-fetch-site is cross-site on POST", async () => {
+      const req = new Request("https://example.com/api/data", {
+        method: "POST",
+        headers: {
+          "sec-fetch-site": "cross-site",
+        },
+      });
+      const ctx = {};
+      const next = vi.fn();
+
+      const res = await ApiSameOrigin(req, ctx, next);
+
+      expect(res.status).toBe(403);
+      const json = await res.json();
+      expect(json.error).toContain("Forbidden");
+      expect(next).not.toHaveBeenCalled();
+    });
+
+    it("returns 403 when origin does not match host on POST", async () => {
+      const req = new Request("https://example.com/api/data", {
+        method: "POST",
+        headers: {
+          origin: "https://malicious.example",
+          host: "example.com",
+        },
+      });
+      const ctx = {};
+      const next = vi.fn();
+
+      const res = await ApiSameOrigin(req, ctx, next);
+
+      expect(res.status).toBe(403);
+      const json = await res.json();
+      expect(json.error).toContain("Forbidden");
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
