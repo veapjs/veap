@@ -145,6 +145,30 @@ export default async function Page({
 }
 ```
 
+## Route rewrites
+
+Veap's virtual router supports internal path rewrites without requiring physical
+file duplication or client-side HTTP redirects.
+
+```ts
+import { addRouteRewrite } from "@veap/framework/router";
+
+// Map an incoming URL directly to a canonical route
+addRouteRewrite("/logowanie", "/signin");
+addRouteRewrite("/rejestracja", "/signup");
+```
+
+When an incoming request matches `/logowanie`:
+
+1. `RouteTree.match(path)` resolves the target route `/signin`.
+2. The virtual router mounts the page component, layouts, boundaries, and
+   metadata belonging to `/signin`.
+3. The browser URL stays `/logowanie` with no round-trip 301/302 redirect.
+
+This feature allows host applications and service providers (such as
+`AuthServiceProvider`) to expose localized or custom URLs while keeping plugin
+file layouts intact.
+
 ## Virtual vs physical pages
 
 Physical Next.js pages can participate in the virtual router (inherit plugin layouts, middleware protection, parallel slots) with the `withRouter` HOC; see [Physical pages and withRouter](./physical-pages.md).

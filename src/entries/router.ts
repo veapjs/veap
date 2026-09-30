@@ -24,6 +24,7 @@ export {
 } from "../presentation/router/api/middlewares";
 
 // --- Engine ---
+export type { RouterConfig } from "../infrastructure/router/provider";
 export type {
   LayoutChainEntry,
   MatchResult,
@@ -48,4 +49,8 @@ export {
   generateRouteManifest,
   globToTree,
 } from "../infrastructure/router/scanner";
-export { getPluginsWithHomepage } from "../application/router/discovery";
+export {
+  addRouteRewrite,
+  getPluginsWithHomepage,
+  getRouteRewrites,
+} from "../application/router/discovery";

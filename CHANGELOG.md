@@ -1,5 +1,23 @@
 # @veap/framework
 
+## 0.11.16
+
+### Patch Changes
+
+- ### Configurable Auth Routes, Virtual Router Rewrites & IoC Fixes
+  - **Configurable Authentication Routes**:
+    - Support custom authentication URLs (e.g. `/logowanie`, `/rejestracja`, `/odzyskaj-haslo`, `/nowe-haslo`, `/weryfikacja-email`) via `Application.configure().withAuth({ routes: { ... } })` and `AuthServiceProvider`.
+    - Added `AUTH_ROUTES` DI token and `AuthRoutesConfig` contract, preserving 100% backward compatibility with default routes (`/signin`, `/signup`, `/forgot-password`, `/reset-password`, `/new-password`, `/verify-email`).
+    - Added `getAuthRoutes()` server facade in `@veap/framework/auth/server` and `useAuthRoutes()` React hook in `@veap/framework/auth`.
+    - Automatically register rewrites with `RouterService` so custom routes seamlessly point to internal auth handlers.
+
+  - **Virtual Router Dynamic Rewrites**:
+    - Added support for application-level rewrites via `Application.configure().withRouter({ rewrites: { ... } })` and `RouterService.registerRewrite()`.
+    - Added dynamic pattern matching in `RouteTree.findMatch()` supporting named parameters (`:slug`, `[slug]`) and catch-all wildcards (`*`, `:path*`), transparently forwarding resolved params to matched routes.
+
+  - **IoC Container Concurrency Deduplication**:
+    - Fixed singleton instantiation race condition in `Container.resolveAsync()` by deduplicating in-flight resolution promises, preventing duplicate service creation and duplicate event listener registration during concurrent initialization (`Promise.all`).
+
 ## 0.11.15
 
 ### Patch Changes

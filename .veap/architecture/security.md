@@ -6,7 +6,7 @@ Veap uses a strict, session-based authentication model powered by `@veap/framewo
 
 Since Veap routes are dynamic (injected via `routeTree`), protection can happen at multiple levels:
 
-1. **Middleware Level**: Virtual router route middlewares (`EnsuredAuth`, `EnsuredUser`, `EnsuredGuest`). Routes declaring `auth = true`, `roles`, or `permissions` automatically receive `EnsuredAuth`.
+1. **Middleware Level**: Virtual router route middlewares (`EnsuredAuth`, `EnsuredUser`, `EnsuredGuest`). Routes declaring `auth = true`, `roles`, or `permissions` automatically receive `EnsuredAuth`. Unauthenticated visitors are redirected to the configured login path (`getAuthRoutes().signIn`, default `/signin`).
 2. **Path-Aware Security Checks**: Security requirements and `checkSecurity(session, user, roles, permissions, fallbackRedirect, path)` are path-aware. Passing `x-pathname` allows registered security requirements (e.g. 2FA, onboarding) to inspect the URL and exempt their own pages from redirects.
 3. **Gate Plugins & `SkipSecurity`**: Gate pages (e.g. `/2fa/setup`, `/onboarding`) must export the `SkipSecurity` middleware (from `@veap/framework/router`) paired with `EnsuredUser`. This suppresses the automatic injection of `EnsuredAuth` on the route, preventing infinite redirect loops while still ensuring the user is authenticated.
 4. **Component Level**: Inside a plugin's page or layout component, retrieve the session and enforce security requirements with `checkSecurity` (from `@veap/framework/auth/server`); it returns a redirect target when roles/permissions are not satisfied.

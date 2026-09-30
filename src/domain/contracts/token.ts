@@ -23,3 +23,4 @@ export const APP_MIGRATIONS: Token<any[]> = Symbol.for(
   "veap:kernel:app-migrations",
 );
 export const CLI_SERVICE: Token<any> = Symbol.for("veap:kernel:cli-service");
+export const AUTH_ROUTES: Token<any> = Symbol.for("veap:auth:routes");

@@ -8,12 +8,22 @@ import type { IConfigService } from "../../domain/contracts/config";
 
 @Injectable()
 export class RouterService {
+  private rewrites = new Map<string, string>();
+
   constructor(
     @Inject(CACHE_PROVIDER) private cache: ICacheProvider,
     @Inject(CONFIG_SERVICE) private config: IConfigService,
     private pluginRegistry: PluginRegistry,
     private navigation: NavigationService,
   ) {}
+
+  public addRewrite(from: string, to: string): void {
+    this.rewrites.set(from, to);
+  }
+
+  public getRewrites(): Map<string, string> {
+    return new Map(this.rewrites);
+  }
 
   public async clearCache(): Promise<void> {
     await this.cache.delete("router:tree");
@@ -60,6 +70,7 @@ export class RouterService {
     includePrivate?: boolean;
   }): Promise<RouteTree> {
     const tree = new RouteTree();
+    tree.setRewrites(this.rewrites);
     await this.pluginRegistry.init();
     const plugins = this.pluginRegistry.getEnabledPlugins();
     const prefix = await this.navigation.getPathPrefix();

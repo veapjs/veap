@@ -35,7 +35,7 @@ import { Application, ApplicationBuilder } from "@veap/framework/core/server";
 ```
 
 - `Application.configure(): ApplicationBuilder` - start building an application.
-- Builder methods (all return `this`): `withMigrations(migrations[])`, `withPlugins(plugins[])`, `withTemplates(templates[])`, `withDatabase()`, `withAuth()`, `withStorage()`, `withCommunication()`, `withIntl()`, `withRouter()`, `withSettings()`, `withProviders(providers[])`.
+- Builder methods (all return `this`): `withMigrations(migrations[])`, `withPlugins(plugins[])`, `withTemplates(templates[])`, `withDatabase()`, `withAuth(config?: AuthConfig)`, `withStorage()`, `withCommunication()`, `withIntl()`, `withRouter()`, `withSettings()`, `withProviders(providers[])`.
 - `builder.create(): Application` - materialize the app without booting.
 - `app.bootstrap(): Promise<void>` - register all providers and boot them. Idempotent per process; skipped during the Next.js build phase (`NEXT_PHASE=phase-production-build`) or when `SKIP_VEAP_INIT=true`.
 
@@ -175,6 +175,7 @@ Server Actions (called from forms/client components):
 
 ```ts
 import {
+  getAuthRoutes,
   loginAction,
   logoutAction,
   registerAction,
@@ -255,7 +256,7 @@ Engine (pure, testable):
 
 - `RouteTree`, `RouteNode`, `matchRoute(path, tree): MatchResult | null`.
 - Segment helpers: `isDynamicSegment`, `isCatchAllSegment`, `isOptionalCatchAllSegment`, `isGroupSegment`, `isParallelSlot`, `resolveMagicPrefix`, `segmentMatchesUrlPart`, `extractParamName`.
-- Discovery: `discoverRoutes(dir)`, `generateRouteManifest`, `globToTree`, `getPluginsWithHomepage` (alias `getModulesWithHomepage`).
+- Discovery & rewrites: `discoverRoutes(dir)`, `generateRouteManifest`, `globToTree`, `getPluginsWithHomepage` (alias `getModulesWithHomepage`), `addRouteRewrite`, `getRouteRewrites`.
 
 React:
 
@@ -411,6 +412,7 @@ import {
   AppProvider, // client providers root
   AuthProvider, // session context for client components
   useUser, // current user in client components
+  useAuthRoutes, // authentication routes helper
   useConfirmAction, // confirmation dialog hook (sonner-backed)
 } from "@veap/framework/react";
 ```

@@ -57,7 +57,7 @@ export const app = Application.configure()
 | `KernelServiceProvider`        | always first           | binds event bus, logger, config service, cache, cookie store, request context                                     |
 | `DatabaseServiceProvider`      | `.withDatabase()`      | creates the Knex instance from `DATABASE_URL`, registers it as `"Knex"`                                           |
 | `MigrationServiceProvider`     | `.withDatabase()`      | runs `core` and `app` migrations in `boot()`; adds `veap make:migration`                                          |
-| `AuthServiceProvider`          | `.withAuth()`          | binds crypto ports, repositories and auth services; binds `AuthContext`; initializes email verification           |
+| `AuthServiceProvider`          | `.withAuth(config?)`   | binds crypto ports, repositories, auth services, and routes; binds `AuthContext`; registers router rewrites; initializes email verification |
 | `StorageServiceProvider`       | `.withStorage()`       | registers `StorageService`; registers the local provider on first boot                                            |
 | `CommunicationServiceProvider` | `.withCommunication()` | selects the mail transport from `MAIL_TRANSPORT`, binds `MAILER` and `CommunicationContext`                       |
 | `IntlServiceProvider`          | `.withIntl()`          | registers `IntlService`                                                                                           |

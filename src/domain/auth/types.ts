@@ -90,3 +90,37 @@ export interface PasswordResetAuthSession {
   session: PasswordResetSession | null;
   user: FullUser | null;
 }
+
+/**
+ * Configuration of public and private authentication route URLs.
+ */
+export interface AuthRoutesConfig {
+  /** Sign in / login page URL. Default: "/signin" */
+  signIn: string;
+  /** Sign up / registration page URL. Default: "/signup" */
+  signUp: string;
+  /** Forgot password page URL. Default: "/forgot-password" */
+  forgotPassword: string;
+  /** Reset password page URL. Default: "/reset-password" */
+  resetPassword: string;
+  /** Email verification page URL. Default: "/verify-email" */
+  verifyEmail: string;
+  /** Redirect target after successful login. Default: "/" */
+  afterLogin: string;
+  /** Redirect target after logout. Default: "/signin" */
+  afterLogout: string;
+}
+
+export const DEFAULT_AUTH_ROUTES: AuthRoutesConfig = {
+  signIn: "/signin",
+  signUp: "/signup",
+  forgotPassword: "/forgot-password",
+  resetPassword: "/reset-password",
+  verifyEmail: "/verify-email",
+  afterLogin: "/",
+  afterLogout: "/signin",
+};
+
+export interface AuthConfig {
+  routes?: Partial<AuthRoutesConfig>;
+}

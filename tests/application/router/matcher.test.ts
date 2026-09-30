@@ -215,4 +215,83 @@ describe("RouteTree Matching", () => {
     expect(matchNested).not.toBeNull();
     expect(matchNested?.params.catchAll).toBe("dashboard/settings");
   });
+
+  it("handles path rewrites seamlessly", async () => {
+    const SignInPage = (() => "SignIn") as any;
+    const tree = new RouteTree({
+      segment: "",
+      children: [
+        {
+          segment: "signin",
+          page: SignInPage,
+          generateMetadata: () => ({ title: "Sign In Page" }),
+        },
+      ],
+    });
+
+    tree.addRewrite("/logowanie", "/signin");
+
+    // Check direct matching with rewrite
+    const match = tree.match("/logowanie");
+    expect(match).not.toBeNull();
+    expect(match?.node.page).toBe(SignInPage);
+
+    // Check resolveRewrite
+    expect(tree.resolveRewrite("/logowanie")).toBe("/signin");
+    expect(tree.resolveRewrite("/logowanie/")).toBe("/signin");
+    expect(tree.resolveRewrite("/other")).toBe("/other");
+
+    // Check metadata generation via rewritten path
+    const meta = await tree.generateMetadata("/logowanie");
+    expect(meta.title).toBe("Sign In Page");
+
+    // Check merging trees with rewrites
+    const parentTree = new RouteTree();
+    parentTree.addTree(tree);
+    expect(parentTree.resolveRewrite("/logowanie")).toBe("/signin");
+    const parentMatch = parentTree.match("/logowanie");
+    expect(parentMatch).not.toBeNull();
+    expect(parentMatch?.node.page).toBe(SignInPage);
+  });
+
+  it("handles dynamic and parameterized rewrites like /blog/[slug]", () => {
+    const BlogPostPage = (() => "BlogPost") as any;
+    const tree = new RouteTree({
+      segment: "",
+      children: [
+        {
+          segment: "blog",
+          children: [
+            {
+              segment: "[slug]",
+              page: BlogPostPage,
+            },
+          ],
+        },
+      ],
+    });
+
+    // 1. Parameterized rewrite with :param
+    tree.addRewrite("/artykuly/:slug", "/blog/:slug");
+    const matchColons = tree.match("/artykuly/nowy-post-2026");
+    expect(matchColons).not.toBeNull();
+    expect(matchColons?.isExact).toBe(true);
+    expect(matchColons?.node.page).toBe(BlogPostPage);
+    expect(matchColons?.params.slug).toBe("nowy-post-2026");
+
+    // 2. Parameterized rewrite with [param]
+    tree.addRewrite("/wpisy/[slug]", "/blog/[slug]");
+    const matchBrackets = tree.match("/wpisy/drugi-post");
+    expect(matchBrackets).not.toBeNull();
+    expect(matchBrackets?.isExact).toBe(true);
+    expect(matchBrackets?.node.page).toBe(BlogPostPage);
+    expect(matchBrackets?.params.slug).toBe("drugi-post");
+
+    // 3. Catch-all / wildcard rewrite
+    tree.addRewrite("/news/*", "/blog/*");
+    const matchWildcard = tree.match("/news/ciekawy-artykul");
+    expect(matchWildcard).not.toBeNull();
+    expect(matchWildcard?.isExact).toBe(true);
+    expect(matchWildcard?.params.slug).toBe("ciekawy-artykul");
+  });
 });

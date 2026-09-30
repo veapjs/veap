@@ -25,6 +25,7 @@ export interface ProviderDef<T = any> {
 export class Container {
   private providers = new Map<Token<any>, ProviderDef<any>>();
   private instances = new Map<Token<any>, any>();
+  private inFlight = new Map<Token<any>, Promise<any>>();
 
   private getTokenKey(token: Token<any>): any {
     if (typeof token === "function") {
@@ -63,51 +64,63 @@ export class Container {
     if (this.instances.has(key)) {
       return this.instances.get(key);
     }
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key);
+    }
 
-    const def = this.providers.get(key);
-    if (!def) {
-      if (typeof token === "function") {
-        // Attempt to auto-instantiate if it's a class without a provider
-        return this.instantiateClass(token as new (...args: any[]) => T);
+    const resolutionPromise = (async () => {
+      try {
+        const def = this.providers.get(key);
+        if (!def) {
+          if (typeof token === "function") {
+            // Attempt to auto-instantiate if it's a class without a provider
+            return await this.instantiateClass(token as new (...args: any[]) => T);
+          }
+          throw AppError.Internal(
+            `[IoC] No provider found for token: ${token.toString()}`,
+          );
+        }
+
+        let instance: any;
+
+        if (def.useValue !== undefined) {
+          instance = def.useValue;
+        } else if (def.useFactory !== undefined) {
+          const dependencies = await this.resolveDependencies(def.inject || []);
+          instance = await def.useFactory(...dependencies);
+        } else if (def.useClass !== undefined) {
+          let tokens: Token<any>[] = def.inject || [];
+          if (!def.inject) {
+            const paramTypes =
+              Reflect.getMetadata("design:paramtypes", def.useClass) || [];
+            const customTokens: Map<number, Token<any>> = Reflect.getMetadata(
+              "ioc:inject_params",
+              def.useClass,
+            ) || new Map();
+            tokens = paramTypes.map(
+              (type: any, index: number) => customTokens.get(index) || type,
+            );
+          }
+          const dependencies = await this.resolveDependencies(tokens);
+          instance = new def.useClass(...dependencies);
+        } else {
+          throw AppError.Internal(
+            `[IoC] Invalid provider definition for token: ${token.toString()}`,
+          );
+        }
+
+        if (def.singleton !== false) {
+          this.instances.set(key, instance);
+        }
+
+        return instance;
+      } finally {
+        this.inFlight.delete(key);
       }
-      throw AppError.Internal(
-        `[IoC] No provider found for token: ${token.toString()}`,
-      );
-    }
+    })();
 
-    let instance: any;
-
-    if (def.useValue !== undefined) {
-      instance = def.useValue;
-    } else if (def.useFactory !== undefined) {
-      const dependencies = await this.resolveDependencies(def.inject || []);
-      instance = await def.useFactory(...dependencies);
-    } else if (def.useClass !== undefined) {
-      let tokens: Token<any>[] = def.inject || [];
-      if (!def.inject) {
-        const paramTypes =
-          Reflect.getMetadata("design:paramtypes", def.useClass) || [];
-        const customTokens: Map<number, Token<any>> = Reflect.getMetadata(
-          "ioc:inject_params",
-          def.useClass,
-        ) || new Map();
-        tokens = paramTypes.map(
-          (type: any, index: number) => customTokens.get(index) || type,
-        );
-      }
-      const dependencies = await this.resolveDependencies(tokens);
-      instance = new def.useClass(...dependencies);
-    } else {
-      throw AppError.Internal(
-        `[IoC] Invalid provider definition for token: ${token.toString()}`,
-      );
-    }
-
-    if (def.singleton !== false) {
-      this.instances.set(key, instance);
-    }
-
-    return instance;
+    this.inFlight.set(key, resolutionPromise);
+    return resolutionPromise;
   }
 
   /**
@@ -168,6 +181,7 @@ export class Container {
    */
   clear(): void {
     this.instances.clear();
+    this.inFlight.clear();
   }
 }
 

@@ -1,5 +1,6 @@
 import { checkSecurity } from "../../../application/auth/logic";
 import { getCurrentSession } from "../../../application/auth/facades/session";
+import { getAuthRoutes } from "../../../application/auth/facades/routes";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AppError } from "../../../domain/errors/app-error";
@@ -31,7 +32,8 @@ export const EnsuredUser: VeapMiddleware = async (_ctx, next) => {
   const { user, session } = await getCurrentSession();
 
   if (!user || !session) {
-    return redirect("/signin");
+    const authRoutes = getAuthRoutes();
+    return redirect(authRoutes.signIn);
   }
 
   return await next();
@@ -52,9 +54,10 @@ export const SkipSecurity: VeapMiddleware = async (ctx, next) => {
 
 export const EnsuredAuth: VeapMiddleware = async (ctx, next) => {
   const { user, session } = await getCurrentSession();
+  const authRoutes = getAuthRoutes();
 
   if (!user || !session) {
-    return redirect("/signin");
+    return redirect(authRoutes.signIn);
   }
 
   const security = await checkSecurity(
@@ -67,7 +70,7 @@ export const EnsuredAuth: VeapMiddleware = async (ctx, next) => {
   );
 
   if (!security.satisfied) {
-    return redirect(security.redirect || "/signin");
+    return redirect(security.redirect || authRoutes.signIn);
   }
 
   return await next();

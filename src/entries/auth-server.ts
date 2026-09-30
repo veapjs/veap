@@ -7,6 +7,7 @@ export * from "../application/auth/facades/user";
 export * from "../application/auth/facades/rbac";
 export * from "../application/auth/facades/email-verification";
 export * from "../application/auth/facades/password-reset";
+export * from "../application/auth/facades/routes";
 
 // Services
 export * from "../application/auth/services/auth.service";

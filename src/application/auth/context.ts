@@ -1,4 +1,8 @@
 import { AppError } from "../../domain/errors/app-error";
+import {
+  type AuthRoutesConfig,
+  DEFAULT_AUTH_ROUTES,
+} from "../../domain/auth/types";
 import type { AuthService } from "./services/auth.service";
 import type { EmailVerificationService } from "./services/email-verification.service";
 import type { PasswordResetService } from "./services/password-reset.service";
@@ -22,6 +26,7 @@ export interface AuthContext {
   passwordReset: PasswordResetService;
   emailVerification: EmailVerificationService;
   auth: AuthService;
+  routes: AuthRoutesConfig;
 }
 
 const globalForAuthContext = globalThis as unknown as {
@@ -48,4 +53,13 @@ export function authContext(): AuthContext {
     );
   }
   return context;
+}
+
+/**
+ * Returns the currently configured authentication routes.
+ * If the Auth context is not bound yet, returns DEFAULT_AUTH_ROUTES.
+ */
+export function getAuthRoutes(): AuthRoutesConfig {
+  const context = globalForAuthContext.__VEAP_AUTH_CONTEXT__;
+  return context?.routes ?? DEFAULT_AUTH_ROUTES;
 }

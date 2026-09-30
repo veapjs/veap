@@ -2,7 +2,18 @@ import { ServiceProvider } from "../../infrastructure/providers/service-provider
 import { eventBus } from "../../application/events/event-bus";
 import { RouterService } from "../../application/router/router.service";
 
+export interface RouterConfig {
+  rewrites?: Record<string, string>;
+}
+
 export class RouterServiceProvider extends ServiceProvider {
+  constructor(
+    container: any,
+    private config?: RouterConfig,
+  ) {
+    super(container);
+  }
+
   register(): void {
     this.container.register({
       token: RouterService,
@@ -12,10 +23,17 @@ export class RouterServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
+    const routerService =
+      await this.container.resolve<RouterService>(RouterService);
+
+    if (this.config?.rewrites) {
+      for (const [from, to] of Object.entries(this.config.rewrites)) {
+        routerService.addRewrite(from, to);
+      }
+    }
+
     // Clear cache when plugins are enabled/disabled
     eventBus.subscribe("system:plugin:toggle", "route-tree-cache", async () => {
-      const routerService =
-        await this.container.resolve<RouterService>(RouterService);
       await routerService.clearCache();
     });
 

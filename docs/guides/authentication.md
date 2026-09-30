@@ -13,7 +13,38 @@ Application.configure()
   .create();
 ```
 
-Auth needs the database: the provider registers the user/session/role models' migrations through the migration system.
+Auth needs the database: the provider registers the user/session/role models'
+migrations through the migration system.
+
+### Customizing authentication routes
+
+By default, authentication endpoints use canonical paths (`/signin`, `/signup`,
+`/forgot-password`, `/reset-password`, `/verify-email`, `/app`). You can customize
+any of these routes directly in `withAuth()`:
+
+```ts
+Application.configure()
+  .withDatabase()
+  .withAuth({
+    routes: {
+      signIn: "/logowanie",
+      signUp: "/rejestracja",
+      forgotPassword: "/odzyskaj-haslo",
+      resetPassword: "/nowe-haslo",
+      verifyEmail: "/weryfikacja-email",
+      afterLogin: "/app/dashboard",
+      afterLogout: "/logowanie",
+    },
+  })
+  .create();
+```
+
+When you define custom paths, the Virtual Router registers transparent rewrites
+(for example, `/logowanie` rewrites to `/signin`). Incoming requests render the
+underlying plugin page without issuing HTTP 30x redirects. Server middleware
+(`EnsuredAuth`), Server Actions, and client components (`useAuthRoutes()`)
+automatically read from this single source of truth.
+
 
 ## Sign-up and sign-in (Server Actions)
 
@@ -87,7 +118,7 @@ export function UserBadge() {
 
 Two layers are available:
 
-1. **Route middlewares** in the Veap pipeline - `EnsuredAuth`, `EnsuredGuest`, `EnsuredUser` from `@veap/framework/router/server`. Attach them to plugin routes; they run before the page renders and redirect or reject early.
+1. **Route middlewares** in the Veap pipeline - `EnsuredAuth`, `EnsuredGuest`, `EnsuredUser` from `@veap/framework/router/server`. Attach them to plugin routes; they run before the page renders and redirect unauthenticated visitors to the configured login path (`getAuthRoutes().signIn`, default `/signin`).
 2. **Facades in the page/action** - `requireUser()`, `requireRole("admin")`, `requirePermission("posts.edit")`. Throwing `AppError.Forbidden` renders the error boundary with the mapped status.
 
 Prefer middlewares for coarse area guards and facades for fine-grained checks inside the handler.

@@ -41,3 +41,10 @@ export default withRouter(
 ```
 
 This pattern ensures the Next.js `/app` directory remains clean, while allowing standard React development seamlessly integrated with plugin-provided layouts.
+
+## 4. Route Rewrites
+
+Veap's Virtual Router supports internal path rewrites via `RouteTree.addRewrite(from, to)` and `RouterService.addRewrite(from, to)`:
+
+- **Transparent Mapping**: When a user accesses an incoming path (e.g. `/logowanie`), the Virtual Router resolves the rewrite target (`/signin`) and matches the corresponding plugin component without issuing an HTTP redirect.
+- **Configurable Domain Paths**: Core domains (like `AuthServiceProvider`) use rewrites to allow applications to customize public URLs (e.g., in `Application.configure().withAuth({ routes: { signIn: "/logowanie" } })`) while plugins continue to use canonical directory paths (`signin/page.tsx`).

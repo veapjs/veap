@@ -23,3 +23,25 @@ export async function getPluginsWithHomepage(): Promise<
 export const buildRouteTree = cache(async (includePrivate: boolean = false) => {
   return (await app(RouterService)).buildRouteTree(includePrivate);
 });
+
+/**
+ * Registers an internal route rewrite rule in RouterService.
+ *
+ * @param from - Incoming public path (e.g. "/logowanie")
+ * @param to - Target virtual path (e.g. "/signin")
+ */
+export async function addRouteRewrite(
+  from: string,
+  to: string,
+): Promise<void> {
+  const router = await app(RouterService);
+  router.addRewrite(from, to);
+}
+
+/**
+ * Returns all registered route rewrites.
+ */
+export async function getRouteRewrites(): Promise<Map<string, string>> {
+  const router = await app(RouterService);
+  return router.getRewrites();
+}

@@ -4,7 +4,7 @@ import { Toaster } from "@veap/ui/components/sonner";
 import { TooltipProvider } from "@veap/ui/components/tooltip";
 import { ThemeProvider } from "@veap/ui/providers";
 import { PageLoader } from "@veap/ui/shared/page-loader";
-import type { AuthSession } from "../../../domain/auth/types";
+import type { AuthRoutesConfig, AuthSession } from "../../../domain/auth/types";
 import type * as React from "react";
 import { useEffect, useState } from "react";
 import { SWRConfig } from "swr";
@@ -14,10 +14,12 @@ export const AppProvider = ({
   children,
   initialSession,
   prefix,
+  authRoutes,
 }: {
   children: React.ReactElement;
   initialSession?: AuthSession;
   prefix?: string;
+  authRoutes?: Partial<AuthRoutesConfig>;
 }) => {
   const [isLoading, setIsLoading] = useState(true);
 
@@ -44,7 +46,11 @@ export const AppProvider = ({
           revalidateIfStale: true,
         }}
       >
-        <AuthProvider initialSession={initialSession} prefix={prefix}>
+        <AuthProvider
+          initialSession={initialSession}
+          prefix={prefix}
+          routes={authRoutes}
+        >
           <TooltipProvider>
             {children}
 

@@ -1,7 +1,7 @@
 import { eventBus } from "../../application/events/event-bus";
 import { logger } from "../logging/console-logger";
 import { container } from "../ioc/container";
-import type { ServiceProvider } from "../providers/service-provider";
+import { ServiceProvider } from "../providers/service-provider";
 import { KernelServiceProvider } from "../providers/kernel.provider";
 import {
   APP_MIGRATIONS,
@@ -17,15 +17,21 @@ import { StorageServiceProvider } from "../storage/provider";
 import { CommunicationServiceProvider } from "../communication/provider";
 import { PluginServiceProvider } from "../plugins/provider";
 import { IntlServiceProvider } from "../intl/provider";
-import { RouterServiceProvider } from "../router/provider";
+import { RouterServiceProvider, type RouterConfig } from "../router/provider";
 import { SettingsServiceProvider } from "../settings/provider";
+import type { AuthConfig } from "../../domain/auth/types";
+
+export type ProviderEntry =
+  | (new (c: typeof container) => ServiceProvider)
+  | ((c: typeof container) => ServiceProvider)
+  | ServiceProvider;
 
 export class ApplicationBuilder {
   private migrations: any[] = [];
   private plugins: any[] = [];
   private templates: any[] = [];
-  private customProviders: (new (c: typeof container) => ServiceProvider)[] =
-    [];
+  private customProviders: ProviderEntry[] = [];
+  private authConfig?: AuthConfig;
 
   public withMigrations(migrations: any[]): this {
     this.migrations = migrations;
@@ -51,8 +57,11 @@ export class ApplicationBuilder {
     return this;
   }
 
-  public withAuth(): this {
-    this.customProviders.push(AuthServiceProvider);
+  public withAuth(config?: AuthConfig): this {
+    this.authConfig = config;
+    this.customProviders.push(
+      (c) => new AuthServiceProvider(c, this.authConfig),
+    );
     return this;
   }
 
@@ -71,8 +80,8 @@ export class ApplicationBuilder {
     return this;
   }
 
-  public withRouter(): this {
-    this.customProviders.push(RouterServiceProvider);
+  public withRouter(config?: RouterConfig): this {
+    this.customProviders.push((c) => new RouterServiceProvider(c, config));
     return this;
   }
 
@@ -82,7 +91,7 @@ export class ApplicationBuilder {
   }
 
   public withProviders(
-    providers: (new (c: typeof container) => ServiceProvider)[],
+    providers: ProviderEntry[],
   ): this {
     this.customProviders.push(...providers);
     return this;
@@ -103,9 +112,7 @@ export class Application {
     private readonly migrations: any[],
     private readonly plugins: any[],
     private readonly templates: any[],
-    private readonly providerClasses: (new (
-      c: typeof container,
-    ) => ServiceProvider)[],
+    private readonly providerEntries: ProviderEntry[],
   ) {}
 
   public static configure(): ApplicationBuilder {
@@ -184,11 +191,20 @@ export class Application {
           });
         }
 
-        const classes = [KernelServiceProvider, ...this.providerClasses];
+        const entries = [KernelServiceProvider, ...this.providerEntries];
         const providers: ServiceProvider[] = [];
 
-        for (const ProviderClass of classes) {
-          providers.push(new ProviderClass(container));
+        for (const entry of entries) {
+          if (entry instanceof ServiceProvider) {
+            providers.push(entry);
+          } else if (
+            typeof entry === "function" &&
+            entry.prototype instanceof ServiceProvider
+          ) {
+            providers.push(new (entry as any)(container));
+          } else if (typeof entry === "function") {
+            providers.push((entry as any)(container));
+          }
         }
 
         for (const provider of providers) {

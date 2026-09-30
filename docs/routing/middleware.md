@@ -50,7 +50,7 @@ flowchart TD
     Prepended -- "Yes" --> EnsuredAuth["EnsuredAuth<br/>(Verifies session & checkSecurity)"]
     Prepended -- "No (or SkipSecurity)" --> RootLayoutMW
 
-    EnsuredAuth -- "Unauthorized / Forbidden" --> RedirectLogin(["HTTP Redirect (/signin)"])
+    EnsuredAuth -- "Unauthorized / Forbidden" --> RedirectLogin(["HTTP Redirect (signIn route)"])
     EnsuredAuth -- "Authorized" --> RootLayoutMW["Root Layout Middlewares<br/>(Outermost layout)"]
 
     RootLayoutMW -- "Short-circuit" --> ExitMW(["Custom Response / Redirect"])
@@ -74,13 +74,13 @@ Properties:
 
 Built-ins from `@veap/framework/router`:
 
-| Middleware     | Behavior                                                                                                 |
-| -------------- | -------------------------------------------------------------------------------------------------------- |
-| `EnsuredAuth`  | session required; RBAC check via `checkSecurity`; redirects to `/signin` or the security redirect target |
-| `EnsuredUser`  | session required only; redirects to `/signin`                                                            |
-| `EnsuredGuest` | signed-in users are redirected away (referer or `/`)                                                     |
-| `SameOrigin`   | verifies request provenance on mutations; throws `AppError.Forbidden` if cross-origin or untrusted        |
-| `SkipSecurity` | marker that suppresses the automatic `EnsuredAuth` injection for the route; pair with `EnsuredUser`      |
+| Middleware     | Behavior                                                                                                                                           |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EnsuredAuth`  | session required; RBAC check via `checkSecurity`; redirects to configured `getAuthRoutes().signIn` (default `/signin`) or security redirect target |
+| `EnsuredUser`  | session required only; redirects to configured `getAuthRoutes().signIn` (default `/signin`)                                                       |
+| `EnsuredGuest` | signed-in users are redirected away (referer or `/`)                                                                                               |
+| `SameOrigin`   | verifies request provenance on mutations; throws `AppError.Forbidden` if cross-origin or untrusted                                                  |
+| `SkipSecurity` | marker that suppresses the automatic `EnsuredAuth` injection for the route; pair with `EnsuredUser`                                                |
 
 ## 3. API middleware
 

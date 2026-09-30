@@ -16,6 +16,7 @@ Veap ships a complete session-based authentication system in `@veap/framework`. 
 - **Identity**: `users`, `roles`, `permissions` tables with pivot tables `users_to_roles`, `users_to_permissions`, `roles_to_permissions`.
 - **Sessions**: opaque random tokens (Oslo base32) stored server-side; the raw token lives in a `session` cookie, the database stores its SHA-256-style hash. Validation hashes the cookie value and looks it up, checking expiry.
 - **Facades**: server-action wrappers over six application services (`AuthService`, `SessionService`, `UserService`, `RbacService`, `PasswordResetService`, `EmailVerificationService`), bound in `AuthServiceProvider` and exposed from `@veap/framework/auth/server`.
+- **Configurable routes & rewrites**: authentication endpoints (`signIn`, `signUp`, `forgotPassword`, `resetPassword`, `verifyEmail`, `afterLogin`, `afterLogout`) are configured in `Application.configure().withAuth({ routes: ... })` and resolved through Virtual Router rewrites.
 - **Crypto ports**: password hashing (`IPasswordHasher`, bcrypt adapter), token generation (`ITokenGenerator`, Oslo adapter) and secret-at-rest encryption (`ISecretCipher`, AES-GCM adapter with `ENCRYPTION_KEY`) are injectable ports.
 
 ## Where things live
@@ -23,6 +24,7 @@ Veap ships a complete session-based authentication system in `@veap/framework`. 
 | Concern                          | API (all server-side unless noted)                                                                                                                                                  |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Current session                  | `getCurrentSession()`                                                                                                                                                               |
+| Auth routes                      | `getAuthRoutes()` (server), `useAuthRoutes()` (client React hook)                                                                                                                  |
 | Login / signup / logout          | `signIn`, `signUp`, `signOut`, `finalizeLogin`                                                                                                                                      |
 | Session management               | `generateSessionToken`, `createSession`, `invalidateSession`, `invalidateUserSessions`, `getUserSessions`, `invalidateOtherSessions`, `updateSessionMetadata`                       |
 | Cookie helpers                   | `setSessionTokenCookie`, `deleteSessionTokenCookie`                                                                                                                                 |
@@ -32,19 +34,21 @@ Veap ships a complete session-based authentication system in `@veap/framework`. 
 | RBAC                             | `getRoles`, `createRole`, `getPermissions`, `createPermission`, `assignPermissionToRole`, `assignRoleToUser`, ...                                                                   |
 | Security checks                  | `checkSecurity(session, user, roles, permissions)`, `verifySameOrigin(request)`                                                                                                     |
 | Validation schemas (client-safe) | `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `verifyEmailSchema`, ...                                                                            |
-| Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`                                                                                                                        |
+| Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`, `AuthRoutesConfig`, `AuthConfig`                                                                                      |
 
-All of these come from `@veap/framework/auth/server` unless marked client-safe (schemas and types also from `@veap/framework/auth`).
+All of these come from `@veap/framework/auth/server` unless marked client-safe (schemas and types also from `@veap/framework/auth`, React hooks from `@veap/framework/react`).
 
 ## Reading the current session
 
 ```tsx
 // Server Component
-import { getCurrentSession } from "@veap/framework/auth/server";
+import { getCurrentSession, getAuthRoutes } from "@veap/framework/auth/server";
 
 export default async function Header() {
   const { user, session } = await getCurrentSession();
-  if (!user) return <a href="/signin">Sign in</a>;
+  const routes = getAuthRoutes();
+
+  if (!user) return <a href={routes.signIn}>Sign in</a>;
   return <p>Signed in as {user.name}</p>;
 }
 ```

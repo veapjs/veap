@@ -31,9 +31,37 @@ import { ConfigService } from "../config/config.service";
 import { BcryptPasswordHasher } from "./adapters/bcrypt-password-hasher";
 import { OsloTokenGenerator } from "./adapters/oslo-token-generator";
 import { AesSecretCipher } from "./adapters/aes-secret-cipher";
+import {
+  type AuthConfig,
+  type AuthRoutesConfig,
+  DEFAULT_AUTH_ROUTES,
+} from "../../domain/auth/types";
+import { AUTH_ROUTES } from "../../domain/contracts/token";
+import { RouterService } from "../../application/router/router.service";
+import type { Container } from "../ioc/container";
 
 export class AuthServiceProvider extends ServiceProvider {
+  private config?: AuthConfig;
+
+  constructor(container: Container, config?: AuthConfig) {
+    super(container);
+    this.config = config;
+  }
+
+  private resolveRoutes(): AuthRoutesConfig {
+    return {
+      ...DEFAULT_AUTH_ROUTES,
+      ...this.config?.routes,
+    };
+  }
+
   register(): void {
+    const routes = this.resolveRoutes();
+    this.container.register({
+      token: AUTH_ROUTES,
+      useValue: routes,
+    });
+
     // Cryptographic ports → concrete adapters
     this.container.register({
       token: PASSWORD_HASHER,
@@ -136,6 +164,8 @@ export class AuthServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
+    const routes = this.resolveRoutes();
+
     // Bind the auth context once so facades and `logic` helpers never resolve
     // services through the container themselves.
     bindAuthContext({
@@ -145,7 +175,38 @@ export class AuthServiceProvider extends ServiceProvider {
       passwordReset: await this.container.resolve(PasswordResetService),
       emailVerification: await this.container.resolve(EmailVerificationService),
       auth: await this.container.resolve(AuthService),
+      routes,
     });
+
+    // Automatically register router rewrites if custom routes differ from default virtual paths
+    if (this.container.has(RouterService)) {
+      const routerService =
+        await this.container.resolve<RouterService>(RouterService);
+      if (routes.signIn !== DEFAULT_AUTH_ROUTES.signIn) {
+        routerService.addRewrite(routes.signIn, DEFAULT_AUTH_ROUTES.signIn);
+      }
+      if (routes.signUp !== DEFAULT_AUTH_ROUTES.signUp) {
+        routerService.addRewrite(routes.signUp, DEFAULT_AUTH_ROUTES.signUp);
+      }
+      if (routes.forgotPassword !== DEFAULT_AUTH_ROUTES.forgotPassword) {
+        routerService.addRewrite(
+          routes.forgotPassword,
+          DEFAULT_AUTH_ROUTES.forgotPassword,
+        );
+      }
+      if (routes.resetPassword !== DEFAULT_AUTH_ROUTES.resetPassword) {
+        routerService.addRewrite(
+          routes.resetPassword,
+          DEFAULT_AUTH_ROUTES.resetPassword,
+        );
+      }
+      if (routes.verifyEmail !== DEFAULT_AUTH_ROUTES.verifyEmail) {
+        routerService.addRewrite(
+          routes.verifyEmail,
+          DEFAULT_AUTH_ROUTES.verifyEmail,
+        );
+      }
+    }
 
     if (await isSystemInstalled()) {
       const emailService = await this.container.resolve(

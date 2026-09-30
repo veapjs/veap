@@ -684,14 +684,178 @@ export function resolveMagicPrefix(
 export class RouteTree {
   /** @internal The root node of the route tree. */
   private root: RouteNode;
+  /** @internal Rewrites mapping from incoming public paths to internal target paths. */
+  private rewrites: Map<string, string> = new Map();
 
   /**
    * @param initialRoot - Optional root node to initialize the tree with.
    *                      When provided, the tree is built from this node.
    *                      When omitted, an empty root node is created.
+   * @param initialRewrites - Optional map or object of path rewrite rules.
    */
-  constructor(initialRoot?: RouteNode) {
+  constructor(
+    initialRoot?: RouteNode,
+    initialRewrites?: Map<string, string> | Record<string, string>,
+  ) {
     this.root = initialRoot ? cloneNode(initialRoot) : createRootNode();
+    if (initialRewrites) {
+      if (initialRewrites instanceof Map) {
+        for (const [from, to] of initialRewrites) {
+          this.addRewrite(from, to);
+        }
+      } else {
+        for (const [from, to] of Object.entries(initialRewrites)) {
+          this.addRewrite(from, to);
+        }
+      }
+    }
+  }
+
+  private normalizeRewritePath(p: string): string {
+    let norm = p.trim();
+    if (!norm.startsWith("/")) norm = "/" + norm;
+    if (norm.length > 1 && norm.endsWith("/")) norm = norm.slice(0, -1);
+    return norm;
+  }
+
+  /**
+   * Registers a path rewrite rule.
+   * When `from` is requested, the router resolves `to` instead.
+   *
+   * @param from - Incoming public path (e.g. `"/logowanie"`).
+   * @param to - Target virtual route path (e.g. `"/signin"`).
+   */
+  addRewrite(from: string, to: string): this {
+    this.rewrites.set(
+      this.normalizeRewritePath(from),
+      this.normalizeRewritePath(to),
+    );
+    return this;
+  }
+
+  /**
+   * Bulk registers or replaces rewrite rules.
+   */
+  setRewrites(rewrites: Map<string, string> | Record<string, string>): this {
+    if (rewrites instanceof Map) {
+      for (const [from, to] of rewrites) {
+        this.addRewrite(from, to);
+      }
+    } else {
+      for (const [from, to] of Object.entries(rewrites)) {
+        this.addRewrite(from, to);
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Returns a copy of the current rewrites map.
+   */
+  getRewrites(): Map<string, string> {
+    return new Map(this.rewrites);
+  }
+
+  /**
+   * Resolves a path through registered rewrites.
+   * Supports:
+   * 1. Exact static matches (e.g. "/logowanie" -> "/signin")
+   * 2. Parameterized patterns (e.g. "/artykuly/:slug" -> "/blog/:slug" or "/artykuly/[slug]" -> "/blog/[slug]")
+   * 3. Wildcards / catch-all (e.g. "/artykuly/*" -> "/blog/*" or "/artykuly/:path*" -> "/blog/:path*")
+   */
+  resolveRewrite(path: string): string {
+    const norm = this.normalizeRewritePath(path);
+    const exact = this.rewrites.get(norm);
+    if (exact) return exact;
+
+    for (const [from, to] of this.rewrites.entries()) {
+      const match = this.matchRewritePattern(from, norm);
+      if (match) {
+        return this.applyRewritePattern(to, match);
+      }
+    }
+
+    return path;
+  }
+
+  private matchRewritePattern(
+    fromPattern: string,
+    path: string,
+  ): Record<string, string> | null {
+    if (
+      !fromPattern.includes(":") &&
+      !fromPattern.includes("[") &&
+      !fromPattern.includes("*")
+    ) {
+      return null;
+    }
+
+    const fromParts = fromPattern.split("/").filter(Boolean);
+    const pathParts = path.split("/").filter(Boolean);
+    const params: Record<string, string> = {};
+
+    for (let i = 0; i < fromParts.length; i++) {
+      const fromPart = fromParts[i];
+
+      // Catch-all or wildcard at the end
+      if (
+        fromPart === "*" ||
+        fromPart.startsWith(":path*") ||
+        fromPart.startsWith("[...")
+      ) {
+        const remaining = pathParts.slice(i).join("/");
+        params["path"] = remaining;
+        params["*"] = remaining;
+        return params;
+      }
+
+      if (i >= pathParts.length) {
+        return null;
+      }
+
+      const pathPart = pathParts[i];
+
+      if (fromPart.startsWith(":") && !fromPart.endsWith("*")) {
+        params[fromPart.slice(1)] = pathPart;
+      } else if (
+        fromPart.startsWith("[") &&
+        fromPart.endsWith("]") &&
+        !fromPart.startsWith("[...")
+      ) {
+        params[fromPart.slice(1, -1)] = pathPart;
+      } else if (fromPart !== pathPart) {
+        return null;
+      }
+    }
+
+    if (pathParts.length !== fromParts.length) {
+      return null;
+    }
+
+    return params;
+  }
+
+  private applyRewritePattern(
+    toPattern: string,
+    params: Record<string, string>,
+  ): string {
+    let result = toPattern;
+
+    for (const [key, value] of Object.entries(params)) {
+      if (key === "*" || key === "path") continue;
+      result = result.replaceAll(`:${key}`, value);
+      result = result.replaceAll(`[${key}]`, value);
+      result = result.replaceAll(`[...${key}]`, value);
+      result = result.replaceAll(`[[...${key}]]`, value);
+    }
+
+    if (params["path"] !== undefined) {
+      result = result.replaceAll(":path*", params["path"]);
+      result = result.replaceAll("[...path]", params["path"]);
+      result = result.replaceAll("*", params["path"]);
+    }
+
+    return this.normalizeRewritePath(result);
   }
 
   /**
@@ -710,6 +874,14 @@ export class RouteTree {
    * @param prefix - Optional path prefix (e.g., `"/admin"`).
    */
   addTree(source: RouteNode | RouteTree, prefix?: string): void {
+    if (source instanceof RouteTree) {
+      for (const [from, to] of source.getRewrites()) {
+        const fullFrom = prefix && prefix !== "/" ? `${prefix}${from}` : from;
+        const fullTo = prefix && prefix !== "/" ? `${prefix}${to}` : to;
+        this.addRewrite(fullFrom, fullTo);
+      }
+    }
+
     const treeNode = source instanceof RouteTree ? source.getRoot() : source;
 
     if (!prefix || prefix === "/") {
@@ -825,7 +997,8 @@ export class RouteTree {
    * @returns The match result, or `null` if no route matches.
    */
   match(path: string): MatchResult | null {
-    const segments = splitPath(path);
+    const resolvedPath = this.resolveRewrite(path);
+    const segments = splitPath(resolvedPath);
 
     // Start with root's chain entry
     const rootEntry = buildChainEntry(this.root, []);
@@ -882,7 +1055,8 @@ export class RouteTree {
     path: string,
     searchParams: Record<string, string> = {},
   ): Promise<Metadata> {
-    const matchResult = this.match(path);
+    const resolvedPath = this.resolveRewrite(path);
+    const matchResult = this.match(resolvedPath);
     if (!matchResult) return {};
 
     const { params, node } = matchResult;
@@ -894,7 +1068,7 @@ export class RouteTree {
     // A full implementation would walk the tree and call generators at each level.
 
     // Collect metadata generators from the matched path
-    const generators = this.collectMetadataGenerators(path);
+    const generators = this.collectMetadataGenerators(resolvedPath);
 
     for (const generator of generators) {
       const metadata = await generator({ params, searchParams });
