@@ -56,7 +56,7 @@ describe("PluginExtensionPoint component", () => {
     const result = (await PluginExtensionPoint({
       target: "app",
       point: "sidebar",
-    })) as React.ReactElement;
+    })) as React.ReactElement<{ children?: React.ReactNode }>;
 
     expect(result.type).toBe("div");
     expect(React.Children.count(result.props.children)).toBe(2);
