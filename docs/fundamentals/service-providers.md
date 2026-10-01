@@ -52,18 +52,18 @@ export const app = Application.configure()
 
 ## Built-in providers
 
-| Provider                       | Registered by          | What it does                                                                                                      |
-| ------------------------------ | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `KernelServiceProvider`        | always first           | binds event bus, logger, config service, cache, cookie store, request context                                     |
-| `DatabaseServiceProvider`      | `.withDatabase()`      | creates the Knex instance from `DATABASE_URL`, registers it as `"Knex"`                                           |
-| `MigrationServiceProvider`     | `.withDatabase()`      | runs `core` and `app` migrations in `boot()`; adds `veap make:migration`                                          |
+| Provider                       | Registered by          | What it does                                                                                                                                |
+| ------------------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `KernelServiceProvider`        | always first           | binds event bus, logger, config service, cache, cookie store, request context                                                               |
+| `DatabaseServiceProvider`      | `.withDatabase()`      | creates the Knex instance from `DATABASE_URL`, registers it as `"Knex"`                                                                     |
+| `MigrationServiceProvider`     | `.withDatabase()`      | runs `core` and `app` migrations in `boot()`; adds `veap make:migration`                                                                    |
 | `AuthServiceProvider`          | `.withAuth(config?)`   | binds crypto ports, repositories, auth services, and routes; binds `AuthContext`; registers router rewrites; initializes email verification |
-| `StorageServiceProvider`       | `.withStorage()`       | registers `StorageService`; registers the local provider on first boot                                            |
-| `CommunicationServiceProvider` | `.withCommunication()` | selects the mail transport from `MAIL_TRANSPORT`, binds `MAILER` and `CommunicationContext`                       |
-| `IntlServiceProvider`          | `.withIntl()`          | registers `IntlService`                                                                                           |
-| `RouterServiceProvider`        | `.withRouter()`        | registers `RouterService`; clears the route tree cache on plugin events                                           |
-| `SettingsServiceProvider`      | `.withSettings()`      | binds settings repository and `SettingsService`                                                                   |
-| `PluginServiceProvider`        | `.withPlugins([...])`  | binds plugin repository and registry; registers and initializes plugins; registers plugin CLI commands            |
+| `StorageServiceProvider`       | `.withStorage()`       | registers `StorageService`; registers the local provider on first boot                                                                      |
+| `CommunicationServiceProvider` | `.withCommunication()` | selects the mail transport from `MAIL_TRANSPORT`, binds `MAILER` and `CommunicationContext`                                                 |
+| `IntlServiceProvider`          | `.withIntl()`          | registers `IntlService`                                                                                                                     |
+| `RouterServiceProvider`        | `.withRouter()`        | registers `RouterService`; clears the route tree cache on plugin events                                                                     |
+| `SettingsServiceProvider`      | `.withSettings()`      | binds settings repository and `SettingsService`                                                                                             |
+| `PluginServiceProvider`        | `.withPlugins([...])`  | binds plugin repository and registry; registers and initializes plugins; registers plugin CLI commands                                      |
 
 ## Registering CLI commands from a provider
 

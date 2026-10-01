@@ -7,12 +7,14 @@ Accepted
 ## Context
 
 Originally, Veap adopted a theme/template paradigm inspired by traditional CMS systems:
+
 1. Templates implemented an `ITemplate` interface, lived in a dedicated `templates/` workspace, and registered layouts and component overrides.
 2. The active template ID was stored in the database (`templates` table) and managed via `TemplateService` and `ITemplateRepository`.
 3. The virtual router resolved page overrides dynamically (`activeTemplate.overrides[path]`), wrapping rendered output with `TemplateLayout`.
 4. The CLI provided `veap make:template` to scaffold new templates.
 
 This design suffered from significant architectural and practical limitations:
+
 - **Monolithic Inflexibility**: Only one template could be active at a time. If an application wanted a custom navbar from Plugin A and a footer from Plugin B, templates forced everything into a single closed theme bundle.
 - **Friction with Next.js App Router**: In a modern Next.js architecture, the host application shell (`app/layout.tsx`) naturally owns layout wrappers, fonts, and global metadata. Abstracting the root layout into a CMS-style template prevented standard Next.js paradigms.
 - **Complex UI Overrides**: Template overrides bypassed standard file-system routing conventions, making it harder for developers to customize plugin views without learning Veap-specific override APIs.

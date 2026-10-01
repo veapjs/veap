@@ -74,7 +74,9 @@ export class Container {
         if (!def) {
           if (typeof token === "function") {
             // Attempt to auto-instantiate if it's a class without a provider
-            return await this.instantiateClass(token as new (...args: any[]) => T);
+            return await this.instantiateClass(
+              token as new (...args: any[]) => T,
+            );
           }
           throw AppError.Internal(
             `[IoC] No provider found for token: ${token.toString()}`,

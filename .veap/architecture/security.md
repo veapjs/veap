@@ -54,24 +54,28 @@ This contract is pinned by unit tests (`tests/infrastructure/auth/encryption-key
 User passwords are hashed using bcrypt via `BcryptPasswordHasher` (implementing `IPasswordHasher`).
 
 **Configurable parameters:**
+
 - `AUTH_BCRYPT_ROUNDS`: Number of salt rounds (default: `10`). Can be increased in production (e.g., `12`) via environment variables or DI configuration for higher computational cost, or decreased in automated test suites for faster test runs.
 - `AUTH_PASSWORD_MIN_LENGTH`: Enforces minimum password character length upon validation (default: `8`).
 
 ## Database Transport Security (PostgreSQL TLS)
 
 In production (`NODE_ENV=production`), PostgreSQL connections enforce TLS certificate validation (`rejectUnauthorized: true`).
+
 - Opt-out via `DATABASE_SSL_REJECT_UNAUTHORIZED=false` or URL params (`?sslmode=no-verify`).
 - Custom PEM certificates can be provided via `DATABASE_SSL_CA`.
 
 ## Login Brute-Force & Timing Attack Protection
 
 `AuthService.signIn()` enforces defense-in-depth protections against credential stuffing and brute-force attacks:
+
 - **Throttling:** Tracks failed login attempts per normalized email and per client IP (maximum 5 failed attempts in a 15-minute sliding window). Exceeding this limit temporarily blocks login requests.
 - **Timing attack mitigation:** If an email is not registered in the database, `signIn()` executes a dummy bcrypt hash verification against a standard work-factor hash. This equalizes response latencies and eliminates timing-based user enumeration.
 
 ## Password Reset OTP & Account Enumeration Defense
 
 The password reset and email verification subsystems enforce strict guessing and enumeration limits:
+
 - **TTL:** OTP verification codes expire after **15 minutes** (reduced from 1 hour).
 - **Attempt throttling:** Each reset session allows at most 5 failed verification attempts. Upon the 5th failure, the reset session is permanently deleted from the database and the cookie is cleared.
 - **Uniform UX / Dummy sessions:** `createDummyPasswordResetSession` produces an ephemeral session when an unregistered email requests a reset. The user interface redirects identically to `/reset-password/verify-email`, preventing attackers from determining whether an email exists in the system.
@@ -79,6 +83,7 @@ The password reset and email verification subsystems enforce strict guessing and
 ## 2FA Challenge Token Architecture
 
 When a user with two-factor authentication enabled submits correct primary credentials (password), `AuthService.signIn()` issues `status: "CHALLENGE_REQUIRED"`.
+
 - An encrypted, 5-minute `httpOnly` cookie (`totp_login_challenge`) is issued containing the user ID and timestamp.
 - The 2FA verification route (`/api/auth/totp/2fa-verify`) requires this cookie before accepting a 6-digit TOTP code. Calling the endpoint without passing primary credentials returns `401 Unauthorized`.
 - Failed attempts are capped at 5; exceeding the limit destroys the challenge token, preventing brute-force attacks against 6-digit OTP codes.
@@ -86,6 +91,7 @@ When a user with two-factor authentication enabled submits correct primary crede
 ## File Storage Security & Stored XSS Prevention
 
 `LocalFileProvider` implements defensive file upload controls:
+
 - **Disallowed extensions:** Blocks dangerous executable and web-interpretable extensions (`.html`, `.htm`, `.xhtml`, `.svg`, `.xml`, `.php`, `.phtml`, `.exe`, `.sh`, `.js`, etc.) from being written into public storage, eliminating Stored XSS vectors.
 - **Filename sanitization:** Strips directory traversal sequences (`..`), null bytes (`\0`), and special characters from uploaded file basenames.
 - **Path containment in delete():** Checks that target deletion paths stay strictly within `FILE_STORAGE_FOLDER` via normalized `path.relative` checks to block arbitrary file deletion.
@@ -93,6 +99,7 @@ When a user with two-factor authentication enabled submits correct primary crede
 ## CSRF & Same-Origin Enforcement
 
 State-changing HTTP requests (`POST`, `PUT`, `DELETE`, `PATCH`) in API route handlers can be validated with `verifySameOrigin(request)`:
+
 - Checks `Sec-Fetch-Site` header (rejects `cross-site`).
 - Verifies that the `Origin` header matches the `Host` or `X-Forwarded-Host` header.
 - Safe read-only methods (`GET`, `HEAD`, `OPTIONS`) always pass.
@@ -100,5 +107,6 @@ State-changing HTTP requests (`POST`, `PUT`, `DELETE`, `PATCH`) in API route han
 ## Trusted Proxy & IP Header Validation
 
 `SessionService.getIPAddress()` securely resolves client IP addresses:
+
 - Prioritizes direct reverse-proxy headers (`cf-connecting-ip`, `x-real-ip`, `x-client-ip`).
 - Parses comma-separated `x-forwarded-for` header values and validates each entry against `node:net.isIP()`. Malformed or injection payloads are ignored, returning strictly a valid IP address or `null`.

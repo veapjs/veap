@@ -3,10 +3,7 @@ import { logger } from "../logging/console-logger";
 import { container } from "../ioc/container";
 import { ServiceProvider } from "../providers/service-provider";
 import { KernelServiceProvider } from "../providers/kernel.provider";
-import {
-  APP_MIGRATIONS,
-  APP_PLUGINS,
-} from "../../domain/contracts/token";
+import { APP_MIGRATIONS, APP_PLUGINS } from "../../domain/contracts/token";
 
 // Core Providers
 import { DatabaseServiceProvider } from "../database/provider";
@@ -83,19 +80,13 @@ export class ApplicationBuilder {
     return this;
   }
 
-  public withProviders(
-    providers: ProviderEntry[],
-  ): this {
+  public withProviders(providers: ProviderEntry[]): this {
     this.customProviders.push(...providers);
     return this;
   }
 
   public create(): Application {
-    return new Application(
-      this.migrations,
-      this.plugins,
-      this.customProviders,
-    );
+    return new Application(this.migrations, this.plugins, this.customProviders);
   }
 }
 
@@ -131,9 +122,8 @@ export class Application {
       // the new component references (extensions, widgets, etc.).
       if (process.env.NODE_ENV === "development") {
         if (this.plugins.length) {
-          const { registerPlugins } = await import(
-            "../../application/plugins/facade"
-          );
+          const { registerPlugins } =
+            await import("../../application/plugins/facade");
           await registerPlugins(this.plugins);
         }
       }

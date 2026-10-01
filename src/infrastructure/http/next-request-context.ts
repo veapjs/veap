@@ -87,4 +87,3 @@ export function verifySameOrigin(request: Request | RequestLike): boolean {
 
   return true;
 }
-

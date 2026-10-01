@@ -78,8 +78,12 @@ describe("BcryptPasswordHasher", () => {
     const strictHasher = new BcryptPasswordHasher(undefined, 12);
     expect(strictHasher.minLength).toBe(12);
 
-    await expect(strictHasher.validateStrength("12345678")).resolves.toBe(false);
-    await expect(strictHasher.validateStrength("123456789012")).resolves.toBe(true);
+    await expect(strictHasher.validateStrength("12345678")).resolves.toBe(
+      false,
+    );
+    await expect(strictHasher.validateStrength("123456789012")).resolves.toBe(
+      true,
+    );
   });
 
   it("reads configuration from process.env when arguments are omitted", () => {
@@ -184,7 +188,8 @@ describe("AuthServiceProvider PASSWORD_HASHER binding", () => {
     const provider = new AuthServiceProvider(container);
     provider.register();
 
-    const hasher = await container.resolve<BcryptPasswordHasher>(PASSWORD_HASHER);
+    const hasher =
+      await container.resolve<BcryptPasswordHasher>(PASSWORD_HASHER);
     expect(hasher).toBeInstanceOf(BcryptPasswordHasher);
     expect(hasher.rounds).toBe(10);
     expect(hasher.minLength).toBe(8);

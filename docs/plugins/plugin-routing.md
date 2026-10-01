@@ -8,10 +8,7 @@ import { fileURLToPath } from "node:url";
 import { discoverRoutes } from "@veap/framework/router";
 
 routeTree: async () => {
-  const appDir = path.join(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "app",
-  );
+  const appDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "app");
   return discoverRoutes(appDir, (relPath) => import(`./app/${relPath}`));
 };
 ```

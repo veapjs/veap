@@ -25,6 +25,7 @@ When a plugin is enabled:
 ## Status Synchronization & Split-Brain Prevention
 
 Plugin activation states are stored both in-memory (in `PluginRegistry`) and persisted in the database (`SystemPlugin` model / table).
+
 - When altering activation state (`enabled` / `installed`), `PluginRegistry.updateStatus()` enforces database synchronization as the authoritative source of truth.
 - If database persistence fails, in-memory state is rolled back to its previous status and the error is re-thrown. This prevents split-brain conditions where memory believes the plugin is active while the DB (shared across workers) has it disabled.
 - Ephemeral UI progress tracking (`lastStep`) gracefully logs warnings without aborting execution.

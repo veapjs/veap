@@ -21,12 +21,7 @@ export type SidebarMenuItemType<T = Record<string, string>> = {
   priority?: number;
   badge?: string | number | null | undefined;
   badgeVariant?:
-    | "default"
-    | "secondary"
-    | "destructive"
-    | "outline"
-    | null
-    | undefined;
+    "default" | "secondary" | "destructive" | "outline" | null | undefined;
 } & T;
 
 export type SidebarMenuType = SidebarMenuItemType<{

@@ -40,7 +40,7 @@ Imports may only point inward: `presentation → infrastructure → application 
   - Plugins: `@veap/framework/plugins`, `@veap/framework/plugins/server`, `@veap/framework/plugins/client`, `@veap/framework/plugins/models` (`SystemPlugin`, `SystemUserWidget`).
   - Routing: `@veap/framework/router`, `@veap/framework/router/server` (middlewares, matcher, pipeline).
   - Data: `@veap/framework/database` (ORM `Model`, query builder, transactions, migrations).
-  - Internationalization: `@veap/framework/intl`, `@veap/framework/intl/client`, `@veap/framework/intl/server`.\n  - Services: `@veap/framework/communication`, `@veap/framework/storage`, `@veap/framework/settings`, `@veap/framework/settings/models` (`Setting`).
+  - Internationalization: `@veap/framework/intl`, `@veap/framework/intl/client`, `@veap/framework/intl/server`.\n - Services: `@veap/framework/communication`, `@veap/framework/storage`, `@veap/framework/settings`, `@veap/framework/settings/models` (`Setting`).
   - Client Presentation: `@veap/framework/react` (hooks and providers).
 
 The entry files (`src/index.ts`, `src/server.ts`) and the per-module barrels in `src/entries/` are the only files allowed to re-export across layers. No layer-internal file may import an entry barrel or use `@veap/framework/...` self-imports.

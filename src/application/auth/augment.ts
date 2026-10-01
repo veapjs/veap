@@ -19,14 +19,11 @@ type PasswordResetSessionAugmenter = (
 
 const globalForAugment = globalThis as unknown as {
   __VEAP_IDENTITY_AUGMENTERS__:
-    | AuthCallbackRegistry<IdentityAugmenter>
-    | undefined;
+    AuthCallbackRegistry<IdentityAugmenter> | undefined;
   __VEAP_SESSION_AUGMENTERS__:
-    | AuthCallbackRegistry<SessionAugmenter>
-    | undefined;
+    AuthCallbackRegistry<SessionAugmenter> | undefined;
   __VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__:
-    | AuthCallbackRegistry<PasswordResetSessionAugmenter>
-    | undefined;
+    AuthCallbackRegistry<PasswordResetSessionAugmenter> | undefined;
 };
 
 const identityAugmenters =

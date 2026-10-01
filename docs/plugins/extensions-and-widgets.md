@@ -1,6 +1,6 @@
 # Extensions and widgets
 
-Extensions and widgets let plugins inject user interfaces into host components without any direct imports from the host application. The host declares *where* using extension points and widget areas, plugins declare *what*, and the kernel resolves the composition at render time with role-based access control (RBAC).
+Extensions and widgets let plugins inject user interfaces into host components without any direct imports from the host application. The host declares _where_ using extension points and widget areas, plugins declare _what_, and the kernel resolves the composition at render time with role-based access control (RBAC).
 
 ## Extension points (server)
 
@@ -39,17 +39,17 @@ extensions: [
 
 ### Extension point properties
 
-| Prop              | Type                          | Default        | Description                                                                                     |
-| ----------------- | ----------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `target`          | `string`                      | -              | Host component or view identifier (for example, `"app"`, `"article"`, `"posts.edit"`).          |
-| `point`           | `string`                      | -              | Slot location within the target (for example, `"navbar"`, `"footer"`, `"sidebar"`).            |
-| `mode`            | `"single" \| "multiple"`      | `"multiple"`   | Resolution strategy. In `"single"` mode, only the highest-priority extension renders.          |
-| `props`           | `any`                         | -              | Context object spread into each injected extension component as React props.                    |
-| `className`       | `string`                      | -              | CSS class names applied to the container wrapper element.                                       |
-| `as`              | `React.ElementType`           | `"div"`        | Wrapper element (for example, `"section"`, `"nav"`). Unused in `"single"` mode unless styled.  |
-| `children`        | `React.ReactNode`             | -              | Idiomatic JSX fallback rendered when no extensions match or when RBAC checks fail.             |
-| `fallback`        | `React.ReactNode`             | `null`         | Alternative fallback prop rendered when no extensions match.                                    |
-| `includeDisabled` | `boolean`                     | `false`        | Whether to include extensions from disabled plugins.                                            |
+| Prop              | Type                     | Default      | Description                                                                                   |
+| ----------------- | ------------------------ | ------------ | --------------------------------------------------------------------------------------------- |
+| `target`          | `string`                 | -            | Host component or view identifier (for example, `"app"`, `"article"`, `"posts.edit"`).        |
+| `point`           | `string`                 | -            | Slot location within the target (for example, `"navbar"`, `"footer"`, `"sidebar"`).           |
+| `mode`            | `"single" \| "multiple"` | `"multiple"` | Resolution strategy. In `"single"` mode, only the highest-priority extension renders.         |
+| `props`           | `any`                    | -            | Context object spread into each injected extension component as React props.                  |
+| `className`       | `string`                 | -            | CSS class names applied to the container wrapper element.                                     |
+| `as`              | `React.ElementType`      | `"div"`      | Wrapper element (for example, `"section"`, `"nav"`). Unused in `"single"` mode unless styled. |
+| `children`        | `React.ReactNode`        | -            | Idiomatic JSX fallback rendered when no extensions match or when RBAC checks fail.            |
+| `fallback`        | `React.ReactNode`        | `null`       | Alternative fallback prop rendered when no extensions match.                                  |
+| `includeDisabled` | `boolean`                | `false`      | Whether to include extensions from disabled plugins.                                          |
 
 The alias `PluginExtensionPoint` is exported as an alternative name for `ExtensionPoint`.
 

@@ -28,17 +28,17 @@ DATABASE_URL="sqlite:./storage/veap.sqlite"
 - PostgreSQL connections enable SSL/TLS automatically when `NODE_ENV=production` with certificate validation enforced (`rejectUnauthorized: true`).
 - If `DATABASE_URL` is unset the database provider registers no engine and `transaction()` fails at call time.
 
-| Variable                           | Notes                                                                                                                                                                          |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DATABASE_SSL_REJECT_UNAUTHORIZED` | `true` (default in production) or `false`. Setting to `false` disables TLS certificate verification (useful for self-signed certificates or legacy staging databases).         |
-| `DATABASE_SSL_CA`                  | Custom CA bundle in PEM format for validating self-signed or internal PostgreSQL certificates.                                                                                 |
+| Variable                           | Notes                                                                                                                                                                  |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | `true` (default in production) or `false`. Setting to `false` disables TLS certificate verification (useful for self-signed certificates or legacy staging databases). |
+| `DATABASE_SSL_CA`                  | Custom CA bundle in PEM format for validating self-signed or internal PostgreSQL certificates.                                                                         |
 
 ## Auth and security
 
-| Variable                   | Notes                                                                                                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Variable                   | Notes                                                                                                                                                  |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `AUTH_BCRYPT_ROUNDS`       | Number of salt rounds for bcrypt password hashing (default: `10`). Increase to `12`+ in high-security production deployments; lower in test pipelines. |
-| `AUTH_PASSWORD_MIN_LENGTH` | Minimum required password character length (default: `8`).                                                                                               |
+| `AUTH_PASSWORD_MIN_LENGTH` | Minimum required password character length (default: `8`).                                                                                             |
 
 ## Mail
 

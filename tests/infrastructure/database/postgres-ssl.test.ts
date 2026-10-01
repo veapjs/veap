@@ -72,7 +72,8 @@ describe("resolvePostgresSslConfig", () => {
     });
 
     it("passes custom CA bundle when caCert is provided", () => {
-      const ca = "-----BEGIN CERTIFICATE-----\nFAKE_CA_BUNDLE\n-----END CERTIFICATE-----";
+      const ca =
+        "-----BEGIN CERTIFICATE-----\nFAKE_CA_BUNDLE\n-----END CERTIFICATE-----";
       const result = resolvePostgresSslConfig({
         databaseUrl: prodUrl,
         isProd: true,

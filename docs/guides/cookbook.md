@@ -42,38 +42,41 @@ export const onboardingGatePlugin: IPlugin = {
   version: "1.0.0",
 
   init: async () => {
-    registerSecurityRequirement("onboarding-gate", async (_session, user, path) => {
-      // 1. Unauthenticated users are handled by standard route guards
-      if (!user) {
+    registerSecurityRequirement(
+      "onboarding-gate",
+      async (_session, user, path) => {
+        // 1. Unauthenticated users are handled by standard route guards
+        if (!user) {
+          return { satisfied: true };
+        }
+
+        // 2. Prevent infinite redirect loops on gate pages
+        if (
+          path &&
+          (path.includes("/onboarding") || path.includes("/api/onboarding"))
+        ) {
+          return { satisfied: true };
+        }
+
+        // 3. Skip gate for system administrators
+        if (user.roles?.includes("admin")) {
+          return { satisfied: true };
+        }
+
+        // 4. Verify account completion condition
+        const isComplete = Boolean((user as any).onboardingCompleted);
+        if (!isComplete) {
+          const prefix = await getPathPrefix();
+          return {
+            satisfied: false,
+            redirect: `${prefix}/onboarding`,
+            requirement: "onboarding-gate",
+          };
+        }
+
         return { satisfied: true };
-      }
-
-      // 2. Prevent infinite redirect loops on gate pages
-      if (
-        path &&
-        (path.includes("/onboarding") || path.includes("/api/onboarding"))
-      ) {
-        return { satisfied: true };
-      }
-
-      // 3. Skip gate for system administrators
-      if (user.roles?.includes("admin")) {
-        return { satisfied: true };
-      }
-
-      // 4. Verify account completion condition
-      const isComplete = Boolean((user as any).onboardingCompleted);
-      if (!isComplete) {
-        const prefix = await getPathPrefix();
-        return {
-          satisfied: false,
-          redirect: `${prefix}/onboarding`,
-          requirement: "onboarding-gate",
-        };
-      }
-
-      return { satisfied: true };
-    });
+      },
+    );
   },
 
   onDisable: async () => {

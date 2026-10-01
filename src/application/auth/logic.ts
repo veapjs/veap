@@ -56,14 +56,11 @@ export type EmailVerificationValidator = (
 const globalForAuth = globalThis as unknown as {
   __VEAP_AUTH_VALIDATORS__: AuthCallbackRegistry<AuthValidator> | undefined;
   __VEAP_SECURITY_REQUIREMENTS__:
-    | AuthCallbackRegistry<SecurityRequirement>
-    | undefined;
+    AuthCallbackRegistry<SecurityRequirement> | undefined;
   __VEAP_PASSWORD_RESET_VALIDATORS__:
-    | AuthCallbackRegistry<PasswordResetValidator>
-    | undefined;
+    AuthCallbackRegistry<PasswordResetValidator> | undefined;
   __VEAP_EMAIL_VERIFICATION_VALIDATORS__:
-    | AuthCallbackRegistry<EmailVerificationValidator>
-    | undefined;
+    AuthCallbackRegistry<EmailVerificationValidator> | undefined;
 };
 
 export const authValidators =

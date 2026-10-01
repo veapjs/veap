@@ -77,9 +77,9 @@ Built-ins from `@veap/framework/router`:
 | Middleware     | Behavior                                                                                                                                           |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `EnsuredAuth`  | session required; RBAC check via `checkSecurity`; redirects to configured `getAuthRoutes().signIn` (default `/signin`) or security redirect target |
-| `EnsuredUser`  | session required only; redirects to configured `getAuthRoutes().signIn` (default `/signin`)                                                       |
+| `EnsuredUser`  | session required only; redirects to configured `getAuthRoutes().signIn` (default `/signin`)                                                        |
 | `EnsuredGuest` | signed-in users are redirected away (referer or `/`)                                                                                               |
-| `SameOrigin`   | verifies request provenance on mutations; throws `AppError.Forbidden` if cross-origin or untrusted                                                  |
+| `SameOrigin`   | verifies request provenance on mutations; throws `AppError.Forbidden` if cross-origin or untrusted                                                 |
 | `SkipSecurity` | marker that suppresses the automatic `EnsuredAuth` injection for the route; pair with `EnsuredUser`                                                |
 
 ## 3. API middleware

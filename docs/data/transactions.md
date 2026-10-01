@@ -42,9 +42,12 @@ await transaction(async () => {
 
   try {
     // Isolated savepoint: failure here does not abort the outer transaction
-    await transaction(async () => {
-      await PaymentGateway.charge(order);
-    }, { savepoint: true });
+    await transaction(
+      async () => {
+        await PaymentGateway.charge(order);
+      },
+      { savepoint: true },
+    );
   } catch (error) {
     // Only PaymentGateway queries were rolled back to the savepoint
     // The outer transaction remains valid and uncorrupted
@@ -54,6 +57,7 @@ await transaction(async () => {
 ```
 
 When `{ savepoint: true }` is enabled:
+
 - If called inside an active transaction, Veap creates a nested transaction savepoint via Knex's `trx.transaction()`.
 - If an error is thrown within the callback, Knex issues a `ROLLBACK TO SAVEPOINT`. The outer transaction remains active, allowing your code to catch the error and proceed.
 - If called outside an active transaction, Veap initializes a standard root transaction.

@@ -58,10 +58,10 @@ There is no explicit shutdown hook. Next.js owns the process lifetime; the Veap 
 
 ## What can fail and why
 
-| Symptom                                                    | Cause                                                                                                                        |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `Context is not bound. PluginServiceProvider must boot...` | Facade called during build-phase prerender, or bootstrap crashed earlier (check logs above the error)                        |
-| `Invalid environment variables`                            | `ENCRYPTION_KEY` missing or wrong length, or another env-schema violation                                                    |
-| `Cannot open database...`                                  | SQLite path in an unwritable location (serverless), or `DATABASE_URL` points at an unreachable server                        |
+| Symptom                                                    | Cause                                                                                                                          |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `Context is not bound. PluginServiceProvider must boot...` | Facade called during build-phase prerender, or bootstrap crashed earlier (check logs above the error)                          |
+| `Invalid environment variables`                            | `ENCRYPTION_KEY` missing or wrong length, or another env-schema violation                                                      |
+| `Cannot open database...`                                  | SQLite path in an unwritable location (serverless), or `DATABASE_URL` points at an unreachable server                          |
 | Bootstrap failure exception thrown at request time         | A provider threw during `register()` or `boot()`; check error log. The failed promise is cleared so the next request can retry |
-| Empty plugins after boot (`Initialized with 0 plugins`)    | `lib/plugins.gen.ts` regenerated with an empty list                                                                          |
+| Empty plugins after boot (`Initialized with 0 plugins`)    | `lib/plugins.gen.ts` regenerated with an empty list                                                                            |

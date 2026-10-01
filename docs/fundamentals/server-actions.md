@@ -99,7 +99,11 @@ A Server Action is an unauthenticated public POST endpoint until you check calle
 ```ts
 "use server";
 
-import { requireUser, requireRole, requirePermission } from "@veap/framework/auth/server";
+import {
+  requireUser,
+  requireRole,
+  requirePermission,
+} from "@veap/framework/auth/server";
 import { AppError } from "@veap/framework/core";
 import { Task } from "../models/Task";
 

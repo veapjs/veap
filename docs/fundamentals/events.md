@@ -60,9 +60,17 @@ eventBus.subscribe("system:auth:signup", "analytics-plugin", async (event) => {
 await eventBus.publish("system:auth:signup", { user, session }, "auth-service");
 
 // Strict publish (throws AggregateError if any subscriber fails)
-await eventBus.publishStrict("system:plugin:toggle", { pluginId: "billing", enabled: true });
+await eventBus.publishStrict("system:plugin:toggle", {
+  pluginId: "billing",
+  enabled: true,
+});
 // Or equivalently:
-await eventBus.publish("system:plugin:toggle", { pluginId: "billing", enabled: true }, "admin", { strict: true });
+await eventBus.publish(
+  "system:plugin:toggle",
+  { pluginId: "billing", enabled: true },
+  "admin",
+  { strict: true },
+);
 
 // Unsubscribe by event type and subscriber ID
 eventBus.unsubscribe("system:auth:signup", "analytics-plugin");

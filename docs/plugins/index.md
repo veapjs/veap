@@ -99,7 +99,7 @@ export default myPlugin;
 | `widgets`    | `PluginWidget[]`         | dashboard widgets per area                                                  |
 | `navigation` | `PluginNavigation`       | `public`, `admin`, `settings` trees                                         |
 | `plugins`    | `IPlugin[]`              | nested plugins registered recursively                                       |
-| `routeTree`  | `RouteNode \| fn`        | App Router-style route tree (usually `discoverRoutes`)                       |
+| `routeTree`  | `RouteNode \| fn`        | App Router-style route tree (usually `discoverRoutes`)                      |
 
 ## Registration and lifecycle
 
@@ -138,23 +138,23 @@ State (enabled, installed, lastStep, config JSON) persists in the `plugins` tabl
 
 The Veap ecosystem provides first-party plugins for common application capabilities:
 
-| Package | Purpose |
-| ----------------------------- | ----------------------------------------------------------------------------------------------- |
-| `@veap/auth-plugin`           | Email/password authentication, registration, password recovery, and profile views              |
+| Package                       | Purpose                                                                                          |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `@veap/auth-plugin`           | Email/password authentication, registration, password recovery, and profile views                |
 | `@veap/auth-totp-plugin`      | Two-Factor Authentication (2FA) with Time-based One-Time Passwords (TOTP) and QR code enrollment |
-| `@veap/auth-google-plugin`    | Google OAuth 2.0 social login integration                                                       |
-| `@veap/auth-passkey-plugin`   | Passwordless WebAuthn / Passkey authentication                                                  |
-| `@veap/rbac-plugin`           | Role-Based Access Control administration UI and permission assignments                          |
-| `@veap/panel-plugin`          | Administrative dashboard, navigation layout, and settings UI                                    |
-| `@veap/manager-plugin`        | Plugin manager UI for enabling, disabling, and configuring plugins at runtime                   |
-| `@veap/installer-plugin`      | First-run setup wizard for initial database migrations and administrator account creation     |
-| `@veap/media-plugin`          | Media asset management, uploads, image browsing, and picker dialogs                             |
-| `@veap/blog-plugin`           | Article publishing, rich text editing, post categories, and tags                                |
-| `@veap/notifications-plugin`  | In-app notification delivery and user alert feeds                                               |
-| `@veap/activity-plugin`       | Audit logging and event timeline tracking system actions                                        |
-| `@veap/action-confirm-plugin` | Password confirmation dialogs for sensitive administrative actions                              |
-| `@veap/devtools-plugin`       | Developer toolbar for inspecting database queries, container services, and events               |
-| `@veap/vercel-blob-plugin`    | Cloud file storage provider backed by Vercel Blob                                               |
+| `@veap/auth-google-plugin`    | Google OAuth 2.0 social login integration                                                        |
+| `@veap/auth-passkey-plugin`   | Passwordless WebAuthn / Passkey authentication                                                   |
+| `@veap/rbac-plugin`           | Role-Based Access Control administration UI and permission assignments                           |
+| `@veap/panel-plugin`          | Administrative dashboard, navigation layout, and settings UI                                     |
+| `@veap/manager-plugin`        | Plugin manager UI for enabling, disabling, and configuring plugins at runtime                    |
+| `@veap/installer-plugin`      | First-run setup wizard for initial database migrations and administrator account creation        |
+| `@veap/media-plugin`          | Media asset management, uploads, image browsing, and picker dialogs                              |
+| `@veap/blog-plugin`           | Article publishing, rich text editing, post categories, and tags                                 |
+| `@veap/notifications-plugin`  | In-app notification delivery and user alert feeds                                                |
+| `@veap/activity-plugin`       | Audit logging and event timeline tracking system actions                                         |
+| `@veap/action-confirm-plugin` | Password confirmation dialogs for sensitive administrative actions                               |
+| `@veap/devtools-plugin`       | Developer toolbar for inspecting database queries, container services, and events                |
+| `@veap/vercel-blob-plugin`    | Cloud file storage provider backed by Vercel Blob                                                |
 
 ## Pages in this section
 

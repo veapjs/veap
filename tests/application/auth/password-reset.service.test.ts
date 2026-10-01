@@ -36,7 +36,11 @@ describe("PasswordResetService Security", () => {
 
   it("creates password reset session with 15-minute TTL", async () => {
     const before = Date.now();
-    await service.createPasswordResetSession("raw-token", "user-1", "user@example.com");
+    await service.createPasswordResetSession(
+      "raw-token",
+      "user-1",
+      "user@example.com",
+    );
     const after = Date.now();
 
     expect(mockRepo.create).toHaveBeenCalled();
@@ -49,11 +53,15 @@ describe("PasswordResetService Security", () => {
   });
 
   it("handles dummy sessions to prevent user enumeration", async () => {
-    const dummy = await service.createDummyPasswordResetSession("dummy-token", "notfound@example.com");
+    const dummy = await service.createDummyPasswordResetSession(
+      "dummy-token",
+      "notfound@example.com",
+    );
     expect(dummy.userId).toBe("dummy");
     expect(dummy.email).toBe("notfound@example.com");
 
-    const validated = await service.validatePasswordResetSessionToken("dummy-token");
+    const validated =
+      await service.validatePasswordResetSessionToken("dummy-token");
     expect(validated.session).not.toBeNull();
     expect(validated.user).not.toBeNull();
     expect(validated.user?.email).toBe("notfound@example.com");
@@ -89,7 +97,9 @@ describe("PasswordResetService Security", () => {
     expect(res5.valid).toBe(false);
     expect(res5.error).toMatch(/too many failed attempts/i);
     expect(mockRepo.remove).toHaveBeenCalledWith("session-123");
-    expect(mockCookieStore.delete).toHaveBeenCalledWith("password_reset_session");
+    expect(mockCookieStore.delete).toHaveBeenCalledWith(
+      "password_reset_session",
+    );
   });
 
   it("verifies code successfully when correct and resets attempts", async () => {

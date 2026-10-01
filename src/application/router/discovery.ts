@@ -30,10 +30,7 @@ export const buildRouteTree = cache(async (includePrivate: boolean = false) => {
  * @param from - Incoming public path (e.g. "/logowanie")
  * @param to - Target virtual path (e.g. "/signin")
  */
-export async function addRouteRewrite(
-  from: string,
-  to: string,
-): Promise<void> {
+export async function addRouteRewrite(from: string, to: string): Promise<void> {
   const router = await app(RouterService);
   router.addRewrite(from, to);
 }

@@ -45,7 +45,6 @@ underlying plugin page without issuing HTTP 30x redirects. Server middleware
 (`EnsuredAuth`), Server Actions, and client components (`useAuthRoutes()`)
 automatically read from this single source of truth.
 
-
 ## Sign-up and sign-in (Server Actions)
 
 Framework Server Actions are exported from `@veap/framework/auth/server`:

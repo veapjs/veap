@@ -7,6 +7,7 @@ Accepted
 ## Context
 
 Previously, authentication routes (`/signin`, `/signup`, `/forgot-password`, `/reset-password`, `/verify-email`) were hardcoded across multiple layers:
+
 1. Virtual router route middlewares (`EnsuredAuth`, `EnsuredUser`) redirected strictly to `"/signin"`.
 2. Server actions (`loginAction`, `logoutAction`, `signupAction`, password reset flows) had hardcoded redirects (`/`, `/login`, `/verify-email`), causing inconsistencies and 404 errors.
 3. UI components (`LoginForm`, `SignUpForm`) had hardcoded `<Link href="/signin">` and `<Link href="/forgot-password">`.

@@ -32,17 +32,17 @@ Veap keeps `next.config.ts` for Next.js concerns and adds `veap.config.ts` for a
 
 ## What Veap adds that Next.js does not have
 
-| Capability            | Implementation                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| Plugin system         | `VeapPlugin` manifests, `PluginServiceProvider`, registry with enable/disable and config, generated `lib/plugins.gen.ts`                    |
-| Virtual router        | `RouteTree` + matcher + route discovery from plugin directories                                                                             |
-| UI Extensions & Slots | Slot injection via `<ExtensionPoint />`, widget areas with `WidgetComposer`, and priority-based overrides                                    |
-| Dependency injection  | Laravel-style container, `app(Token)`, service providers with `register()`/`boot()`                                                         |
-| ORM                   | ActiveRecord `Model` over Knex, relations (including polymorphic via `MorphMap`), `transaction()` as the write path, code-first migrations  |
-| Auth with RBAC        | sessions, users, roles, permissions, email verification, password reset - all via ports and facades                                         |
-| Event bus             | typed publish/subscribe with zod-validated payloads, system events (`system:auth:*` and friends)                                            |
-| Settings and storage  | namespaced settings service; local file storage with a serving route                                                                        |
-| CLI                   | `veap` binary: init, make:plugin/migration, add/register, eject, docker                                                                     |
+| Capability            | Implementation                                                                                                                             |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plugin system         | `VeapPlugin` manifests, `PluginServiceProvider`, registry with enable/disable and config, generated `lib/plugins.gen.ts`                   |
+| Virtual router        | `RouteTree` + matcher + route discovery from plugin directories                                                                            |
+| UI Extensions & Slots | Slot injection via `<ExtensionPoint />`, widget areas with `WidgetComposer`, and priority-based overrides                                  |
+| Dependency injection  | Laravel-style container, `app(Token)`, service providers with `register()`/`boot()`                                                        |
+| ORM                   | ActiveRecord `Model` over Knex, relations (including polymorphic via `MorphMap`), `transaction()` as the write path, code-first migrations |
+| Auth with RBAC        | sessions, users, roles, permissions, email verification, password reset - all via ports and facades                                        |
+| Event bus             | typed publish/subscribe with zod-validated payloads, system events (`system:auth:*` and friends)                                           |
+| Settings and storage  | namespaced settings service; local file storage with a serving route                                                                       |
+| CLI                   | `veap` binary: init, make:plugin/migration, add/register, eject, docker                                                                    |
 
 ## What behaves differently from a plain Next.js app
 

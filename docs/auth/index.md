@@ -21,20 +21,20 @@ Veap ships a complete session-based authentication system in `@veap/framework`. 
 
 ## Where things live
 
-| Concern                          | API (all server-side unless noted)                                                                                                                                                  |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Current session                  | `getCurrentSession()`                                                                                                                                                               |
-| Auth routes                      | `getAuthRoutes()` (server), `useAuthRoutes()` (client React hook)                                                                                                                  |
-| Login / signup / logout          | `signIn`, `signUp`, `signOut`, `finalizeLogin`                                                                                                                                      |
-| Session management               | `generateSessionToken`, `createSession`, `invalidateSession`, `invalidateUserSessions`, `getUserSessions`, `invalidateOtherSessions`, `updateSessionMetadata`                       |
-| Cookie helpers                   | `setSessionTokenCookie`, `deleteSessionTokenCookie`                                                                                                                                 |
-| Users                            | `createUser`, `createOAuthUser`, `getUserById`, `getUserFromEmail`, `updateUserPassword`, `updateUserName`, `updateUserAwatar` (sic, kept for compatibility), recovery code helpers |
-| Email verification               | `initEmailVerification`, `createEmailVerificationRequest`, `sendVerificationEmail`, `getUserEmailVerificationRequestFromRequest`, cookie helpers                                    |
+| Concern                          | API (all server-side unless noted)                                                                                                                                                                  |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Current session                  | `getCurrentSession()`                                                                                                                                                                               |
+| Auth routes                      | `getAuthRoutes()` (server), `useAuthRoutes()` (client React hook)                                                                                                                                   |
+| Login / signup / logout          | `signIn`, `signUp`, `signOut`, `finalizeLogin`                                                                                                                                                      |
+| Session management               | `generateSessionToken`, `createSession`, `invalidateSession`, `invalidateUserSessions`, `getUserSessions`, `invalidateOtherSessions`, `updateSessionMetadata`                                       |
+| Cookie helpers                   | `setSessionTokenCookie`, `deleteSessionTokenCookie`                                                                                                                                                 |
+| Users                            | `createUser`, `createOAuthUser`, `getUserById`, `getUserFromEmail`, `updateUserPassword`, `updateUserName`, `updateUserAwatar` (sic, kept for compatibility), recovery code helpers                 |
+| Email verification               | `initEmailVerification`, `createEmailVerificationRequest`, `sendVerificationEmail`, `getUserEmailVerificationRequestFromRequest`, cookie helpers                                                    |
 | Password reset                   | `createPasswordResetSession`, `createDummyPasswordResetSession`, `validatePasswordResetSessionToken`, `verifyResetCode`, `getCurrentPasswordResetSession`, `sendPasswordResetEmail`, cookie helpers |
-| RBAC                             | `getRoles`, `createRole`, `getPermissions`, `createPermission`, `assignPermissionToRole`, `assignRoleToUser`, ...                                                                   |
-| Security checks                  | `checkSecurity(session, user, roles, permissions)`, `verifySameOrigin(request)`                                                                                                     |
-| Validation schemas (client-safe) | `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `verifyEmailSchema`, ...                                                                            |
-| Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`, `AuthRoutesConfig`, `AuthConfig`                                                                                      |
+| RBAC                             | `getRoles`, `createRole`, `getPermissions`, `createPermission`, `assignPermissionToRole`, `assignRoleToUser`, ...                                                                                   |
+| Security checks                  | `checkSecurity(session, user, roles, permissions)`, `verifySameOrigin(request)`                                                                                                                     |
+| Validation schemas (client-safe) | `loginSchema`, `registerSchema`, `forgotPasswordSchema`, `resetPasswordSchema`, `verifyEmailSchema`, ...                                                                                            |
+| Types (client-safe)              | `User`, `Session`, `AuthSession`, `FullUser`, `AuthResponse`, `AuthRoutesConfig`, `AuthConfig`                                                                                                      |
 
 All of these come from `@veap/framework/auth/server` unless marked client-safe (schemas and types also from `@veap/framework/auth`, React hooks from `@veap/framework/react`).
 

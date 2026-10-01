@@ -38,18 +38,22 @@ await transaction(async () => {
   await Order.create({ id: 1 });
 
   try {
-    await transaction(async () => {
-      await Payment.charge(); // might fail
-    }, { savepoint: true });
+    await transaction(
+      async () => {
+        await Payment.charge(); // might fail
+      },
+      { savepoint: true },
+    );
   } catch (error) {
     // Only Payment changes rolled back to the savepoint!
     // Order creation is preserved.
-    await Order.update({ status: 'failed_payment' });
+    await Order.update({ status: "failed_payment" });
   }
 });
 ```
 
 When `{ savepoint: true }` is enabled:
+
 - If called inside an existing transaction, a SQL `SAVEPOINT` is allocated using Knex's `trx.transaction()`.
 - If an error is thrown within the savepoint callback, Knex executes `ROLLBACK TO SAVEPOINT`, keeping the outer transaction intact and allowing the outer code to catch and handle the error.
 - If called when no transaction is currently active, a standard root database transaction is created.
@@ -67,6 +71,7 @@ If `DATABASE_URL` points to a local SQLite file but runs on Vercel/Serverless (w
 In production (`NODE_ENV=production`), PostgreSQL connections enable TLS with certificate verification by default (`rejectUnauthorized: true`), protecting against MITM attacks.
 
 Configuration options:
+
 - **Disabling certificate verification (legacy/self-signed)**: Set `DATABASE_SSL_REJECT_UNAUTHORIZED=false` in `.env`, or append `?sslmode=no-verify` or `?rejectUnauthorized=false` to `DATABASE_URL`.
 - **Custom CA Certificate**: Set `DATABASE_SSL_CA` in `.env` to a PEM certificate string.
 - **Disabling SSL**: Append `?sslmode=disable` to `DATABASE_URL`.

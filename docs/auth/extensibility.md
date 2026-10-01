@@ -119,6 +119,7 @@ const plugin: IPlugin = {
 ```
 
 Using a string ID guarantees:
+
 - **Idempotency:** Re-registering with the same ID replaces the previous handler instead of duplicating it in memory.
 - **Clean teardown:** Calling `unregister*(id)` reliably removes the specific handler without needing to preserve function references in module scope.
 
