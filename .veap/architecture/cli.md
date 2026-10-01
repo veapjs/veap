@@ -6,7 +6,7 @@ The CLI is bundled with the core package (`@veap/framework`, `packages/veap`): t
 
 In Veap, CLI commands are NOT centralized in a single folder. Commands are localized to their respective domain modules, ensuring encapsulation:
 
-- **Plugins Domain** (`packages/veap/src/infrastructure/plugins/cli/`): Houses the implementations for `add`, `eject`, `make:plugin` (`generate-plugin`) and `make:template` (`generate-template`).
+- **Plugins Domain** (`packages/veap/src/infrastructure/plugins/cli/`): Houses the implementations for `add`, `eject`, and `make:plugin` (`generate-plugin`).
 - **Database Domain** (`packages/veap/src/infrastructure/database/cli/`): Houses the `make:migration` command (`generate-migration`).
 - **Kernel** (`packages/veap/src/infrastructure/cli/`): Handles global lifecycle commands like `init` and `docker`.
 
@@ -17,8 +17,8 @@ Commands are registered dynamically during the application boot phase: the `CliS
 1. **`veap init [name]`**: Scaffolds a new project using `create-veap` (see _Project Scaffolding_ below). `name` is optional - when omitted (or other details), the CLI asks interactively. Options: `--docker`, `--skip-install` and `--pm <manager>`.
 2. **`veap add <plugin>`**: Installs a plugin from npm (or a Git source with `--local`). Automatically calls `veap register` afterward.
 3. **`veap register`**: The most critical internal command. It scans the workspace `package.json` for installed dependencies, identifies which ones are Veap plugins (based on naming and metadata), and regenerates `lib/plugins.gen.ts`. This file is used by the Kernel to load plugins at runtime.
-4. **`veap make:*`**: Scaffolds new resources inside the local project: plugins (`make:plugin`), templates (`make:template`), and native app migrations (`make:migration`).
-5. **`veap eject <package>`**: Copies an installed npm plugin or template directly into the local `/plugins` or `/templates` directory for manual customization.
+4. **`veap make:*`**: Scaffolds new resources inside the local project: plugins (`make:plugin`) and native app migrations (`make:migration`).
+5. **`veap eject <package>`**: Copies an installed npm plugin directly into the local `/plugins` directory for manual customization.
 6. **`veap docker`**: Generates Docker configuration (Dockerfile, compose.yml, .dockerignore).
 
 ## Project Scaffolding (create-veap)
@@ -28,7 +28,7 @@ Commands are registered dynamically during the application boot phase: the `CliS
 1. **Scaffold** - runs the official `create-next-app@latest` (runner follows the chosen package manager: `bun create`, `pnpm dlx`, `yarn dlx`, `npx`) with explicit non-interactive flags (`--ts --tailwind --app --eslint --react-compiler --import-alias "@/*" --skip-install --yes`). Next/React/TypeScript/Tailwind versions come from CNA, so generated apps stay current with the framework.
 2. **Overlay** - copies only the veap-owned files over the CNA output: root layout (`force-dynamic` contract), `not-found.tsx`, router catch-all page, API catch-all pipeline, storage route, `lib/veap.ts` bootstrap, `lib/plugins.gen.ts`, `next.config.ts`, the design-system `globals.css`, and an `AGENTS.md` carrying Veap agent knowledge (contracts, conventions, commands) into every generated project.
 3. **Mutate** - merges veap dependencies into `package.json` (CNA-provided versions win; only `@types/node` is pinned), writes a starter `.env` with a **freshly generated random 16-byte `ENCRYPTION_KEY`** (the fail-fast contract of `@veap/framework` - there is no fallback) and a SQLite dev `DATABASE_URL`, appends storage entries to `.gitignore`.
-4. **Finalize** - package-manager pinning and workspace config, optional Docker files, then a single dependency install.
+4. **Finalize** - package-manager pinning and workspace config (`plugins/*`), optional Docker files, then a single dependency install.
 
 The stubs directory (`stubs/overlay-full`) contains only veap-specific files; CNA boilerplate (`tsconfig.json`, `postcss.config.mjs`, `package.json`) is intentionally not duplicated there. There is no "bare" variant - every generated project is the full plugin-enabled setup.
 

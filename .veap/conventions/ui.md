@@ -12,7 +12,8 @@ To maintain visual consistency across all independent plugins, primitive UI comp
 2. **Tailwind First**: Always use Tailwind utility classes for layout and spacing. Avoid writing custom `.css` files unless implementing a highly specific third-party library override.
 3. **Responsive Design**: Ensure all plugin views and widgets are fully responsive using Tailwind's `sm:`, `md:`, `lg:` prefixes.
 
-## Templates vs Plugins
+## Application Shell & Plugins
 
-- **Plugins** define the structural markup and layout of the feature (using generic `@veap/ui` components).
-- **Templates** can completely override this markup or provide global CSS variables (colors, fonts, radii) that affect how `@veap/ui` renders across the entire system.
+- **Host Application** defines the design tokens (colors, fonts, radii in `globals.css`) and global layout shell in `app/layout.tsx`.
+- **Plugins** define functional views and reusable widgets using `@veap/ui` components, integrating into the host application via `<ExtensionPoint />` or route declarations.
+- **Host Overrides**: Host applications can override any plugin page by creating a corresponding physical Next.js page in `app/` (e.g., `app/(auth)/signin/page.tsx`), cleanly replacing the plugin's markup with custom designs.
