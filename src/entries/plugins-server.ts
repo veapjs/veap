@@ -1,8 +1,7 @@
 // Re-export client-safe plugins
 
-// Core: Registry & Templates
+// Core: Registry
 export * from "../application/plugins/registry";
-export * from "../application/plugins/templates";
 // Core: Compatibility Aliases
 export {
   applyPluginFilters as applyFilters,

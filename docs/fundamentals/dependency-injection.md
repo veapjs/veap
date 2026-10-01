@@ -115,11 +115,10 @@ Built-in port tokens bound by the kernel:
 | `REQUEST_CONTEXT` | `IHttpRequestContext` | Next.js `headers()`/`redirect()` adapter |
 | `DATABASE`        | `Knex`                | active Knex instance (also `"Knex"`)     |
 | `APP_PLUGINS`     | `IPlugin[]`           | array of registered plugins              |
-| `APP_TEMPLATES`   | `ITemplate[]`         | array of registered templates            |
 | `APP_MIGRATIONS`  | `Migration[]`         | array of native app migrations           |
 | `CLI_SERVICE`     | `CliService`          | CAC CLI command registry service         |
 
-Feature tokens: `PASSWORD_HASHER`, `TOKEN_GENERATOR`, `SECRET_CIPHER` (auth); `USER_REPOSITORY`, `ROLE_REPOSITORY`, `PERMISSION_REPOSITORY`, `SESSION_REPOSITORY`, `PASSWORD_RESET_REPOSITORY`, `EMAIL_VERIFICATION_REPOSITORY` (auth persistence); `MAILER`, `CUSTOM_MAILER` (communication); `PLUGIN_REPOSITORY`, `TEMPLATE_REPOSITORY`, `MIGRATION_RUNNER`, `SETTINGS_REPOSITORY` (platform).
+Feature tokens: `PASSWORD_HASHER`, `TOKEN_GENERATOR`, `SECRET_CIPHER` (auth); `USER_REPOSITORY`, `ROLE_REPOSITORY`, `PERMISSION_REPOSITORY`, `SESSION_REPOSITORY`, `PASSWORD_RESET_REPOSITORY`, `EMAIL_VERIFICATION_REPOSITORY` (auth persistence); `MAILER`, `CUSTOM_MAILER` (communication); `PLUGIN_REPOSITORY`, `MIGRATION_RUNNER`, `SETTINGS_REPOSITORY` (platform).
 
 To replace an adapter, register your implementation under the same token in a provider that boots before the subsystem that consumes it (or re-register after boot, like the communication provider rebinds `MAILER` when selecting a transport).
 

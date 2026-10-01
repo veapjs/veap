@@ -63,7 +63,7 @@ A `RouteNode` mirrors Next.js App Router file conventions:
 | `breadcrumb`                   | breadcrumbs      | string or function                                                                    |
 | `children`                     | subdirectories   | nested segments                                                                       |
 | `parallelRoutes`               | `@slot` dirs     | slot subtrees                                                                         |
-| `id`                           | route id         | stable id, used by template overrides                                                 |
+| `id`                           | route id         | stable identifier for the route node                                                  |
 
 ## Defining routes for a plugin
 
@@ -133,13 +133,11 @@ Route groups organize the tree without affecting URLs; their layouts and protect
 export default async function Page({
   params,
   searchParams,
-  config,
   breadcrumbs,
   context,
 }) {
   // params: matched params (already resolved, not a Promise)
   // searchParams: query parameters
-  // config: active template config (if any)
   // breadcrumbs: resolved BreadcrumbItem[] for this path
   // context: VeapMiddlewareContext after the middleware pipeline
 }

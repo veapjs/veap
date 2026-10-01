@@ -13,7 +13,7 @@ routeTree: async () => {
     "app",
   );
   return discoverRoutes(appDir, (relPath) => import(`./app/${relPath}`));
-},
+};
 ```
 
 `discoverRoutes` returns a `RouteNode`; returning a function keeps discovery lazy (runs once when the router first builds the merged tree). A `RouteTree` instance is also accepted.
@@ -45,7 +45,6 @@ export default async function Page({
   params, // { slug: "hello" } for [slug]
   searchParams, // { q: "veap" } for ?q=veap
   context, // VeapMiddlewareContext: path, roles, permissions after middleware
-  config, // active template config
   breadcrumbs, // BreadcrumbItem[] resolved for this path
 }) {
   return <div>{params.slug}</div>;
@@ -82,4 +81,4 @@ routeTree: () => {
 },
 ```
 
-`id` properties on nodes enable template overrides (a template can replace the component for a given route id, including `${id}/layout` keys for layouts).
+Nodes can carry an `id` property for stable node identification and programmatic inspection or manipulation.

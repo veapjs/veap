@@ -1,6 +1,5 @@
 import { AppError } from "../../domain/errors/app-error";
 import type { PluginRegistry } from "./registry";
-import type { TemplateService } from "./templates";
 import type { NavigationService } from "./navigation";
 
 /**
@@ -13,7 +12,6 @@ import type { NavigationService } from "./navigation";
  */
 export interface PluginsContext {
   registry: PluginRegistry;
-  templates: TemplateService;
   navigation: NavigationService;
 }
 

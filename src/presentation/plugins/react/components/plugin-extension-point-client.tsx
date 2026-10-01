@@ -5,12 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 import { getPluginExtensionsAction } from "../../actions";
 import { onPluginsChanged } from "../events";
 
-interface PluginExtensionPointClientProps {
+export interface PluginExtensionPointClientProps {
   target: string;
   point: string;
+  mode?: "single" | "multiple";
   className?: string;
   props?: any;
   fallback?: React.ReactNode;
+  children?: React.ReactNode;
   includeDisabled?: boolean;
   as?: React.ElementType;
 }
@@ -44,23 +46,45 @@ export function usePluginExtensions(
 export function PluginExtensionPointClient({
   target,
   point,
+  mode = "multiple",
   className,
   props,
   fallback,
+  children,
   includeDisabled = false,
-  as: Container = "div",
+  as: Container,
 }: PluginExtensionPointClientProps) {
   const extensions = usePluginExtensions(target, point, includeDisabled);
 
-  if (extensions.length === 0) return (fallback as any) || null;
+  const fallbackContent = (children ?? fallback ?? null) as React.ReactNode;
 
+  if (extensions.length === 0) return fallbackContent;
+
+  if (mode === "single") {
+    const ext = extensions[0];
+    const Component = ext?.component;
+    if (!Component) return fallbackContent;
+
+    if (Container || className) {
+      const Wrapper = Container || "div";
+      return (
+        <Wrapper className={className}>
+          <Component key={ext.id} {...props} />
+        </Wrapper>
+      );
+    }
+
+    return <Component key={ext.id} {...props} />;
+  }
+
+  const Wrapper = Container || "div";
   return (
-    <Container className={className}>
+    <Wrapper className={className}>
       {extensions.map((ext) => {
         const Component = ext.component;
         if (!Component) return null;
         return <Component key={ext.id} {...props} />;
       })}
-    </Container>
+    </Wrapper>
   );
 }

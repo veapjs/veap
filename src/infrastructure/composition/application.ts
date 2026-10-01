@@ -6,7 +6,6 @@ import { KernelServiceProvider } from "../providers/kernel.provider";
 import {
   APP_MIGRATIONS,
   APP_PLUGINS,
-  APP_TEMPLATES,
 } from "../../domain/contracts/token";
 
 // Core Providers
@@ -29,7 +28,6 @@ export type ProviderEntry =
 export class ApplicationBuilder {
   private migrations: any[] = [];
   private plugins: any[] = [];
-  private templates: any[] = [];
   private customProviders: ProviderEntry[] = [];
   private authConfig?: AuthConfig;
 
@@ -41,11 +39,6 @@ export class ApplicationBuilder {
   public withPlugins(plugins: any[]): this {
     this.plugins = plugins;
     this.customProviders.push(PluginServiceProvider);
-    return this;
-  }
-
-  public withTemplates(templates: any[]): this {
-    this.templates = templates;
     return this;
   }
 
@@ -101,7 +94,6 @@ export class ApplicationBuilder {
     return new Application(
       this.migrations,
       this.plugins,
-      this.templates,
       this.customProviders,
     );
   }
@@ -111,7 +103,6 @@ export class Application {
   constructor(
     private readonly migrations: any[],
     private readonly plugins: any[],
-    private readonly templates: any[],
     private readonly providerEntries: ProviderEntry[],
   ) {}
 
@@ -134,19 +125,11 @@ export class Application {
 
     // 2. Return if already bootstrapped successfully
     if (g.__VEAP_BOOTSTRAPPED__) {
-      // In development, when a template/plugin source file changes, the
-      // bundler re-evaluates this Application instance with fresh module
-      // references — but the bootstrap guard above prevents full
-      // re-initialization. We only refresh the in-memory registries so
-      // the renderer picks up the new component references (layout,
-      // overrides, extensions, widgets, etc.).
+      // In development, when a plugin source file changes, the bundler
+      // re-evaluates this Application instance with fresh module references.
+      // We only refresh the in-memory registries so the renderer picks up
+      // the new component references (extensions, widgets, etc.).
       if (process.env.NODE_ENV === "development") {
-        if (this.templates.length) {
-          const { registerTemplates } = await import(
-            "../../application/plugins/templates"
-          );
-          await registerTemplates(this.templates);
-        }
         if (this.plugins.length) {
           const { registerPlugins } = await import(
             "../../application/plugins/facade"
@@ -179,16 +162,6 @@ export class Application {
         if (this.plugins.length) {
           container.register({ token: APP_PLUGINS, useValue: this.plugins });
           container.register({ token: "AppPlugins", useValue: this.plugins });
-        }
-        if (this.templates.length) {
-          container.register({
-            token: APP_TEMPLATES,
-            useValue: this.templates,
-          });
-          container.register({
-            token: "AppTemplates",
-            useValue: this.templates,
-          });
         }
 
         const entries = [KernelServiceProvider, ...this.providerEntries];

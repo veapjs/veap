@@ -1,6 +1,6 @@
-# Layouts
+# Layouts and slots
 
-Layouts wrap pages and nested segments. Veap supports layouts in three places: the physical Next.js root layout, plugin route-tree layouts, and template layouts for public pages.
+Layouts wrap pages and nested route segments. Veap supports layouts through native Next.js root and directory layouts, plugin route-tree layouts, and modular UI slot injection using `ExtensionPoint`.
 
 ## Root layout (physical)
 
@@ -18,7 +18,11 @@ import { initializeSystem } from "@/lib/veap";
 
 export const dynamic = "force-dynamic";
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   await initializeSystem();
   const installed = await isSystemInstalled();
   const session = installed
@@ -42,15 +46,48 @@ export default async function RootLayout({ children }) {
 }
 ```
 
-Points to keep:
+Key points to understand:
 
 - `export const dynamic = "force-dynamic"` is required. Without it, `next build` prerenders `/_not-found` during the build phase, bootstrap intentionally skips provider boot, and context-bound helpers throw `Context is not bound`. This is a deliberate trade-off (framework decision record ADR-006).
-- `ExtensionPoint target="app"` lets plugins inject content around the whole application without touching this file.
+- `ExtensionPoint target="app"` lets plugins inject content around the whole application without modifying this file.
 - `AppProvider` wraps the tree in theme, tooltip, toaster and auth contexts (client). `initialSession` seeds the client auth context from the server-side session lookup.
+
+## Modular shells with ExtensionPoint
+
+Rather than relying on closed, monolithic theme templates, Veap applications compose their public and administrative shells using standard React components alongside `<ExtensionPoint />`.
+
+Plugins can inject navigation headers, footers, or announcement banners into predefined application slots. Using `mode="single"`, the host application provides default components as fallback children. If an installed plugin registers a higher-priority component for that slot, it replaces the default:
+
+```tsx
+// app/layout.tsx or components/layout-shell.tsx
+import { ExtensionPoint } from "@veap/framework/plugins/server";
+import { DefaultHeader } from "@/components/default-header";
+import { DefaultFooter } from "@/components/default-footer";
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      {/* Plugin can override navbar; otherwise renders DefaultHeader */}
+      <ExtensionPoint target="app" point="navbar" mode="single">
+        <DefaultHeader />
+      </ExtensionPoint>
+
+      <main className="flex-1">{children}</main>
+
+      {/* Plugin can override footer; otherwise renders DefaultFooter */}
+      <ExtensionPoint target="app" point="footer" mode="single">
+        <DefaultFooter />
+      </ExtensionPoint>
+    </div>
+  );
+}
+```
+
+When multiple plugins provide an extension for the same single-mode slot, the kernel selects the one with the lowest `priority` value (for example, `priority: 10` takes precedence over `priority: 50`).
 
 ## Plugin route-tree layouts
 
-Any directory in a plugin's `app/` tree can provide `layout.tsx`; the discovered node gets a `layout` property. At render time the router builds the nested tree from the matched layout chain, innermost first:
+Any directory in a plugin's `app/` tree can provide `layout.tsx`; the discovered node receives a `layout` property. At render time the router builds the nested tree from the matched layout chain, innermost first:
 
 ```tsx
 // plugins/shop-plugin/src/app/shop/layout.tsx
@@ -72,24 +109,28 @@ Layouts receive:
 
 | Prop       | Content                                               |
 | ---------- | ----------------------------------------------------- |
-| `children` | the wrapped subtree                                   |
-| `params`   | matched route params                                  |
+| `children` | The wrapped subtree                                   |
+| `params`   | Matched route parameters                              |
 | `context`  | `VeapMiddlewareContext` after middleware              |
-| slot props | resolved parallel slot subtrees, one prop per `@slot` |
+| slot props | Resolved parallel slot subtrees, one prop per `@slot` |
 
-Layout modules may export `auth`, `roles`, `permissions` and `middlewares`, applying to every route beneath them.
+Layout modules may export `auth`, `roles`, `permissions` and `middlewares`, which apply to every route beneath them.
 
 ## Boundaries per level
 
-Each layout level can also provide `loading.tsx` and `error.tsx`; the router wraps the subtree at that level in a Suspense boundary (with the loading component as fallback) and a `RouterErrorBoundary`. `not-found.tsx` at any level is used for partial matches beneath it.
+Each layout level can provide `loading.tsx` and `error.tsx`. The router wraps the subtree at that level in a React `Suspense` boundary (with the loading component as fallback) and a `RouterErrorBoundary`. A `not-found.tsx` at any level handles partial matches beneath it.
 
-## Template layouts (public pages)
+## Overriding plugin UI with Next.js file shadowing
 
-When the URL is outside the private prefix and no plugin layout matched, the active template's `layout` wraps the page. Templates are `ITemplate` objects with a `layout` component receiving `config`, `breadcrumbs` and `children`; the template system is described in [Templates](../plugins/templates.md). The `/setup` path is excluded from template wrapping, and a page already wrapped by a plugin layout is not double-wrapped.
+Because Veap is an additive layer on top of Next.js App Router, host applications do not need template override systems to customize plugin user interfaces.
+
+Next.js file-system routing takes precedence over the catch-all virtual router. If a plugin provides a page at `/signin` or `/blog/[slug]`, you can override its UI simply by creating a physical Next.js file at `app/(auth)/signin/page.tsx` or `app/blog/[slug]/page.tsx`.
+
+The physical Next.js page renders your custom UI, while retaining full access to the plugin's backend services, models, and Server Actions.
 
 ## Physical pages with withRouter
 
-A physical Next.js page can opt into the virtual router to inherit layouts, slots and protection:
+A physical Next.js page can opt into the virtual router to inherit layouts, slots, and route protection:
 
 ```tsx
 import { withRouter } from "@veap/framework/router";
@@ -99,4 +140,4 @@ export default withRouter(async function CustomPage() {
 }, "/app/custom");
 ```
 
-The second argument is a path or a config object `{ path, roles, permissions, middlewares }`. If omitted, the path is inferred from the `x-invoke-path` header (set for you by `proxy.ts`). See [Physical pages and withRouter](./physical-pages.md).
+The second argument is a path or a configuration object `{ path, roles, permissions, middlewares }`. If omitted, the path is inferred from the `x-invoke-path` header (set for you by `proxy.ts`). See [Physical pages and withRouter](./physical-pages.md).

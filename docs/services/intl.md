@@ -1,6 +1,6 @@
 # Internationalization (intl)
 
-Veap bundles an intl system with server-side locale detection, message loading from core, plugins, templates and the application, and typed translation helpers for both server and client.
+Veap bundles an intl system with server-side locale detection, message loading from core, plugins, and the application, and typed translation helpers for both server and client.
 
 ## Configuration
 
@@ -79,8 +79,7 @@ Hooks throw if rendered outside `I18nProvider`. `useTranslation` returns the tra
 1. Messages registered programmatically (`registerMessages(locale, dict)`).
 2. Core dictionaries (built-in `en`, `pl`).
 3. Every registered plugin's `locales[locale]` loader.
-4. Templates' locale loaders (via the same `locales` record on `ITemplate`).
-5. Application files: `locales/<locale>.json` in the project root (plus any extra directories passed to `getMessages`).
+4. Application files: `locales/<locale>.json` in the project root (plus any extra directories passed to `getMessages`).
 
 A missing key renders the key itself (or the key with `{param}` interpolation when values are passed), so development never blocks on missing translations.
 

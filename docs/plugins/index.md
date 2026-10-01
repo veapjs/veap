@@ -2,7 +2,7 @@
 title: "Plugin Architecture"
 description: "Isolated, composable packages providing routes, widgets, models, migrations, and lifecycle hooks."
 status: "Stable"
-category: "Plugins & Templates"
+category: "Plugins & Extensions"
 author: "Veap Core Team"
 lastUpdated: "2026-03"
 ---
@@ -99,7 +99,7 @@ export default myPlugin;
 | `widgets`    | `PluginWidget[]`         | dashboard widgets per area                                                  |
 | `navigation` | `PluginNavigation`       | `public`, `admin`, `settings` trees                                         |
 | `plugins`    | `IPlugin[]`              | nested plugins registered recursively                                       |
-| `routeTree`  | `RouteNode               | fn`                                                                         | App Router-style route tree (usually `discoverRoutes`) |
+| `routeTree`  | `RouteNode \| fn`        | App Router-style route tree (usually `discoverRoutes`)                       |
 
 ## Registration and lifecycle
 
@@ -145,7 +145,7 @@ The Veap ecosystem provides first-party plugins for common application capabilit
 | `@veap/auth-google-plugin`    | Google OAuth 2.0 social login integration                                                       |
 | `@veap/auth-passkey-plugin`   | Passwordless WebAuthn / Passkey authentication                                                  |
 | `@veap/rbac-plugin`           | Role-Based Access Control administration UI and permission assignments                          |
-| `@veap/panel-plugin`          | Administrative dashboard, navigation layout, template switcher, and settings UI                 |
+| `@veap/panel-plugin`          | Administrative dashboard, navigation layout, and settings UI                                    |
 | `@veap/manager-plugin`        | Plugin manager UI for enabling, disabling, and configuring plugins at runtime                   |
 | `@veap/installer-plugin`      | First-run setup wizard for initial database migrations and administrator account creation     |
 | `@veap/media-plugin`          | Media asset management, uploads, image browsing, and picker dialogs                             |
@@ -162,4 +162,3 @@ The Veap ecosystem provides first-party plugins for common application capabilit
 - [Routing in plugins](./plugin-routing.md): route trees, the `[prefix]` magic segment, admin pages.
 - [Extensions and widgets](./extensions-and-widgets.md): injecting UI into other components' areas.
 - [Hooks](./hooks.md): the filter pipeline and well-known points.
-- [Templates](./templates.md): themes that restyle public pages and override components.

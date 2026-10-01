@@ -13,7 +13,7 @@ Veap (`@veap/framework`) is a single npm package with several entry points. The 
 - **Authentication.** Session-based auth with bcrypt password hashing, Oslo-based token generation, email verification, password reset, 2FA extension points, and roles and permissions (RBAC).
 - **An event bus.** An in-process publish/subscribe bus with a typed event map for system events and model lifecycle events.
 - **Support services.** File storage with provider registration, key/value settings, mail with pluggable transports, and internationalization with server and client translation APIs.
-- **A CLI** (`veap`) for scaffolding projects, plugins, templates and migrations, plus Docker configuration.
+- **A CLI** (`veap`) for scaffolding projects, plugins and migrations, plus Docker configuration.
 
 ## What Veap does not provide
 

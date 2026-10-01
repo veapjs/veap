@@ -34,7 +34,7 @@ flowchart TD
     Matcher --> MiddlewarePipe["Middleware Pipeline<br/>Run EnsuredAuth, RBAC & custom middlewares"]
 
     MiddlewarePipe -- "Redirect / Rejection" --> ShortCircuit(["HTTP Redirect or 401/403 Error"])
-    MiddlewarePipe -- "next()" --> Render["Render React Server Component<br/>Wrap with Layouts, Boundaries & Template"]
+    MiddlewarePipe -- "next()" --> Render["Render React Server Component<br/>Wrap with Layouts & Boundaries"]
 
     Render --> FinalResponse(["HTML / Streamed Response"])
 ```
@@ -114,7 +114,7 @@ flowchart TD
     CheckDedupe -- "Yes" --> AwaitDedupe["Await existing Promise"]
     AwaitDedupe --> Ready(["System Ready"])
 
-    CheckDedupe -- "No" --> BindInputs["Register Core Inputs into Container<br/>(AppMigrations, AppPlugins, AppTemplates)"]
+    CheckDedupe -- "No" --> BindInputs["Register Core Inputs into Container<br/>(AppMigrations, AppPlugins)"]
     BindInputs --> InstantiateProviders["Instantiate Service Providers<br/>(KernelServiceProvider, then feature providers)"]
 
     InstantiateProviders --> RegisterPhase["Phase 1: register()<br/>Synchronously bind ports, contracts & tokens"]
@@ -129,7 +129,7 @@ flowchart TD
 
 1. **Skips** when running during `next build` (`NEXT_PHASE=phase-production-build`) or when `SKIP_VEAP_INIT=true`. This is deliberate; prerendering must not boot providers.
 2. **Deduplicates** across concurrent requests: a second caller awaits the in-flight bootstrap promise; after success a global flag short-circuits further calls.
-3. Registers the builder's inputs (`AppMigrations`, `AppPlugins`, `AppTemplates`) into the container.
+3. Registers the builder's inputs (`AppMigrations`, `AppPlugins`) into the container.
 4. Instantiates providers in registration order: `KernelServiceProvider` first, then the ones added by `with*` calls.
 5. Calls `register()` on every provider (bind contracts and services into the IoC container; do not resolve anything here).
 6. Calls `boot()` on every provider (safe to resolve; wires contexts, runs core and app migrations, initializes plugins, registers CLI commands).
@@ -205,7 +205,7 @@ sequenceDiagram
         Pipeline->>PluginRSC: Render page component with props
         PluginRSC->>PluginRSC: Query ORM models / domain logic
         PluginRSC-->>CatchAll: React Server Component tree
-        CatchAll-->>Layout: Wrap with layouts, boundaries & active template
+        CatchAll-->>Layout: Wrap with layouts & boundaries
         Layout-->>Client: Stream HTML / React Flight response
     end
 ```
@@ -217,7 +217,7 @@ For a page request to `/tasks/42`:
 3. `VeapRouter` matches `/tasks/42` against the tree, producing a `MatchResult` with params, a layout chain and the matched node.
 4. Middlewares are collected from the layout chain (outermost first), plus route-level exports; `EnsuredAuth` is prepended if any level declares `auth`, `roles` or `permissions`.
 5. The pipeline runs: each middleware can inspect `VeapMiddlewareContext`, redirect, or call `next()`. The final callback builds the React tree: page wrapped by layouts from innermost to outermost, each level optionally wrapped in its `error` boundary and `loading` Suspense, with parallel slots resolved per layout.
-6. If the URL is outside the private prefix and a template is active, the template layout wraps the content.
+6. UI extension points and widget areas render registered plugin components or fallback UI.
 7. Metadata: the catch-all's `generateMetadata` calls `tree.generateMetadata(path)`, which merges `generateMetadata` exports along the matched path.
 
 For `/api/*` requests the API catch-all performs the same match and instead invokes the route handler export (`GET`, `POST`, ...) with the enriched context, wrapped in the API middleware pipeline (`ApiEnsuredAuth` returns 401 JSON instead of redirecting).
@@ -226,5 +226,5 @@ For `/api/*` requests the API catch-all performs the same match and instead invo
 
 - **Process-global singletons** (`container`, `eventBus`, logger, contexts) live on `globalThis` to survive HMR and dual-package boundaries. They are per-server-process, not per-request.
 - **Request-scoped values** (active transaction) live in `AsyncLocalStorage`.
-- **Per-request caching** uses React `cache` (`getCurrentSession`, `buildRouteTree`, `getActiveTemplate`).
+- **Per-request caching** uses React `cache` (`getCurrentSession`, `buildRouteTree`).
 - **Persistent state** lives in the database (users, sessions, plugin status, settings) and the filesystem (storage provider).

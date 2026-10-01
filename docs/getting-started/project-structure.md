@@ -1,6 +1,6 @@
 # Project structure
 
-A generated Veap application is a workspace. The host Next.js app is the root workspace; plugins, templates and the framework live in sibling packages.
+A generated Veap application is a workspace. The host Next.js app is the root workspace; plugins and the framework live in sibling packages.
 
 ```text
 my-app/
@@ -11,7 +11,6 @@ my-app/
 │   └── plugins.gen.ts          # Generated plugin registry (do not edit)
 ├── plugins/                    # Local plugins, one package per directory
 │   └── my-plugin/
-├── templates/                  # Local templates, one package per directory
 ├── migrations/                 # App migrations (index.ts is generated)
 ├── locales/                    # App-level translation files (en.json, pl.json, ...)
 ├── public/
@@ -54,7 +53,6 @@ This is the file where you decide which framework features and plugins your appl
 import { cache } from "react";
 import { Application } from "@veap/framework/core/server";
 
-import { default as MinimalTemplate } from "@veap/minimal-template";
 import { appMigrations } from "../migrations";
 import { plugins } from "./plugins.gen";
 
@@ -68,7 +66,6 @@ export const app = Application.configure()
   .withSettings()
   .withMigrations(appMigrations)
   .withPlugins(plugins)
-  .withTemplates([MinimalTemplate])
   .create();
 
 export const initializeSystem = cache(async () => {

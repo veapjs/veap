@@ -24,11 +24,11 @@ Next.js route match (app/[[...catchAll]] or app/api/[...catchAll])
    |
    veap route middlewares (pipeline, in registration order)
    |
-   router matcher (virtual router: plugin routes + template routes)
+   router matcher (virtual router: plugin routes)
    |
    route handler: React Server Component or JSON response
    |
-   layout tree (root layout + template layouts + plugin widget areas)
+   layout tree (root layout + plugin layouts + extension points / widget areas)
    |
    response to the client
 ```
@@ -37,7 +37,7 @@ Next.js route match (app/[[...catchAll]] or app/api/[...catchAll])
 2. The catch-all page/API route calls `runPipeline()`, executing registered middlewares in order. A middleware may return a response, short-circuiting the pipeline.
 3. `RouterService` resolves the path against the virtual router (plugin-registered routes, static and dynamic segments, 404 otherwise).
 4. The matched route's component renders as a React Server Component. Request-scoped values are read through ports (`IHttpRequestContext`, `ICookieStore`) bound by the framework adapter for the duration of the request.
-5. Layouts compose: Next.js root layout, then the template system builds the layout tree from the matched route's template metadata, inserting plugin widget areas.
+5. Layouts compose: Next.js root layout, nested plugin layouts along the route tree, error and loading boundaries, and extension points / widget areas.
 
 Server Actions and API route handlers work through the same container: they call `app(Token)` or facades, which resolve from the already-booted container.
 

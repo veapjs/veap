@@ -140,7 +140,7 @@ export function registerAuthListeners(mailer: MailService) {
 }
 ```
 
-## Plugin and template lifecycle events
+## Plugin lifecycle events
 
 Plugin lifecycle events allow plugins and kernel managers to coordinate dependencies, clear virtual route trees, and reload caches when extensions are toggled.
 
@@ -149,7 +149,6 @@ Plugin lifecycle events allow plugins and kernel managers to coordinate dependen
 | `system:plugins:init:start` | `{ plugins: Array<{ id: string, name: string, version: string, system: boolean }> }` | Emitted immediately before plugin initialization passes execute.                      |
 | `system:plugins:init:end`   | `{ plugins: Array<{ id: string, name: string, version: string, system: boolean }> }` | Emitted after all registered plugins have finished their `init()` hooks.              |
 | `system:plugin:toggle`      | `{ pluginId: string, enabled: boolean }`                                             | Emitted when a plugin is enabled or disabled in the administration panel or database. |
-| `system:template:toggle`    | `{ templateId: string, enabled: boolean }`                                           | Emitted when an active presentation template is switched.                             |
 
 ### Example: Invalidating caches on plugin toggle
 
@@ -171,7 +170,7 @@ eventBus.subscribe(
 
 ## Action confirmation dialog protocol
 
-The client-side confirmation protocol coordinates UI dialogs without tight coupling between calling components and UI modal templates:
+The client-side confirmation protocol coordinates UI dialogs without tight coupling between calling components and UI modal components:
 
 | Event                     | Payload                                                                                                                                                          | Description                                                                                    |
 | :------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |

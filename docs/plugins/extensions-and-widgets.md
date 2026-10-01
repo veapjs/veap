@@ -1,10 +1,10 @@
 # Extensions and widgets
 
-Extensions and widgets are how plugins inject UI into host components without any import from the host. The host declares _where_ (extension points, widget areas), plugins declare _what_, and the kernel resolves the composition at render time with RBAC filtering.
+Extensions and widgets let plugins inject user interfaces into host components without any direct imports from the host application. The host declares *where* using extension points and widget areas, plugins declare *what*, and the kernel resolves the composition at render time with role-based access control (RBAC).
 
 ## Extension points (server)
 
-An extension point renders all extensions registered for a `target` + `point` pair:
+An extension point renders extensions registered for a given `target` and `point` pair. You can render multiple injected components or select a single component using the `mode` property.
 
 ```tsx
 // host component (your app or another plugin)
@@ -19,7 +19,7 @@ export function ArticleFooter() {
 }
 ```
 
-A plugin registers an extension:
+A plugin registers an extension in its `IPlugin` declaration:
 
 ```ts
 // in the IPlugin object
@@ -37,19 +37,66 @@ extensions: [
 ],
 ```
 
-`ExtensionPoint` props:
+### Extension point properties
 
-| Prop              | Type                | Default | Description                                                            |
-| ----------------- | ------------------- | ------- | ---------------------------------------------------------------------- |
-| `target`          | `string`            | -       | Host component or view identifier (e.g. `"article"`, `"posts.edit"`)   |
-| `point`           | `string`            | -       | Slot location within the target (e.g. `"sidebar"`, `"footer-actions"`) |
-| `props`           | `any`               | -       | Context object spread into each injected extension component           |
-| `className`       | `string`            | -       | CSS class names applied to the container wrapper element               |
-| `as`              | `React.ElementType` | `"div"` | Wrapper element (e.g. `"section"`, `"ul"`, `"nav"`)                    |
-| `fallback`        | `React.ReactNode`   | `null`  | Rendered when no extensions match or when the user fails RBAC checks   |
-| `includeDisabled` | `boolean`           | `false` | Whether to include extensions from disabled plugins                    |
+| Prop              | Type                          | Default        | Description                                                                                     |
+| ----------------- | ----------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
+| `target`          | `string`                      | -              | Host component or view identifier (for example, `"app"`, `"article"`, `"posts.edit"`).          |
+| `point`           | `string`                      | -              | Slot location within the target (for example, `"navbar"`, `"footer"`, `"sidebar"`).            |
+| `mode`            | `"single" \| "multiple"`      | `"multiple"`   | Resolution strategy. In `"single"` mode, only the highest-priority extension renders.          |
+| `props`           | `any`                         | -              | Context object spread into each injected extension component as React props.                    |
+| `className`       | `string`                      | -              | CSS class names applied to the container wrapper element.                                       |
+| `as`              | `React.ElementType`           | `"div"`        | Wrapper element (for example, `"section"`, `"nav"`). Unused in `"single"` mode unless styled.  |
+| `children`        | `React.ReactNode`             | -              | Idiomatic JSX fallback rendered when no extensions match or when RBAC checks fail.             |
+| `fallback`        | `React.ReactNode`             | `null`         | Alternative fallback prop rendered when no extensions match.                                    |
+| `includeDisabled` | `boolean`                     | `false`        | Whether to include extensions from disabled plugins.                                            |
 
 The alias `PluginExtensionPoint` is exported as an alternative name for `ExtensionPoint`.
+
+### Rendering modes: single vs multiple
+
+The `mode` prop determines how collisions between multiple plugins targeting the same slot are resolved.
+
+#### Multiple mode (default)
+
+When `mode="multiple"`, all matching extensions are sorted by their `priority` and rendered sequentially inside the wrapper container:
+
+```tsx
+<ExtensionPoint
+  target="article"
+  point="footer-actions"
+  mode="multiple"
+  as="div"
+  className="flex items-center gap-4"
+/>
+```
+
+#### Single mode and fallback components
+
+When building extensible page shells such as navigation headers or footers, you typically want only **one** component to occupy the slot. Setting `mode="single"` tells Veap to select the single extension with the highest priority (the lowest `priority` number).
+
+If no plugins provide an extension for that slot, or if the user lacks the required roles or permissions, the extension point renders its `children` (or `fallback` prop) as the default UI:
+
+```tsx
+// app/layout.tsx or components/layout-shell.tsx
+import { ExtensionPoint } from "@veap/framework/plugins/server";
+import { DefaultAppFooter } from "./default-footer";
+
+export function AppLayoutShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col">
+      <main className="flex-1">{children}</main>
+
+      {/* Render the highest priority plugin footer, or fall back to DefaultAppFooter */}
+      <ExtensionPoint target="app" point="footer" mode="single">
+        <DefaultAppFooter />
+      </ExtensionPoint>
+    </div>
+  );
+}
+```
+
+In `mode="single"`, if neither `as` nor `className` is specified, Veap renders the extension component directly into the tree without an extraneous wrapper element.
 
 ### Passing context to extensions
 
@@ -88,7 +135,7 @@ export default async function EditPostPage({
 }
 ```
 
-The plugin component simply receives `post` as a standard React prop:
+The plugin component receives `post` as a standard React prop:
 
 ```tsx
 // Plugin component: plugins/seo-plugin/src/ui/seo-sidebar-box.tsx
@@ -129,16 +176,17 @@ extensions: [
 
 When evaluating access:
 
-1. **Roles check**: If `roles` array is provided, the user must have **at least one** matching role (`roles.some(...)`).
-2. **Permissions check**: If `permissions` array is provided, the user must possess **all** listed permissions (`permissions.every(...)`).
-3. If the user does not satisfy the criteria, the extension is omitted from rendering. If all extensions are filtered out, the `fallback` prop is displayed.
+1. **Roles check**: If a `roles` array is provided, the user must have **at least one** matching role (`roles.some(...)`).
+2. **Permissions check**: If a `permissions` array is provided, the user must possess **all** listed permissions (`permissions.every(...)`).
+3. If the user does not satisfy the criteria, the extension is omitted from rendering. If all extensions are filtered out, the fallback is displayed.
 
 ### Priority and ordering
 
 Extensions and widgets are sorted ascending by their `priority` number:
 
 - Lower numbers render earlier: an extension with `priority: 10` renders above `priority: 50`.
-- Extensions without an explicit `priority` default to `100` and appear at the end.
+- In `mode="single"`, the extension with the lowest priority number wins and replaces all other candidates.
+- Extensions without an explicit `priority` default to `100`.
 
 ## Widget areas (server)
 
@@ -195,6 +243,8 @@ export function RichTextEditorToolbar({ editor }: { editor: any }) {
 }
 ```
 
+`ExtensionPointClient` supports the same `mode?: "single" | "multiple"`, `children`, and `fallback` props.
+
 ### Custom client rendering with `usePluginExtensions`
 
 If you need programmatic control over how extensions are structured or wrapped on the client:
@@ -222,18 +272,19 @@ export function CustomNavigationMenu() {
 }
 ```
 
-The hook automatically re-fetches extensions whenever plugins are enabled, disabled, or updated via `onPluginsChanged`.
+The hook automatically re-fetches extensions whenever plugins are enabled, disabled, or updated.
 
 ## Well-known points used by the platform
 
 | Target          | Point                               | Used for                                                 |
 | --------------- | ----------------------------------- | -------------------------------------------------------- |
-| `app`           | `before-content`, `after-content`   | injected around the whole application in the root layout |
-| `panel`         | `plugin-setup-dialogs`              | setup dialogs for plugins with `hasSetup`                |
-| dashboard areas | `dashboard-stats`, `dashboard-main` | admin dashboard widgets                                  |
+| `app`           | `before-content`, `after-content`   | Injected around the whole application in the root layout |
+| `app`           | `navbar`, `footer`                  | Common slots for layout shell header and footer          |
+| `panel`         | `plugin-setup-dialogs`              | Setup dialogs for plugins with `hasSetup`                |
+| dashboard areas | `dashboard-stats`, `dashboard-main` | Admin dashboard widgets                                  |
 
-Your own targets and points are first-class: pick a target id (usually the component's name) and point names that describe the slot (`"sidebar-top"`, `"header-actions"`).
+Your own targets and points are first-class: pick a target identifier (usually the component name) and point names that describe the slot (`"sidebar-top"`, `"header-actions"`).
 
 ## Hooks vs extensions
 
-Use extensions/widgets for UI composition. Use hooks (see [Hooks](./hooks.md)) for data transformation pipelines. If you find yourself rendering HTML from a hook, it should be an extension.
+Use extensions and widgets for user interface composition. Use hooks (see [Hooks](./hooks.md)) for data transformation pipelines. If you find yourself rendering HTML from a hook, use an extension instead.

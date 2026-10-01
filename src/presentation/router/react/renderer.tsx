@@ -9,6 +9,9 @@ import type {
 } from "../../../application/router/route-tree";
 import { RouterErrorBoundary } from "./error-boundary";
 import { SoftNavigationInterceptor } from "./soft-navigation";
+import { eventBus } from "../../../application/events/event-bus";
+import { warn } from "../../../infrastructure/logging";
+import { collectAuthRequirements, collectMiddlewares } from "../api/utils";
 
 // ---------------------------------------------------------------------------
 // Parallel slot resolution
@@ -25,7 +28,6 @@ async function resolveParallelSlot(
   searchParams: Record<string, any>,
   params: Record<string, string>,
   _slotName: string,
-  activeTemplate: any,
   context: VeapMiddlewareContext,
 ): Promise<React.ReactNode> {
   const { RouteTree: RouteTreeClass } =
@@ -34,11 +36,7 @@ async function resolveParallelSlot(
   const slotMatch = tempTree.match(path);
 
   if (slotMatch?.node.page) {
-    const overrideKey = slotMatch.node.id;
-    const TemplateOverride = overrideKey
-      ? activeTemplate?.overrides?.[overrideKey]
-      : undefined;
-    const SlotPage = TemplateOverride || slotMatch.node.page;
+    const SlotPage = slotMatch.node.page;
     const mergedParams = { ...params, ...slotMatch.params };
     return (
       <SlotPage
@@ -73,7 +71,6 @@ async function resolveAllParallelSlots(
   path: string,
   searchParams: Record<string, any>,
   params: Record<string, string>,
-  activeTemplate: any,
   context: VeapMiddlewareContext,
 ): Promise<Record<string, React.ReactNode>> {
   if (!parallelSlots || Object.keys(parallelSlots).length === 0) {
@@ -88,7 +85,6 @@ async function resolveAllParallelSlots(
         searchParams,
         params,
         slotName,
-        activeTemplate,
         context,
       );
       return [slotName, rendered] as const;
@@ -101,10 +97,6 @@ async function resolveAllParallelSlots(
   }
   return result;
 }
-
-import { eventBus } from "../../../application/events/event-bus";
-import { warn } from "../../../infrastructure/logging";
-import { collectAuthRequirements, collectMiddlewares } from "../api/utils";
 
 // ---------------------------------------------------------------------------
 // Main renderer
@@ -135,7 +127,6 @@ export async function VeapRouter({
   const match = tree.match(path);
 
   if (process.env.NODE_ENV !== "production") {
-    // const { eventBus } = await import("../core/services/event-bus");
     eventBus
       .publish("router:request", {
         path,
@@ -215,25 +206,10 @@ async function buildLayoutTree(
 ): Promise<React.ReactNode> {
   const { node, params, layoutChain } = match;
 
-  const { getActiveTemplate, getTemplateConfig } =
-    await import("../../../application/plugins/templates");
   const { getPluginBreadcrumbs: getBreadcrumbs } =
     await import("../../../application/plugins/breadcrumbs");
-  const { getPathPrefix } =
-    await import("../../../application/plugins/navigation");
 
-  const activeTemplate = await getActiveTemplate();
-  const templateConfig = activeTemplate
-    ? await getTemplateConfig(activeTemplate.id)
-    : {};
   const breadcrumbs = await getBreadcrumbs(path, searchParams);
-  const prefix = await getPathPrefix();
-
-  const isPublicRoute = !path.startsWith(prefix);
-
-  // Check if template overrides this specific component
-  const overrideKey = node.id || path;
-  const TemplateOverride = activeTemplate?.overrides?.[overrideKey];
 
   // Start with the page component at the innermost level
   let content: React.ReactNode;
@@ -249,12 +225,11 @@ async function buildLayoutTree(
       />
     );
   } else if (match.isExact && node.page) {
-    const Page = TemplateOverride || node.page;
+    const Page = node.page;
     content = (
       <Page
         params={params}
         searchParams={searchParams}
-        config={templateConfig}
         breadcrumbs={breadcrumbs}
         context={context}
       />
@@ -348,10 +323,7 @@ async function buildLayoutTree(
 
     // Layout wrapping
     if (entry.layout) {
-      const layoutOverrideKey = entry.id ? `${entry.id}/layout` : undefined;
-      const Layout =
-        (layoutOverrideKey && activeTemplate?.overrides?.[layoutOverrideKey]) ||
-        entry.layout;
+      const Layout = entry.layout;
 
       // Resolve parallel slots if present
       // The slot needs to match against the *remaining* path segments after this layout
@@ -366,7 +338,6 @@ async function buildLayoutTree(
         remainingPath,
         searchParams,
         params,
-        activeTemplate,
         context,
       );
 
@@ -376,18 +347,6 @@ async function buildLayoutTree(
         </Layout>
       );
     }
-  }
-
-  // Inject TemplateLayout for public routes if applicable
-  const TemplateLayout = activeTemplate?.layout;
-  const hasTreeLayout = layoutChain.some((entry) => entry.layout);
-
-  if (isPublicRoute && TemplateLayout && !hasTreeLayout && path !== "/setup") {
-    content = (
-      <TemplateLayout config={templateConfig} breadcrumbs={breadcrumbs}>
-        {content}
-      </TemplateLayout>
-    );
   }
 
   return <SoftNavigationInterceptor>{content}</SoftNavigationInterceptor>;

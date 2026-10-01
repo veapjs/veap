@@ -21,7 +21,12 @@ export type SidebarMenuItemType<T = Record<string, string>> = {
   priority?: number;
   badge?: string | number | null | undefined;
   badgeVariant?:
-    "default" | "secondary" | "destructive" | "outline" | null | undefined;
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline"
+    | null
+    | undefined;
 } & T;
 
 export type SidebarMenuType = SidebarMenuItemType<{
@@ -58,7 +63,7 @@ export interface PluginManifest {
 }
 
 /**
- * Shape of the `veap` field in a plugin or template `package.json`.
+ * Shape of the `veap` field in a plugin `package.json`.
  * This replaces the standalone `manifest.json` file.
  */
 export interface VeapPackageMetadata {
@@ -77,7 +82,7 @@ export interface VeapPackageMetadata {
 }
 
 /**
- * Shape of the `package.json` for a Veap plugin or template.
+ * Shape of the `package.json` for a Veap plugin.
  */
 export interface VeapPackageJson {
   name: string;
@@ -213,30 +218,6 @@ export interface PluginNavigation {
   public?: PluginNavElement[];
   admin?: PluginNavigationGroupMap;
   settings?: PluginNavigationGroupMap;
-}
-
-export interface ITemplate<TConfig = any> {
-  id: string;
-  name: string;
-  description?: string;
-  version: string;
-  author?: string;
-  thumbnail?: string;
-
-  /**
-   * Locale message loaders, keyed by locale code (e.g. "en", "pl").
-   * Merged into the global message dictionary by the intl discovery loader.
-   */
-  locales?: Record<string, () => Promise<{ default: any }>>;
-
-  layout: React.ComponentType<{
-    children: React.ReactNode;
-    config: TConfig;
-    breadcrumbs?: BreadcrumbItem[];
-  }>;
-  overrides?: Record<string, React.ComponentType<any>>;
-  configSchema?: any;
-  defaultConfig?: TConfig;
 }
 
 export interface IPlugin {

@@ -1,5 +1,30 @@
 # @veap/framework
 
+## 0.12.0
+
+### Minor Changes
+
+- ### Removal of Legacy Template Subsystem & Enhanced ExtensionPoint Architecture
+  - **Template Subsystem Removal**:
+    - Removed deprecated template layer (`withTemplates()`, `APP_TEMPLATES` DI token, `TemplateService`, `ITemplateRepository`, and database migrations for the `templates` table).
+    - Removed `veap make:template` command from the CLI.
+    - Removed template generator stubs from `packages/veap/stubs/template/`.
+    - Replaced legacy template override mechanisms with native Next.js App Router file shadowing (e.g. creating `/app/signin/page.tsx` in the host application to override virtual routes provided by plugins).
+
+  - **ExtensionPoint Enhancements (`single` / `multiple` mode & fallback support)**:
+    - Added `mode?: "single" | "multiple"` prop to `<ExtensionPoint />` (server) and `<PluginExtensionPointClient />` (client), defaulting to `"multiple"`.
+    - When `mode="single"` is specified, only the registered widget/extension with the highest `priority` is rendered (ideal for modular navigation bars, single footers, hero sections, etc.).
+    - Added support for `children` fallback: when no widgets match or are enabled for the specified target/point, the optional children are rendered as a fallback.
+    - Retained deterministic descending priority ordering (`priority` property).
+
+  - **Documentation & Ecosystem Alignment**:
+    - Re-architected documentation around modular App Shell composition, layouts, slots, and Next.js route shadowing.
+
+### Patch Changes
+
+- Updated dependencies
+  - create-veap@0.2.0
+
 ## 0.11.16
 
 ### Patch Changes

@@ -12,7 +12,7 @@ This reference lists the public API of `@veap/framework` 0.11.x, organized by en
 | `@veap/framework/auth`                                               | yes                       | auth domain types, validation, ports, repositories          |
 | `@veap/framework/auth/server`                                        | no                        | auth facades, services, Server Actions, provider            |
 | `@veap/framework/plugins`                                            | yes                       | plugin types and provider class                             |
-| `@veap/framework/plugins/server`                                     | no                        | plugin registry, navigation, templates, server widgets      |
+| `@veap/framework/plugins/server`                                     | no                        | plugin registry, navigation, server widgets, UI extensions  |
 | `@veap/framework/plugins/client`                                     | yes                       | client-side plugin presentation helpers                     |
 | `@veap/framework/router`                                             | mixed                     | router engine, matcher, React router components             |
 | `@veap/framework/router/server`                                      | no                        | API handler, middlewares, route discovery                   |
@@ -35,7 +35,7 @@ import { Application, ApplicationBuilder } from "@veap/framework/core/server";
 ```
 
 - `Application.configure(): ApplicationBuilder` - start building an application.
-- Builder methods (all return `this`): `withMigrations(migrations[])`, `withPlugins(plugins[])`, `withTemplates(templates[])`, `withDatabase()`, `withAuth(config?: AuthConfig)`, `withStorage()`, `withCommunication()`, `withIntl()`, `withRouter()`, `withSettings()`, `withProviders(providers[])`.
+- Builder methods (all return `this`): `withMigrations(migrations[])`, `withPlugins(plugins[])`, `withDatabase()`, `withAuth(config?: AuthConfig)`, `withStorage()`, `withCommunication()`, `withIntl()`, `withRouter()`, `withSettings()`, `withProviders(providers[])`.
 - `builder.create(): Application` - materialize the app without booting.
 - `app.bootstrap(): Promise<void>` - register all providers and boot them. Idempotent per process; skipped during the Next.js build phase (`NEXT_PHASE=phase-production-build`) or when `SKIP_VEAP_INIT=true`.
 
@@ -45,7 +45,6 @@ Typical usage in the composition root (`lib/veap.ts`):
 const application = Application.configure()
   .withMigrations(appMigrations)
   .withPlugins(plugins)
-  .withTemplates(templates)
   .withDatabase()
   .withAuth()
   .withStorage()
@@ -66,7 +65,6 @@ import {
   container,
   DATABASE,
   APP_PLUGINS,
-  APP_TEMPLATES,
   APP_MIGRATIONS,
   CLI_SERVICE,
 } from "@veap/framework/core/server";
@@ -80,7 +78,7 @@ const config = await app(ConfigService);
 const knex = await app(DATABASE); // typed Knex token (or legacy "Knex")
 ```
 
-The container is a singleton stored on `globalThis` (survives HMR in dev). Resolution is by token (class constructor, typed `Token<T>` symbol, or string). Services are singletons by default. Built-in kernel tokens (`DATABASE`, `APP_PLUGINS`, `APP_TEMPLATES`, `APP_MIGRATIONS`, `CLI_SERVICE`) are exported for type-safe bindings.
+The container is a singleton stored on `globalThis` (survives HMR in dev). Resolution is by token (class constructor, typed `Token<T>` symbol, or string). Services are singletons by default. Built-in kernel tokens (`DATABASE`, `APP_PLUGINS`, `APP_MIGRATIONS`, `CLI_SERVICE`) are exported for type-safe bindings.
 
 ### ConfigService
 
@@ -88,14 +86,22 @@ The container is a singleton stored on `globalThis` (survives HMR in dev). Resol
 import { ConfigService } from "@veap/framework/core/server";
 ```
 
-- `config.get(key: EnvKey): string | undefined` - validated environment access.
-- `config.has(key)`, `config.all()` - presence and full snapshot.
-- Validates `ENCRYPTION_KEY` (must decode to 16, 24 or 32 bytes), `DATABASE_URL`, `FILE_STORAGE_FOLDER` and the mail/intl variables at first construction.
+- `ConfigService.get(key, default?)` - synchronous access to validated environment config (`app.env`, `app.debug`, `auth.secret`, `database.client`, `storage.disk`, ...).
+- Zod schemas in `ConfigService` validate environment variables at first import; missing required variables crash early with informative error messages.
+
+### ServiceProvider and service contract
+
+- Base class: `ServiceProvider` with `register(): void | Promise<void>` and `boot(): void | Promise<void>`.
+- `this.app` is the container instance.
+- Registration phase must not resolve services from other providers; cross-service wiring belongs in `boot()`.
+- Built-in providers: `DatabaseServiceProvider`, `AuthServiceProvider`, `PluginServiceProvider`, `RouterServiceProvider`, `IntlServiceProvider`, `StorageServiceProvider`, `CommunicationServiceProvider`, `SettingsServiceProvider`, `MigrationServiceProvider`.
+
+## `@veap/framework` and `@veap/framework/core` (client-safe core)
 
 ### Errors and Result
 
 ```ts
-import { AppError, Result } from "@veap/framework/core/server";
+import { AppError, Result } from "@veap/framework";
 ```
 
 - `AppError` carries a machine code (`VALIDATION_ERROR`, `UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `INTERNAL_SERVER_ERROR`, ...), an HTTP status and optional details. Static constructors: `AppError.Validation`, `AppError.Unauthorized`, `AppError.Forbidden`, `AppError.NotFound`, `AppError.Conflict`, `AppError.Internal`.
@@ -159,44 +165,32 @@ import {
   revokeRole,
   sendVerificationEmail,
   verifyEmail,
-  sendPasswordResetEmail,
-  createDummyPasswordResetSession,
-  verifyResetCode,
+  requestPasswordReset,
   resetPassword,
-  verifySameOrigin,
 } from "@veap/framework/auth/server";
 ```
 
-- `getCurrentUser(): Promise<AuthUser | null>` - session user or null.
-- `requireUser()` throws `AppError.Unauthorized` when not signed in; `requireRole(role)` / `requirePermission(perm)` throw `AppError.Forbidden`.
-- Sessions are httpOnly cookies; creation and destruction go through the session facade.
+- `getCurrentUser()`, `getCurrentSession()` - return the active user/session or `null`. Cached per request via React `cache`.
+- `requireUser()`, `requireRole(role)`, `requirePermission(perm)` - throw `AppError.Unauthorized` or `AppError.Forbidden` on failure.
+- `login(credentials)`, `logout()`, `register(data)` - authenticate and issue/clear cookies through `CookieStorePort`.
 
-Server Actions (called from forms/client components):
+Server Actions (callable from client forms):
 
 ```ts
 import {
-  getAuthRoutes,
   loginAction,
-  logoutAction,
   registerAction,
+  logoutAction,
+  requestPasswordResetAction,
+  resetPasswordAction,
+  sendVerificationEmailAction,
+  verifyEmailAction,
 } from "@veap/framework/auth/server";
 ```
 
-Services (resolve with `app(...)` when extending the framework):
-
-- `AuthService`, `SessionService`, `UserService`, `RbacService`, `EmailVerificationService`, `PasswordResetService`.
-- Provider: `AuthServiceProvider` (registered by `withAuth()`).
-
-Auth events (typed): `system:auth:user-registered`, `system:auth:login`, `system:auth:logout`, and related verification/reset events - subscribe with the event bus.
-
-### Extending auth
-
-Replace crypto or HTTP ports by binding your own implementation before boot:
+Port implementations (for swapping in custom providers):
 
 ```ts
-import { PASSWORD_HASHER } from "@veap/framework/auth";
-import { Argon2Hasher } from "./argon2-hasher";
-
 container.bind(PASSWORD_HASHER).to(Argon2Hasher);
 ```
 
@@ -237,7 +231,7 @@ import {
 
 Compatibility aliases (`getModuleConfig`, `getModules`, `hasExtension`, ...) exist for code written before the module-to-plugin rename; prefer the plugin names.
 
-Server widgets:
+Server extensions and widgets:
 
 ```ts
 import {
@@ -247,8 +241,8 @@ import {
 } from "@veap/framework/plugins/server";
 ```
 
-- `<PluginExtensionPoint name="dashboard.widgets" />` renders every widget registered by booted plugins for that point.
-- `<PluginWidgetArea plugin="shop" area="product.sidebar" />` renders widgets of one plugin.
+- `<PluginExtensionPoint target="app" point="navbar" mode="single"><DefaultNavbar /></PluginExtensionPoint>` renders extensions for the specified target and point, with `"single"` or `"multiple"` mode and fallback children.
+- `<PluginWidgetArea area="dashboard-stats" className="grid grid-cols-4 gap-4" />` renders widgets registered for a named dashboard area.
 
 ## `@veap/framework/router` and `@veap/framework/router/server`
 
@@ -301,117 +295,100 @@ import {
 
 Server:
 
-```tsx
-import { I18nProvider } from "@veap/framework/intl/server";
-import { detectLocale, getTranslations } from "@veap/framework/intl/server";
-```
-
-- `detectLocale(request)` negotiates the locale from cookie, then `Accept-Language` (`negotiator` + `@formatjs/intl-localematcher`).
-- `getTranslations(namespace)` loads merged dictionaries (app + plugins) on the server.
-
-Shared translator (server and client safe):
-
 ```ts
-import { createTranslator } from "@veap/framework/intl";
+import {
+  detectLocale,
+  loadPluginTranslations,
+  I18nProvider, // server wrapper
+} from "@veap/framework/intl/server";
 ```
+
+- `detectLocale(request, config)` detects language from cookie (`locale`), query param (`?lang=`), or `Accept-Language`.
 
 ## `@veap/framework/communication`
 
+Ports: `MAILER` (`IMailer`).
+
+Transports: `LogMailer` (logs to console/logger in development), `SendgridMailer` (`@sendgrid/mail`).
+
+Facades:
+
 ```ts
 import {
-  sendMail, // facade: send one MailMessage
-  communicationContext, // typed access to the bound port
-  MailMessage, // framework-neutral message DTO (subject, to, from, text, html, replyTo, attachments...)
-  IMailer, // transport port
-  MAIL_TRANSPORT, // DI token for the active transport
-  NodemailerMailService, // SMTP transport (alias: MailService)
-  ConsoleMailService, // logs the message instead of sending
-  CommunicationServiceProvider,
+  sendMail,
+  Mailer, // facade class
 } from "@veap/framework/communication";
+
+await sendMail({
+  to: "user@example.com",
+  subject: "Welcome",
+  html: "<h1>Welcome</h1>",
+});
 ```
 
-- `SendMailOptions` exists as a deprecated alias of `MailMessage` for pre-refactor plugins.
-- Transports only deliver `MailMessage` objects; semantic emails (verification, reset) are built by domain mailables and handed to the facade. This keeps SES/Postmark/Resend adapters possible: implement `IMailer`, bind it to `MAIL_TRANSPORT` with `transport: "custom"`.
+Mailables: extend `Mailable` class to define reusable, strongly-typed email templates.
 
 ## `@veap/framework/storage`
 
+Ports: `STORAGE_SERVICE`, `STORAGE_DRIVER` (`IStorageDriver`).
+
+Drivers: `LocalDiskDriver` (stores in `public/storage`, served via route handler).
+
+Facades:
+
 ```ts
 import {
-  StorageService, // facade: put/get/delete/url/metadata
-  IStorageProvider, // port
-  STORAGE_PROVIDER, // DI token
-  LocalFileProvider, // default provider (FILE_STORAGE_FOLDER, default public/storage)
-  StorageServiceProvider,
+  putFile,
+  getFile,
+  deleteFile,
+  fileExists,
+  getFileUrl,
 } from "@veap/framework/storage";
 ```
 
-Files under the local provider are served by the built-in `/storage/[...path]` route.
-
 ## `@veap/framework/settings`
+
+Ports: `SETTINGS_SERVICE`, `SETTINGS_REPOSITORY`.
+
+Facades:
 
 ```ts
 import {
-  SettingsService, // namespaced key-value settings with typed getters
-  SettingsServiceProvider,
+  getSetting,
+  setSetting,
+  hasSetting,
+  deleteSetting,
 } from "@veap/framework/settings";
 ```
 
-Settings are persisted through the settings model and cached; plugins read and write their own namespaces.
+Keys use `namespace:key` notation (`system:theme`, `plugin:commentable.autoApprove`). Settings are persisted in the `settings` table as JSON values and cached in memory.
 
 ## `@veap/framework/database`
 
+ActiveRecord ORM:
+
 ```ts
 import {
-  Model, // ActiveRecord base class
-  QB, // query builder facade over Knex
-  transaction, // the only supported write path
-  HasMany,
-  BelongsTo,
-  BelongsToMany,
-  MorphOne,
-  MorphMany,
-  MorphToMany,
-  MorphTo,
-  MorphMap, // polymorphic target registry
-  connectDatabase, // low-level Knex bootstrap (used by the provider)
+  Model,
+  Schema,
+  transaction,
+  type Knex,
 } from "@veap/framework/database";
 ```
 
-- Models declare `static table = "name"` (the old `static tableName` is gone; see the ORM chapter for the full contract).
-- All writes must run inside `transaction(async (trx) => { ... }, options?)` (uses `AsyncLocalStorage`; supports `{ savepoint: true }` for nested savepoints).
-- Full usage is documented in the Data chapter: [ORM](../data/orm.md), [Transactions](../data/transactions.md), [Migrations](../data/migrations.md).
-
-## `@veap/framework/auth/models`, `@veap/framework/plugins/models`, `@veap/framework/settings/models`
-
-Core domain entities are exported from dedicated subpaths to enforce clean DDD boundaries:
-
-```ts
-// Auth domain models
-import {
-  User,
-  Session,
-  Role,
-  Permission,
-  PasswordResetSession,
-  EmailVerification,
-} from "@veap/framework/auth/models";
-
-// Plugin system models
-import { SystemPlugin, SystemUserWidget } from "@veap/framework/plugins/models";
-
-// Settings model
-import { Setting } from "@veap/framework/settings/models";
-```
-
-All models inherit from `Model` and have full ActiveRecord features (casts, scopes, relations, validation).
+- `Model` - base class for ActiveRecord models (`find`, `findOrFail`, `where`, `create`, `update`, `delete`, `all`, `first`). Relations: `hasOne`, `hasMany`, `belongsTo`, `belongsToMany`, `morphMany`, `morphTo`.
+- `transaction(async (trx) => { ... })` - execute operations in a database transaction with automatic commit/rollback.
+- `MorphMap` - polymorphic relation type-to-class registry.
 
 ## `@veap/framework/react`
 
-```ts
+Client hooks and components (client safe):
+
+```tsx
 import {
-  AppProvider, // client providers root
-  AuthProvider, // session context for client components
-  useUser, // current user in client components
+  AppProvider, // wraps theme, tooltip, auth
+  useUser, // current user hook
+  useSession, // current session hook
   useAuthRoutes, // authentication routes helper
   useConfirmAction, // confirmation dialog hook (sonner-backed)
 } from "@veap/framework/react";
@@ -419,4 +396,4 @@ import {
 
 ## CLI
 
-The `veap` binary ships with the package (`bin.veap`). Full documentation for all commands and options is in the [CLI reference](./cli.md). Supported commands: `veap init`, `veap make:plugin`, `veap make:template`, `veap make:migration`, `veap add`, `veap eject`, `veap register`, and `veap docker`.
+The `veap` binary ships with the package (`bin.veap`). Full documentation for all commands and options is in the [CLI reference](./cli.md). Supported commands: `veap init`, `veap make:plugin`, `veap make:migration`, `veap add`, `veap eject`, `veap register`, and `veap docker`.

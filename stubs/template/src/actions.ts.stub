@@ -1,9 +1,0 @@
-"use server";
-
-import { signOut } from "@veap/framework/auth/server";
-import { redirect } from "next/navigation";
-
-export async function logoutAction() {
-  await signOut();
-  redirect("/signin");
-}

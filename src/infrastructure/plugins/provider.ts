@@ -1,21 +1,17 @@
 import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 import { bindPluginsContext } from "../../application/plugins/context";
 import { PluginRegistry } from "../../application/plugins/registry";
-import { TemplateService } from "../../application/plugins/templates";
 import { NavigationService } from "../../application/plugins/navigation";
 import {
   PLUGIN_REPOSITORY,
   MIGRATION_RUNNER,
 } from "../../domain/plugins/repositories/plugin.repository";
-import { TEMPLATE_REPOSITORY } from "../../domain/plugins/repositories/template.repository";
 import { ActiveRecordPluginRepository } from "./repositories/active-record-plugin.repository";
-import { ActiveRecordTemplateRepository } from "./repositories/active-record-template.repository";
 import { KnexMigrationRunner } from "./repositories/knex-migration-runner";
 import {
   registerPlugins,
   ensurePluginsInitialized,
 } from "../../application/plugins/facade";
-import { registerTemplates } from "../../application/plugins/templates";
 
 export class PluginServiceProvider extends ServiceProvider {
   register(): void {
@@ -23,12 +19,6 @@ export class PluginServiceProvider extends ServiceProvider {
     this.container.register({
       token: PLUGIN_REPOSITORY,
       useClass: ActiveRecordPluginRepository,
-      singleton: true,
-    });
-
-    this.container.register({
-      token: TEMPLATE_REPOSITORY,
-      useClass: ActiveRecordTemplateRepository,
       singleton: true,
     });
 
@@ -45,12 +35,6 @@ export class PluginServiceProvider extends ServiceProvider {
     });
 
     this.container.register({
-      token: TemplateService,
-      useClass: TemplateService,
-      singleton: true,
-    });
-
-    this.container.register({
       token: NavigationService,
       useClass: NavigationService,
       singleton: true,
@@ -62,7 +46,6 @@ export class PluginServiceProvider extends ServiceProvider {
     // resolve services through the container themselves.
     bindPluginsContext({
       registry: await this.container.resolve(PluginRegistry),
-      templates: await this.container.resolve(TemplateService),
       navigation: await this.container.resolve(NavigationService),
     });
 
@@ -76,14 +59,6 @@ export class PluginServiceProvider extends ServiceProvider {
 
     // Boot plugins
     await ensurePluginsInitialized();
-
-    // Register templates
-    if (this.container.has("AppTemplates")) {
-      const appTemplates = await this.container.resolve<any[]>("AppTemplates");
-      if (appTemplates?.length) {
-        await registerTemplates(appTemplates);
-      }
-    }
 
     if (this.container.has("CliService")) {
       const cliService = await this.container.resolve<any>("CliService");
@@ -116,7 +91,7 @@ export class PluginServiceProvider extends ServiceProvider {
       cli
         .command(
           "eject <package>",
-          "Eject an installed plugin or template to local workspace folder",
+          "Eject an installed plugin to local workspace folder",
         )
         .action(async (pkg: string) => {
           const { ejectPackage } = await import(
@@ -136,19 +111,6 @@ export class PluginServiceProvider extends ServiceProvider {
             /* webpackIgnore: true */ "./cli/generate-plugin.js"
           );
           await generatePlugin(name, options);
-        });
-
-      cli
-        .command(
-          "make:template <name>",
-          "Generate a new template with the given name",
-        )
-        .option("--skip-install", "Skip dependencies installation")
-        .action(async (name: string, options: any) => {
-          const { generateTemplate } = await import(
-            /* webpackIgnore: true */ "./cli/generate-template.js"
-          );
-          await generateTemplate(name, options);
         });
 
       cli

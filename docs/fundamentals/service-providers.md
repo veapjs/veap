@@ -63,7 +63,7 @@ export const app = Application.configure()
 | `IntlServiceProvider`          | `.withIntl()`          | registers `IntlService`                                                                                           |
 | `RouterServiceProvider`        | `.withRouter()`        | registers `RouterService`; clears the route tree cache on plugin events                                           |
 | `SettingsServiceProvider`      | `.withSettings()`      | binds settings repository and `SettingsService`                                                                   |
-| `PluginServiceProvider`        | `.withPlugins([...])`  | binds plugin/template repositories and registry; registers and initializes plugins; registers plugin CLI commands |
+| `PluginServiceProvider`        | `.withPlugins([...])`  | binds plugin repository and registry; registers and initializes plugins; registers plugin CLI commands            |
 
 ## Registering CLI commands from a provider
 
@@ -81,7 +81,7 @@ async boot(): Promise<void> {
 }
 ```
 
-The plugin and migration providers register `veap add`, `veap register`, `veap eject`, `veap make:plugin`, `veap make:template`, `veap docker` and `veap make:migration` exactly this way.
+The plugin and migration providers register `veap add`, `veap register`, `veap eject`, `veap make:plugin`, `veap docker` and `veap make:migration` exactly this way.
 
 ## Tips
 

@@ -68,6 +68,6 @@ Migrations are plain objects `{ name, up(db, schema), down? }`, tracked per scop
 
 ## Where data lives
 
-- Core owns `users`, `sessions`, `roles`, `permissions`, pivots, `password_reset_sessions`, `email_verification_sessions`, `plugins`, `templates`, `settings`, `user_widgets`.
+- Core owns `users`, `sessions`, `roles`, `permissions`, pivots, `password_reset_sessions`, `email_verification_sessions`, `plugins`, `settings`, `user_widgets`.
 - Plugins own their own tables (created by their migrations) and their own models.
 - Models for core entities are exported from the models entries: `@veap/framework/auth/models` (`User`, `Session`, `Role`, `Permission`, `PasswordResetSession`, `EmailVerification`), `@veap/framework/plugins/models` (`SystemPlugin`, `SystemUserWidget`), `@veap/framework/settings/models` (`Setting`).

@@ -235,4 +235,4 @@ Store plugin configuration through the settings service namespaced by plugin nam
 - Guard the admin area with route middlewares (`EnsuredAuth`) - [Middleware](../routing/middleware.md).
 - Ship translations in the plugin - [Intl](../services/intl.md).
 - Publish the plugin as its own npm package and install it with `veap add <package>`.
-- Eject any installed third-party plugin or template to customize it locally with `veap eject <package>`.
+- Eject any installed third-party plugin to customize it locally with `veap eject <package>`.

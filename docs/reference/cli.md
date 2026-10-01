@@ -34,7 +34,7 @@ The Veap CLI operates in two modes depending on your current working directory:
   providers to dynamically contribute commands during their `boot()` phase:
   - `MigrationServiceProvider` registers `make:migration`.
   - `PluginsServiceProvider` registers `add`, `register`, `eject`,
-    `make:plugin`, `make:template`, and `docker`.
+    `make:plugin`, and `docker`.
   - Custom host application providers can register domain-specific commands
     by resolving `CliService`.
 
@@ -98,27 +98,22 @@ Running `veap add` executes:
 
 ### `veap eject <package>`
 
-Eject an installed npm plugin or template into your project's local `plugins/`
-or `templates/` folder, allowing you to modify and customize its source code
-directly.
+Eject an installed npm plugin into your project's local `plugins/` folder,
+allowing you to modify and customize its source code directly.
 
 ```bash
 # Eject an installed plugin
 bun veap eject @veap/commentable
-
-# Eject an installed template
-bun veap eject @veap/minimal-template
 ```
 
 The CLI:
 
-1. Detects whether the package is a plugin or template by inspecting `veap.type`
-   in its `package.json`.
-2. Clones the package repository into `plugins/<name>` or `templates/<name>`.
+1. Inspects `veap.type` in the package's `package.json`.
+2. Clones the package repository into `plugins/<name>`.
 3. Updates root `package.json` dependencies to point to the local workspace
    (`workspace:*`).
 4. Re-links workspace packages with the detected package manager.
-5. Re-syncs `lib/plugins.gen.ts` when ejecting a plugin.
+5. Re-syncs `lib/plugins.gen.ts`.
 
 ---
 
@@ -149,22 +144,6 @@ plugins/blog/
 ```
 
 The new plugin is automatically registered in `lib/plugins.gen.ts`.
-
----
-
-### `veap make:template <name>`
-
-Scaffold a new layout and presentation template under `templates/<name>`.
-
-```bash
-bun veap make:template modern-theme
-```
-
-#### Options
-
-| Option           | Description                           |
-| ---------------- | ------------------------------------- |
-| `--skip-install` | Skip updating workspace dependencies. |
 
 ---
 

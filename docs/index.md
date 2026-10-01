@@ -10,7 +10,7 @@ author: "Veap Core Team"
 # Veap Documentation
 
 > [!IMPORTANT]
-> **Early Access Release**: Veap is currently in active developer preview (`v0.11.x.x`). Core architecture, plugin interfaces, and developer tooling are actively evolving. We encourage testing and welcome issues, ideas, and contributions on GitHub.
+> **Early Access Release**: Veap is currently in active developer preview (`v0.12.x.x`). Core architecture, plugin interfaces, and developer tooling are actively evolving. We encourage testing and welcome issues, ideas, and contributions on GitHub.
 
 Veap is a modular application framework built on Next.js App Router and React Server Components. It provides a plugin system with a virtual router, an ActiveRecord-style ORM, built-in authentication with RBAC, and a Laravel-inspired service provider architecture with dependency injection.
 
@@ -23,7 +23,7 @@ This documentation covers `@veap/framework` version **0.11.x**. Code in the repo
 - [Routing](./routing/routing.md): the virtual router, defining pages, layouts, error and loading boundaries, middleware, metadata, API routes.
 - [Authentication](./auth/index.md): sessions, users, RBAC, extending the identity system.
 - [Data](./data/database.md): the ORM, models, relations, transactions, migrations.
-- [Plugins](./plugins/index.md): plugin architecture, lifecycle, extensions, widgets, hooks, templates.
+- [Plugins](./plugins/index.md): plugin architecture, lifecycle, extensions, widgets, hooks.
 - [Services](./services/communication.md): mail, file storage, settings, internationalization.
 - [Configuration](./configuration/configuration.md): `veap.config.ts` options and environment variables.
 - [Advanced](./advanced/veap-vs-nextjs.md): how Veap relates to Next.js, custom service providers.
