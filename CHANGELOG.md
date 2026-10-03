@@ -1,5 +1,12 @@
 # @veap/framework
 
+## 0.13.1
+
+### Patch Changes
+
+- Updated dependencies
+  - create-veap@0.3.0
+
 ## 0.13.0
 
 ### Minor Changes
