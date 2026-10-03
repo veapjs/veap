@@ -15,7 +15,11 @@ export function handleActionError(e: unknown, context?: string): Result<never> {
   }
 
   if (e instanceof Error) {
-    logError(context || "ErrorHandler", `Unhandled error: ${e.message}`, e.stack);
+    logError(
+      context || "ErrorHandler",
+      `Unhandled error: ${e.message}`,
+      e.stack,
+    );
     return AppError.Internal(e.message).toJSON();
   }
 

@@ -1,6 +1,15 @@
-import { type IPasswordHasher, PASSWORD_HASHER } from "../../../domain/auth/ports/password-hasher";
-import { type ISecretCipher, SECRET_CIPHER } from "../../../domain/auth/ports/secret-cipher";
-import { type ITokenGenerator, TOKEN_GENERATOR } from "../../../domain/auth/ports/token-generator";
+import {
+  type IPasswordHasher,
+  PASSWORD_HASHER,
+} from "../../../domain/auth/ports/password-hasher";
+import {
+  type ISecretCipher,
+  SECRET_CIPHER,
+} from "../../../domain/auth/ports/secret-cipher";
+import {
+  type ITokenGenerator,
+  TOKEN_GENERATOR,
+} from "../../../domain/auth/ports/token-generator";
 import {
   type IRoleRepository,
   ROLE_REPOSITORY,
@@ -30,13 +39,21 @@ export class UserService {
    * Validates the username input.
    */
   public async verifyUsernameInput(username: string): Promise<boolean> {
-    return username.length > 3 && username.length < 32 && username.trim() === username;
+    return (
+      username.length > 3 &&
+      username.length < 32 &&
+      username.trim() === username
+    );
   }
 
   /**
    * Creates a new user with an initial recovery code and default 'user' role.
    */
-  public async createUser(email: string, username: string, password: string): Promise<User> {
+  public async createUser(
+    email: string,
+    username: string,
+    password: string,
+  ): Promise<User> {
     const passwordHash = await this.hasher.hash(password);
     const recoveryCode = this.tokens.generateRecoveryCode();
 
@@ -63,7 +80,11 @@ export class UserService {
   /**
    * Creates a new user from an OAuth provider.
    */
-  public async createOAuthUser(email: string, name: string, image?: string): Promise<User> {
+  public async createOAuthUser(
+    email: string,
+    name: string,
+    image?: string,
+  ): Promise<User> {
     const recoveryCode = this.tokens.generateRecoveryCode();
 
     const user = await this.users.create({
@@ -125,7 +146,10 @@ export class UserService {
   /**
    * Updates the user's password.
    */
-  public async updateUserPassword(userId: string, password: string): Promise<void> {
+  public async updateUserPassword(
+    userId: string,
+    password: string,
+  ): Promise<void> {
     const passwordHash = await this.hasher.hash(password);
     await this.users.update(userId, { password: passwordHash });
   }
@@ -147,7 +171,10 @@ export class UserService {
   /**
    * Updates the user's email and marks it as verified.
    */
-  public async updateUserEmailAndSetEmailAsVerified(userId: string, email: string): Promise<void> {
+  public async updateUserEmailAndSetEmailAsVerified(
+    userId: string,
+    email: string,
+  ): Promise<void> {
     await this.users.update(userId, {
       email,
       emailVerifiedAt: new Date(),

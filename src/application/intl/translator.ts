@@ -1,7 +1,11 @@
 import { IntlMessageFormat } from "intl-messageformat";
 import { AppError } from "../../domain/errors/app-error";
 import { IN_MS } from "../../domain/intl/constants";
-import type { AbstractIntlMessages, CoercibleDate, TranslationKeys } from "../../domain/intl/types";
+import type {
+  AbstractIntlMessages,
+  CoercibleDate,
+  TranslationKeys,
+} from "../../domain/intl/types";
 import { warn } from "../../infrastructure/logging";
 
 export function getNestedMessage(
@@ -116,7 +120,13 @@ export function createTextFormatter({
   };
 }
 
-export function createDateFormatter({ locale, timeZone }: { locale: string; timeZone?: string }) {
+export function createDateFormatter({
+  locale,
+  timeZone,
+}: {
+  locale: string;
+  timeZone?: string;
+}) {
   return (date: CoercibleDate, options?: Intl.DateTimeFormatOptions) => {
     const baseOptions: Intl.DateTimeFormatOptions = options ?? {
       year: "numeric",
@@ -129,7 +139,9 @@ export function createDateFormatter({ locale, timeZone }: { locale: string; time
       ...baseOptions,
     };
 
-    return new Intl.DateTimeFormat(locale, finalOptions).format(coerceDate(date));
+    return new Intl.DateTimeFormat(locale, finalOptions).format(
+      coerceDate(date),
+    );
   };
 }
 
@@ -173,7 +185,10 @@ export function createRelativeTimeFormatter({
     }
 
     if (absDiff < IN_MS.HOUR) {
-      return formatter.format(sign * Math.round(absDiff / IN_MS.MINUTE), "minute");
+      return formatter.format(
+        sign * Math.round(absDiff / IN_MS.MINUTE),
+        "minute",
+      );
     }
 
     if (absDiff < IN_MS.DAY) {
@@ -189,7 +204,10 @@ export function createRelativeTimeFormatter({
     }
 
     if (absDiff < IN_MS.YEAR) {
-      return formatter.format(sign * Math.round(absDiff / IN_MS.MONTH), "month");
+      return formatter.format(
+        sign * Math.round(absDiff / IN_MS.MONTH),
+        "month",
+      );
     }
 
     return formatter.format(sign * Math.round(absDiff / IN_MS.YEAR), "year");

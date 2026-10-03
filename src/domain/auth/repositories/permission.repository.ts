@@ -35,4 +35,6 @@ export interface IPermissionRepository {
 }
 
 /** Injection token for the permission repository port. */
-export const PERMISSION_REPOSITORY = Symbol.for("veap:auth:permission-repository");
+export const PERMISSION_REPOSITORY = Symbol.for(
+  "veap:auth:permission-repository",
+);

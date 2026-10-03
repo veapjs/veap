@@ -54,7 +54,11 @@ describe("EventBus", () => {
     const handler = vi.fn();
     bus.subscribe("system:auth:login", "sub", handler);
 
-    await bus.publish("system:auth:login", { session: null, user: null } as never, "google-plugin");
+    await bus.publish(
+      "system:auth:login",
+      { session: null, user: null } as never,
+      "google-plugin",
+    );
 
     expect(handler.mock.calls[0][0].source).toBe("google-plugin");
   });

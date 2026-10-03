@@ -1,6 +1,10 @@
 import * as React from "react";
 import { eventBus } from "../../../application/events/event-bus";
-import type { MatchResult, RouteNode, RouteTree } from "../../../application/router/route-tree";
+import type {
+  MatchResult,
+  RouteNode,
+  RouteTree,
+} from "../../../application/router/route-tree";
 import { AppError } from "../../../domain/errors/app-error";
 import type { VeapMiddlewareContext } from "../../../domain/plugins/types";
 import { warn } from "../../../infrastructure/logging";
@@ -26,20 +30,34 @@ async function resolveParallelSlot(
   _slotName: string,
   context: VeapMiddlewareContext,
 ): Promise<React.ReactNode> {
-  const { RouteTree: RouteTreeClass } = await import("../../../application/router/route-tree");
+  const { RouteTree: RouteTreeClass } = await import(
+    "../../../application/router/route-tree"
+  );
   const tempTree = new RouteTreeClass(slotTree);
   const slotMatch = tempTree.match(path);
 
   if (slotMatch?.node.page) {
     const SlotPage = slotMatch.node.page;
     const mergedParams = { ...params, ...slotMatch.params };
-    return <SlotPage params={mergedParams} searchParams={searchParams} context={context} />;
+    return (
+      <SlotPage
+        params={mergedParams}
+        searchParams={searchParams}
+        context={context}
+      />
+    );
   }
 
   // No match - try the `default` export (acts as a fallback like Next.js)
   if (slotTree.default) {
     const DefaultComponent = slotTree.default;
-    return <DefaultComponent params={params} searchParams={searchParams} context={context} />;
+    return (
+      <DefaultComponent
+        params={params}
+        searchParams={searchParams}
+        context={context}
+      />
+    );
   }
 
   return null;
@@ -123,7 +141,9 @@ export async function VeapRouter({
 
   if (!match) {
     warn("veap:Router", "[renderer] match should never be null");
-    throw AppError.Internal(`[VeapRouter] Invariant failed: match should never be null`);
+    throw AppError.Internal(
+      `[VeapRouter] Invariant failed: match should never be null`,
+    );
   }
 
   // 2. Collect middlewares (outermost-first order, since layoutChain is already outermost-first)
@@ -246,7 +266,11 @@ async function buildLayoutTree(
           }}
         >
           <div style={{ textAlign: "center" }}>
-            <h1 style={{ fontSize: "3rem", fontWeight: 700, margin: "0 0 1rem" }}>404</h1>
+            <h1
+              style={{ fontSize: "3rem", fontWeight: 700, margin: "0 0 1rem" }}
+            >
+              404
+            </h1>
             <p style={{ fontSize: "1.125rem", color: "#6b7280" }}>
               Page not found:{" "}
               <code
@@ -278,7 +302,9 @@ async function buildLayoutTree(
     // Error boundary wrapping
     if (entry.error) {
       content = (
-        <RouterErrorBoundary key={`error-${entry.consumedPath || entry.id || "root"}`}>
+        <RouterErrorBoundary
+          key={`error-${entry.consumedPath || entry.id || "root"}`}
+        >
           {content}
         </RouterErrorBoundary>
       );

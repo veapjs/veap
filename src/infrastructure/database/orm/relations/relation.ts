@@ -1,7 +1,10 @@
 import type { Model } from "../model";
 import type { ModelQueryBuilder } from "../query-builder";
 
-export abstract class Relation<Parent extends Model = any, Related extends Model = any> {
+export abstract class Relation<
+  Parent extends Model = any,
+  Related extends Model = any,
+> {
   constructor(
     public parent: Parent,
     public related: any, // typeof Model

@@ -73,9 +73,12 @@ export class ActiveRecordPluginRepository implements IPluginRepository {
     const existing = await SystemPlugin.find(id);
 
     if (existing) {
-      if (update.enabled !== undefined) existing.setAttribute("enabled", update.enabled);
-      if (update.installed !== undefined) existing.setAttribute("installed", update.installed);
-      if (update.lastStep !== undefined) existing.setAttribute("lastStep", update.lastStep);
+      if (update.enabled !== undefined)
+        existing.setAttribute("enabled", update.enabled);
+      if (update.installed !== undefined)
+        existing.setAttribute("installed", update.installed);
+      if (update.lastStep !== undefined)
+        existing.setAttribute("lastStep", update.lastStep);
       existing.setAttribute("updatedAt", new Date());
       await existing.save();
       return;

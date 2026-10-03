@@ -7,7 +7,10 @@ import type {
   PluginPageProps,
 } from "../../domain/plugins/types";
 import { buildRouteTree } from "../router/discovery";
-import { getPluginNavigation, getVeapPluginNavigationGrouped } from "./navigation";
+import {
+  getPluginNavigation,
+  getVeapPluginNavigationGrouped,
+} from "./navigation";
 
 async function resolveBreadcrumb(
   value: BreadcrumbValue,

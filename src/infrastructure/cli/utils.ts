@@ -36,7 +36,9 @@ function hasWorkspacesField(dir: string): boolean {
 
 export function findProjectRoot(currentDir: string): string {
   if (
-    WORKSPACE_MARKERS.some((marker) => fs.existsSync(path.join(currentDir, marker))) ||
+    WORKSPACE_MARKERS.some((marker) =>
+      fs.existsSync(path.join(currentDir, marker)),
+    ) ||
     hasWorkspacesField(currentDir)
   ) {
     return currentDir;
@@ -48,7 +50,11 @@ export function findProjectRoot(currentDir: string): string {
   return findProjectRoot(parentDir);
 }
 
-export function processStubs(srcDir: string, destDir: string, variables: Record<string, string>) {
+export function processStubs(
+  srcDir: string,
+  destDir: string,
+  variables: Record<string, string>,
+) {
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
   }
@@ -58,7 +64,10 @@ export function processStubs(srcDir: string, destDir: string, variables: Record<
   for (const entry of entries) {
     let destName = entry.name;
     for (const [key, value] of Object.entries(variables)) {
-      destName = destName.replace(new RegExp("\\{\\{" + key + "\\}\\}", "g"), value);
+      destName = destName.replace(
+        new RegExp("\\{\\{" + key + "\\}\\}", "g"),
+        value,
+      );
     }
 
     if (destName.endsWith(".stub")) {
@@ -73,7 +82,10 @@ export function processStubs(srcDir: string, destDir: string, variables: Record<
     } else {
       let content = fs.readFileSync(srcPath, "utf-8");
       for (const [key, value] of Object.entries(variables)) {
-        content = content.replace(new RegExp("\\{\\{" + key + "\\}\\}", "g"), value);
+        content = content.replace(
+          new RegExp("\\{\\{" + key + "\\}\\}", "g"),
+          value,
+        );
       }
       fs.writeFileSync(destPath, content);
     }

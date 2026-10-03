@@ -19,7 +19,10 @@ export async function hashPassword(password: string): Promise<string> {
  * @param password Password for comparison.
  * @returns Returns true if the password is correct, false otherwise.
  */
-export async function verifyPasswordHash(hash: string, password: string): Promise<boolean> {
+export async function verifyPasswordHash(
+  hash: string,
+  password: string,
+): Promise<boolean> {
   return await bcrypt.compare(password, hash);
   // return password === hash;
 }
@@ -29,6 +32,8 @@ export async function verifyPasswordHash(hash: string, password: string): Promis
  * @param password Password to validate.
  * @returns Returns true if the password meets complexity requirements.
  */
-export async function verifyPasswordStrength(password: string): Promise<boolean> {
+export async function verifyPasswordStrength(
+  password: string,
+): Promise<boolean> {
   return password.length >= 8 && password.length <= 255;
 }

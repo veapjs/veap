@@ -52,7 +52,12 @@ describe("ejectPackage CLI", () => {
     );
 
     // Setup node_modules package
-    const modDir = path.join(tmpDir, "node_modules", "@veap", "custom-template");
+    const modDir = path.join(
+      tmpDir,
+      "node_modules",
+      "@veap",
+      "custom-template",
+    );
     fs.mkdirSync(modDir, { recursive: true });
     fs.writeFileSync(
       path.join(modDir, "package.json"),
@@ -79,8 +84,12 @@ describe("ejectPackage CLI", () => {
     );
 
     // Verify root package.json was updated with workspace:* and workspaces array updated
-    const updatedPkg = JSON.parse(fs.readFileSync(path.join(tmpDir, "package.json"), "utf-8"));
-    expect(updatedPkg.dependencies["@veap/custom-template"]).toBe("workspace:*");
+    const updatedPkg = JSON.parse(
+      fs.readFileSync(path.join(tmpDir, "package.json"), "utf-8"),
+    );
+    expect(updatedPkg.dependencies["@veap/custom-template"]).toBe(
+      "workspace:*",
+    );
     expect(updatedPkg.workspaces).toContain("templates/*");
   });
 
@@ -131,7 +140,9 @@ describe("ejectPackage CLI", () => {
     );
 
     // Verify root package.json was updated with workspace:* and workspaces array updated
-    const updatedPkg = JSON.parse(fs.readFileSync(path.join(tmpDir, "package.json"), "utf-8"));
+    const updatedPkg = JSON.parse(
+      fs.readFileSync(path.join(tmpDir, "package.json"), "utf-8"),
+    );
     expect(updatedPkg.dependencies["@veap/shop-plugin"]).toBe("workspace:*");
     expect(updatedPkg.workspaces).toContain("plugins/*");
   });

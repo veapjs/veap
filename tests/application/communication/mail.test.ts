@@ -28,7 +28,10 @@ import type { MailMessage } from "../../../src/domain/communication/mail-message
 const interpolatingTranslator = () =>
   Promise.resolve((key: string, params?: Record<string, unknown>) =>
     params
-      ? Object.entries(params).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)), key)
+      ? Object.entries(params).reduce(
+          (acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)),
+          key,
+        )
       : key,
   );
 
@@ -78,7 +81,9 @@ describe("mailables", () => {
     await send2FACode("u@x.dev", "654321");
 
     expect(sent[0].subject).toBe("Your 2FA Code");
-    expect(sent[0].text).toBe("Your verification code is: 654321. It will expire in 10 minutes.");
+    expect(sent[0].text).toBe(
+      "Your verification code is: 654321. It will expire in 10 minutes.",
+    );
   });
 
   it("sendMail forwards arbitrary messages to the bound port", async () => {

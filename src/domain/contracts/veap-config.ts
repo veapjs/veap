@@ -18,4 +18,6 @@ export interface IVeapConfigProvider {
  * boundaries, the same reason the container keys class tokens with
  * `Symbol.for(...)`.
  */
-export const VEAP_CONFIG: Token<IVeapConfigProvider> = Symbol.for("veap:kernel:veap-config");
+export const VEAP_CONFIG: Token<IVeapConfigProvider> = Symbol.for(
+  "veap:kernel:veap-config",
+);

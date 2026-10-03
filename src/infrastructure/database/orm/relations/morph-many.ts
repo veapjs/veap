@@ -3,10 +3,10 @@ import type { ModelQueryBuilder } from "../query-builder";
 import { MorphMap } from "./morph-map";
 import { Relation } from "./relation";
 
-export class MorphMany<Parent extends Model = any, Related extends Model = any> extends Relation<
-  Parent,
-  Related
-> {
+export class MorphMany<
+  Parent extends Model = any,
+  Related extends Model = any,
+> extends Relation<Parent, Related> {
   public morphType: string;
 
   constructor(

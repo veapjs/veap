@@ -36,7 +36,11 @@ export function Injectable(): ClassDecorator {
  * constructor(@Inject('MyConfig') config: any) {}
  */
 export function Inject(token: Token<any>): ParameterDecorator {
-  return (target: any, propertyKey: string | symbol | undefined, parameterIndex: number) => {
+  return (
+    target: any,
+    propertyKey: string | symbol | undefined,
+    parameterIndex: number,
+  ) => {
     const customTokens: Map<number, Token<any>> = Reflect.getMetadata(
       "ioc:inject_params",
       target,

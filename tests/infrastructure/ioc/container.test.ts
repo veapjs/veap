@@ -142,7 +142,9 @@ describe("Container", () => {
     const error = await container.resolve(MISSING).catch((e) => e as Error);
     expect(error).toBeInstanceOf(AppError);
     expect((error as AppError).code).toBe("INTERNAL_SERVER_ERROR");
-    expect((error as AppError).message).toContain("No provider found for token");
+    expect((error as AppError).message).toContain(
+      "No provider found for token",
+    );
   });
 
   it("guards against `import type` dependencies that erase to the Object token", async () => {

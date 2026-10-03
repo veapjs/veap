@@ -1,7 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import ora from "ora";
-import { applyDockerfileForPackageManager, detectPackageManager } from "../package-manager.js";
+import {
+  applyDockerfileForPackageManager,
+  detectPackageManager,
+} from "../package-manager.js";
 import { stubPath } from "../stubs.js";
 import { findProjectRoot } from "../utils.js";
 
@@ -54,7 +57,9 @@ export async function initDockerConfig(targetDir?: string) {
     spin.succeed("Docker configuration files initialized.");
     console.log(`\n✨ Docker files are ready!`);
     console.log(`💡 Run: docker compose up -d (to start postgres and redis)`);
-    console.log(`💡 Run: docker build -t ${projectName} . (to build the image)`);
+    console.log(
+      `💡 Run: docker build -t ${projectName} . (to build the image)`,
+    );
   } catch (err) {
     spin.fail("Failed to copy Docker configuration files.");
     console.error(err);

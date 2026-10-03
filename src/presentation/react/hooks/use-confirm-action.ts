@@ -59,7 +59,11 @@ export function useConfirmAction() {
       }
     };
 
-    eventBus.subscribe("action:confirm:response", subscriberId, responseHandler);
+    eventBus.subscribe(
+      "action:confirm:response",
+      subscriberId,
+      responseHandler,
+    );
 
     return () => {
       eventBus.unsubscribe("action:confirm:response", subscriberId);

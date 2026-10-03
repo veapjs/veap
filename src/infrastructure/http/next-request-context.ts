@@ -19,7 +19,11 @@ export class NextCookieStore implements ICookieStore {
     return (await cookies()).get(name)?.value ?? null;
   }
 
-  public async set(name: string, value: string, options?: CookieOptions): Promise<void> {
+  public async set(
+    name: string,
+    value: string,
+    options?: CookieOptions,
+  ): Promise<void> {
     (await cookies()).set(name, value, options);
   }
 
@@ -69,7 +73,8 @@ export function verifySameOrigin(request: Request | RequestLike): boolean {
 
   // 2. Origin / Host validation
   const origin = request.headers.get("origin");
-  const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+  const host =
+    request.headers.get("x-forwarded-host") || request.headers.get("host");
 
   if (origin && host) {
     try {

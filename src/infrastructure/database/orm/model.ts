@@ -20,7 +20,9 @@ import {
 import type { GlobalScope } from "./scopes";
 import { toCamelCase, toSnakeCase } from "./utils";
 
-export abstract class Model<Attributes extends Record<string, any> = Record<string, any>> {
+export abstract class Model<
+  Attributes extends Record<string, any> = Record<string, any>,
+> {
   [key: string]: any;
 
   /**
@@ -156,7 +158,10 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
           }
 
           // 2. Base Model instance methods (save, delete, update, getAttribute, etc.)
-          const baseDesc = Object.getOwnPropertyDescriptor(Model.prototype, prop);
+          const baseDesc = Object.getOwnPropertyDescriptor(
+            Model.prototype,
+            prop,
+          );
           if (baseDesc && typeof baseDesc.value === "function") {
             return Reflect.get(target, prop, receiver);
           }
@@ -448,7 +453,8 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     const registered = Factory.getForModel(this);
     if (registered) {
       const f =
-        typeof registered === "function" && !(registered.prototype instanceof Factory)
+        typeof registered === "function" &&
+        !(registered.prototype instanceof Factory)
           ? registered(count)
           : new registered();
       if (count !== undefined && typeof f.count === "function") {
@@ -624,7 +630,8 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     const deletedAtCol = modelClass.deletedAtColumn || "deleted_at";
 
     for (const [key, rawVal] of Object.entries(rawRow)) {
-      let castType = casts[key] || casts[toCamelCase(key)] || casts[toSnakeCase(key)];
+      let castType =
+        casts[key] || casts[toCamelCase(key)] || casts[toSnakeCase(key)];
       if (!castType && key.endsWith("_count")) {
         castType = "number";
       }
@@ -666,7 +673,8 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     const isSoftDelete = modelClass.softDeletes;
     const deletedAtCol = modelClass.deletedAtColumn || "deleted_at";
 
-    let castType = casts[key] || casts[toSnakeCase(key)] || casts[toCamelCase(key)];
+    let castType =
+      casts[key] || casts[toSnakeCase(key)] || casts[toCamelCase(key)];
     if (
       !castType &&
       isSoftDelete &&
@@ -687,10 +695,13 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
       const original =
         key in this._original
           ? this._original[key]
-          : (this._original[toSnakeCase(key)] ?? this._original[toCamelCase(key)]);
+          : (this._original[toSnakeCase(key)] ??
+            this._original[toCamelCase(key)]);
       return current !== original;
     }
-    return Object.keys(this._attributes).some((k) => this._attributes[k] !== this._original[k]);
+    return Object.keys(this._attributes).some(
+      (k) => this._attributes[k] !== this._original[k],
+    );
   }
 
   getRelation<R = any>(name: string): R | undefined {
@@ -758,10 +769,18 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
             (modelClass.timestamps.includes("updated_at") ||
               modelClass.timestamps.includes("updatedAt")));
 
-        if (hasCreatedAt && !this.getAttribute("created_at") && !this.getAttribute("createdAt")) {
+        if (
+          hasCreatedAt &&
+          !this.getAttribute("created_at") &&
+          !this.getAttribute("createdAt")
+        ) {
           this.setAttribute("created_at", now);
         }
-        if (hasUpdatedAt && !this.getAttribute("updated_at") && !this.getAttribute("updatedAt")) {
+        if (
+          hasUpdatedAt &&
+          !this.getAttribute("updated_at") &&
+          !this.getAttribute("updatedAt")
+        ) {
           this.setAttribute("updated_at", now);
         }
       }
@@ -808,7 +827,10 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
               modelClass.timestamps.includes("updatedAt")));
 
         if (hasUpdatedAt) {
-          if ("updated_at" in this._attributes || !("updatedAt" in this._attributes)) {
+          if (
+            "updated_at" in this._attributes ||
+            !("updatedAt" in this._attributes)
+          ) {
             this.setAttribute("updated_at", now);
           } else {
             this.setAttribute("updatedAt", now);
@@ -1075,7 +1097,15 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     const rpk = relatedPivotKey
       ? toSnakeCase(relatedPivotKey)
       : `${toSnakeCase(related.name || related.table)}_id`;
-    return new BelongsToMany(this, related, pivotTable, fpk, rpk, localKey, relatedKey);
+    return new BelongsToMany(
+      this,
+      related,
+      pivotTable,
+      fpk,
+      rpk,
+      localKey,
+      relatedKey,
+    );
   }
 
   // --- POLYMORPHIC RELATION BUILDERS ---
@@ -1084,9 +1114,15 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
    * Defines a polymorphic, inverse one-to-one or one-to-many relation.
    * E.g. comment.morphTo('commentable') -> resolves type from commentable_type and id from commentable_id
    */
-  morphTo<R extends Model = any>(name?: string, type?: string, id?: string): MorphTo<this, R> {
+  morphTo<R extends Model = any>(
+    name?: string,
+    type?: string,
+    id?: string,
+  ): MorphTo<this, R> {
     const callerName = name || "commentable";
-    const typeCol = type ? toSnakeCase(type) : `${toSnakeCase(callerName)}_type`;
+    const typeCol = type
+      ? toSnakeCase(type)
+      : `${toSnakeCase(callerName)}_type`;
     const idCol = id ? toSnakeCase(id) : `${toSnakeCase(callerName)}_id`;
     return new MorphTo(this, callerName, typeCol, idCol);
   }
@@ -1141,9 +1177,13 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     parentKey = (this.constructor as typeof Model).primaryKey || "id",
     relatedKey = related.primaryKey || "id",
   ): MorphToMany<this, R> {
-    const fpk = foreignPivotKey ? toSnakeCase(foreignPivotKey) : `${toSnakeCase(name)}_id`;
+    const fpk = foreignPivotKey
+      ? toSnakeCase(foreignPivotKey)
+      : `${toSnakeCase(name)}_id`;
     const relatedAlias = MorphMap.getMorphAlias(related);
-    const rpk = relatedPivotKey ? toSnakeCase(relatedPivotKey) : `${toSnakeCase(relatedAlias)}_id`;
+    const rpk = relatedPivotKey
+      ? toSnakeCase(relatedPivotKey)
+      : `${toSnakeCase(relatedAlias)}_id`;
     const morphTypeColumn = `${toSnakeCase(name)}_type`;
     return new MorphToMany(
       this,
@@ -1176,9 +1216,13 @@ export abstract class Model<Attributes extends Record<string, any> = Record<stri
     parentKey = (this.constructor as typeof Model).primaryKey || "id",
     relatedKey = related.primaryKey || "id",
   ): MorphedByMany<this, R> {
-    const fpk = foreignPivotKey ? toSnakeCase(foreignPivotKey) : `${toSnakeCase(name)}_id`;
+    const fpk = foreignPivotKey
+      ? toSnakeCase(foreignPivotKey)
+      : `${toSnakeCase(name)}_id`;
     const parentAlias = MorphMap.getMorphAlias(this.constructor);
-    const rpk = relatedPivotKey ? toSnakeCase(relatedPivotKey) : `${toSnakeCase(parentAlias)}_id`;
+    const rpk = relatedPivotKey
+      ? toSnakeCase(relatedPivotKey)
+      : `${toSnakeCase(parentAlias)}_id`;
     const morphTypeColumn = `${toSnakeCase(name)}_type`;
     return new MorphedByMany(
       this,

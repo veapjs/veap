@@ -11,7 +11,11 @@ export async function createPasswordResetSession(
   userId: string,
   email: string,
 ): Promise<PasswordResetSessionType> {
-  return authContext().passwordReset.createPasswordResetSession(token, userId, email);
+  return authContext().passwordReset.createPasswordResetSession(
+    token,
+    userId,
+    email,
+  );
 }
 
 export async function validatePasswordResetSessionToken(
@@ -20,12 +24,20 @@ export async function validatePasswordResetSessionToken(
   return authContext().passwordReset.validatePasswordResetSessionToken(token);
 }
 
-export async function setPasswordResetSessionAsEmailVerified(sessionId: string): Promise<void> {
-  return authContext().passwordReset.setPasswordResetSessionAsEmailVerified(sessionId);
+export async function setPasswordResetSessionAsEmailVerified(
+  sessionId: string,
+): Promise<void> {
+  return authContext().passwordReset.setPasswordResetSessionAsEmailVerified(
+    sessionId,
+  );
 }
 
-export async function invalidateUserPasswordResetSessions(userId: string): Promise<void> {
-  return authContext().passwordReset.invalidateUserPasswordResetSessions(userId);
+export async function invalidateUserPasswordResetSessions(
+  userId: string,
+): Promise<void> {
+  return authContext().passwordReset.invalidateUserPasswordResetSessions(
+    userId,
+  );
 }
 
 export async function getCurrentPasswordResetSession(): Promise<PasswordResetAuthSession> {
@@ -36,14 +48,20 @@ export async function setPasswordResetSessionTokenCookie(
   token: string,
   expiresAt: Date,
 ): Promise<void> {
-  return authContext().passwordReset.setPasswordResetSessionTokenCookie(token, expiresAt);
+  return authContext().passwordReset.setPasswordResetSessionTokenCookie(
+    token,
+    expiresAt,
+  );
 }
 
 export async function deletePasswordResetSessionTokenCookie(): Promise<void> {
   return authContext().passwordReset.deletePasswordResetSessionTokenCookie();
 }
 
-export async function sendPasswordResetEmail(email: string, code: string): Promise<void> {
+export async function sendPasswordResetEmail(
+  email: string,
+  code: string,
+): Promise<void> {
   return authContext().passwordReset.sendPasswordResetEmail(email, code);
 }
 
@@ -51,7 +69,10 @@ export async function createDummyPasswordResetSession(
   token: string,
   email: string,
 ): Promise<PasswordResetSessionType> {
-  return authContext().passwordReset.createDummyPasswordResetSession(token, email);
+  return authContext().passwordReset.createDummyPasswordResetSession(
+    token,
+    email,
+  );
 }
 
 export async function verifyResetCode(

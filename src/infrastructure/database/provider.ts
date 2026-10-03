@@ -26,7 +26,10 @@ export class DatabaseServiceProvider extends ServiceProvider {
       const isSqlite = isSqliteDatabase(databaseUrl);
       const client = isSqlite ? "better-sqlite3" : "pg";
 
-      debug("veap:database", `Auto-initializing Knex from DATABASE_URL with client: ${client}`);
+      debug(
+        "veap:database",
+        `Auto-initializing Knex from DATABASE_URL with client: ${client}`,
+      );
 
       const ssl = resolvePostgresSslConfig({
         databaseUrl,

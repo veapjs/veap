@@ -30,15 +30,21 @@ describe("isSqliteDatabase", () => {
   it("accepts bare filenames and rejects postgres URLs", () => {
     expect(isSqliteDatabase("veap.sqlite")).toBe(true);
     expect(isSqliteDatabase("data.db")).toBe(true);
-    expect(isSqliteDatabase("postgresql://user:pass@localhost:5432/db")).toBe(false);
+    expect(isSqliteDatabase("postgresql://user:pass@localhost:5432/db")).toBe(
+      false,
+    );
     expect(isSqliteDatabase(undefined)).toBe(false);
   });
 });
 
 describe("resolveSqliteFilename", () => {
   it("strips all URL prefix variants", () => {
-    expect(resolveSqliteFilename("sqlite:./storage/veap.sqlite")).toBe("./storage/veap.sqlite");
-    expect(resolveSqliteFilename("sqlite://./storage/veap.sqlite")).toBe("./storage/veap.sqlite");
+    expect(resolveSqliteFilename("sqlite:./storage/veap.sqlite")).toBe(
+      "./storage/veap.sqlite",
+    );
+    expect(resolveSqliteFilename("sqlite://./storage/veap.sqlite")).toBe(
+      "./storage/veap.sqlite",
+    );
     expect(resolveSqliteFilename("file:./data.db")).toBe("./data.db");
     expect(resolveSqliteFilename("file://./data.db")).toBe("./data.db");
   });
@@ -68,6 +74,8 @@ describe("resolveSqliteFilename", () => {
 
   it("redirects to /tmp on serverless environments", () => {
     vi.stubEnv("VERCEL", "1");
-    expect(resolveSqliteFilename("sqlite:./storage/veap.sqlite")).toBe("/tmp/veap.sqlite");
+    expect(resolveSqliteFilename("sqlite:./storage/veap.sqlite")).toBe(
+      "/tmp/veap.sqlite",
+    );
   });
 });

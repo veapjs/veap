@@ -30,7 +30,11 @@ export const applyPluginFilters = async <T = any>(
   return result;
 };
 
-export const togglePluginState = async (id: string, enabled: boolean, context?: any) => {
+export const togglePluginState = async (
+  id: string,
+  enabled: boolean,
+  context?: any,
+) => {
   await pluginsContext().registry.togglePlugin(id, enabled, context);
 };
 

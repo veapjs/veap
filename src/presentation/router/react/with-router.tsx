@@ -32,7 +32,9 @@ export function withRouter(
     const searchParams = (await props.searchParams) || {};
 
     const config: WithRouterConfig =
-      typeof configOrPath === "string" ? { path: configOrPath } : configOrPath || {};
+      typeof configOrPath === "string"
+        ? { path: configOrPath }
+        : configOrPath || {};
 
     let routePath = config.path;
 

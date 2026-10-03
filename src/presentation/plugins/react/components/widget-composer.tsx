@@ -9,7 +9,11 @@ interface WidgetComposerProps {
   fallback?: React.ReactNode;
 }
 
-export async function WidgetComposer({ slot, columns = 4, fallback }: WidgetComposerProps) {
+export async function WidgetComposer({
+  slot,
+  columns = 4,
+  fallback,
+}: WidgetComposerProps) {
   const { user } = await getCurrentSession();
   const userRoles = user?.roles || [];
   const userPermissions = user?.permissions || [];

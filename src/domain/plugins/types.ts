@@ -20,7 +20,13 @@ export type SidebarMenuItemType<T = Record<string, string>> = {
   permissions?: string[];
   priority?: number;
   badge?: string | number | null | undefined;
-  badgeVariant?: "default" | "secondary" | "destructive" | "outline" | null | undefined;
+  badgeVariant?:
+    | "default"
+    | "secondary"
+    | "destructive"
+    | "outline"
+    | null
+    | undefined;
 } & T;
 
 export type SidebarMenuType = SidebarMenuItemType<{
@@ -97,7 +103,9 @@ export interface VeapPackageJson {
  * const manifest = createManifestFromPackageJson(pkg);
  * ```
  */
-export function createManifestFromPackageJson(pkg: VeapPackageJson): PluginManifest {
+export function createManifestFromPackageJson(
+  pkg: VeapPackageJson,
+): PluginManifest {
   const meta: VeapPackageMetadata = pkg.veap || ({} as VeapPackageMetadata);
   return {
     id: meta.id || pkg.name.replace(/^@[^/]+\//, ""),

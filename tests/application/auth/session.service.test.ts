@@ -79,7 +79,10 @@ class InMemorySessionRepository implements ISessionRepository {
       .map((s) => ({ ...s }));
   }
 
-  public async updateMetadata(id: string, metadata: Record<string, any>): Promise<void> {
+  public async updateMetadata(
+    id: string,
+    metadata: Record<string, any>,
+  ): Promise<void> {
     const session = this.sessions.get(id);
     if (session) session.metadata = { ...metadata };
   }
@@ -94,7 +97,10 @@ class InMemorySessionRepository implements ISessionRepository {
     }
   }
 
-  public async removeOtherUserSessions(userId: string, currentSessionId: string): Promise<void> {
+  public async removeOtherUserSessions(
+    userId: string,
+    currentSessionId: string,
+  ): Promise<void> {
     for (const [id, s] of this.sessions) {
       if (String(s.userId ?? s.user_id) === userId && id !== currentSessionId) {
         this.sessions.delete(id);
@@ -104,13 +110,20 @@ class InMemorySessionRepository implements ISessionRepository {
 }
 
 class InMemoryCookieStore implements ICookieStore {
-  public entries = new Map<string, { value: string; options?: CookieOptions }>();
+  public entries = new Map<
+    string,
+    { value: string; options?: CookieOptions }
+  >();
 
   public async get(name: string): Promise<string | null> {
     return this.entries.get(name)?.value ?? null;
   }
 
-  public async set(name: string, value: string, options?: CookieOptions): Promise<void> {
+  public async set(
+    name: string,
+    value: string,
+    options?: CookieOptions,
+  ): Promise<void> {
     this.entries.set(name, { value, options });
   }
 
@@ -260,7 +273,9 @@ describe("SessionService", () => {
       expect(repo.sessions.get(session.id)?.metadata).toEqual({ mfa: true });
 
       const expectedExpiry = Date.now() + 7 * 86_400_000;
-      const actualExpiry = (repo.sessions.get(session.id)?.expiresAt as Date).getTime();
+      const actualExpiry = (
+        repo.sessions.get(session.id)?.expiresAt as Date
+      ).getTime();
       expect(Math.abs(actualExpiry - expectedExpiry)).toBeLessThan(60_000);
     });
   });
@@ -275,7 +290,9 @@ describe("SessionService", () => {
       });
       await cookies.set("session", "raw-3");
 
-      await expect(service.sessionSignOut()).rejects.toThrow("REDIRECT:/signin");
+      await expect(service.sessionSignOut()).rejects.toThrow(
+        "REDIRECT:/signin",
+      );
 
       expect(repo.sessions.has(id)).toBe(false);
       expect(cookies.entries.has("session")).toBe(false);
@@ -283,7 +300,9 @@ describe("SessionService", () => {
     });
 
     it("still redirects when there is no active session", async () => {
-      await expect(service.sessionSignOut()).rejects.toThrow("REDIRECT:/signin");
+      await expect(service.sessionSignOut()).rejects.toThrow(
+        "REDIRECT:/signin",
+      );
       expect(requestContext.redirects).toEqual(["/signin"]);
     });
   });
@@ -308,7 +327,9 @@ describe("SessionService", () => {
     });
 
     it("updateSessionMetadata is a no-op without a session", async () => {
-      await expect(service.updateSessionMetadata({ mfa: true })).resolves.toBeUndefined();
+      await expect(
+        service.updateSessionMetadata({ mfa: true }),
+      ).resolves.toBeUndefined();
     });
 
     it("getUserSessions flags the current one", async () => {

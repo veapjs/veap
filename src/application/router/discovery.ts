@@ -5,7 +5,9 @@ import { RouterService } from "./router.service";
 
 export { matchRoute };
 
-export async function getPluginsWithHomepage(): Promise<{ id: string; name: string }[]> {
+export async function getPluginsWithHomepage(): Promise<
+  { id: string; name: string }[]
+> {
   return (await app(RouterService)).getPluginsWithHomepage();
 }
 

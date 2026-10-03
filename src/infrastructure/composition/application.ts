@@ -42,13 +42,18 @@ export class ApplicationBuilder {
   }
 
   public withDatabase(): this {
-    this.customProviders.push(DatabaseServiceProvider, MigrationServiceProvider);
+    this.customProviders.push(
+      DatabaseServiceProvider,
+      MigrationServiceProvider,
+    );
     return this;
   }
 
   public withAuth(config?: AuthConfig): this {
     this.authConfig = config;
-    this.customProviders.push((c) => new AuthServiceProvider(c, this.authConfig));
+    this.customProviders.push(
+      (c) => new AuthServiceProvider(c, this.authConfig),
+    );
     return this;
   }
 
@@ -123,7 +128,9 @@ export class Application {
       // the new component references (extensions, widgets, etc.).
       if (process.env.NODE_ENV === "development") {
         if (this.plugins.length) {
-          const { registerPlugins } = await import("../../application/plugins/facade");
+          const { registerPlugins } = await import(
+            "../../application/plugins/facade"
+          );
           await registerPlugins(this.plugins);
         }
       }
@@ -160,7 +167,10 @@ export class Application {
         for (const entry of entries) {
           if (entry instanceof ServiceProvider) {
             providers.push(entry);
-          } else if (typeof entry === "function" && entry.prototype instanceof ServiceProvider) {
+          } else if (
+            typeof entry === "function" &&
+            entry.prototype instanceof ServiceProvider
+          ) {
             providers.push(new (entry as any)(container));
           } else if (typeof entry === "function") {
             providers.push((entry as any)(container));
@@ -188,7 +198,11 @@ export class Application {
         ) {
           throw error;
         }
-        logger.error("veap:bootstrap", "Critical error during system initialization:", error);
+        logger.error(
+          "veap:bootstrap",
+          "Critical error during system initialization:",
+          error,
+        );
         throw error;
       } finally {
         g.__VEAP_BOOTSTRAPPING_PROMISE__ = null;

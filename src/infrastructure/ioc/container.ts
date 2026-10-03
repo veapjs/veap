@@ -51,7 +51,8 @@ export class Container {
    */
   has(token: Token<any>): boolean {
     return (
-      this.providers.has(this.getTokenKey(token)) || this.instances.has(this.getTokenKey(token))
+      this.providers.has(this.getTokenKey(token)) ||
+      this.instances.has(this.getTokenKey(token))
     );
   }
 
@@ -73,9 +74,15 @@ export class Container {
         if (!def) {
           if (typeof token === "function") {
             // Attempt to auto-instantiate if it's a class without a provider
-            return await this.instantiateClass(token as new (...args: any[]) => T);
+            return await this.instantiateClass(
+              token as new (
+                ...args: any[]
+              ) => T,
+            );
           }
-          throw AppError.Internal(`[IoC] No provider found for token: ${token.toString()}`);
+          throw AppError.Internal(
+            `[IoC] No provider found for token: ${token.toString()}`,
+          );
         }
 
         let instance: any;
@@ -88,12 +95,15 @@ export class Container {
         } else if (def.useClass !== undefined) {
           let tokens: Token<any>[] = def.inject || [];
           if (!def.inject) {
-            const paramTypes = Reflect.getMetadata("design:paramtypes", def.useClass) || [];
+            const paramTypes =
+              Reflect.getMetadata("design:paramtypes", def.useClass) || [];
             const customTokens: Map<number, Token<any>> = Reflect.getMetadata(
               "ioc:inject_params",
               def.useClass,
             ) || new Map();
-            tokens = paramTypes.map((type: any, index: number) => customTokens.get(index) || type);
+            tokens = paramTypes.map(
+              (type: any, index: number) => customTokens.get(index) || type,
+            );
           }
           const dependencies = await this.resolveDependencies(tokens);
           instance = new def.useClass(...dependencies);
@@ -127,7 +137,9 @@ export class Container {
   /**
    * Instantiates a class by automatically resolving its constructor parameters.
    */
-  private async instantiateClass<T>(TargetClass: new (...args: any[]) => T): Promise<T> {
+  private async instantiateClass<T>(
+    TargetClass: new (...args: any[]) => T,
+  ): Promise<T> {
     if ((TargetClass as unknown) === Object) {
       // `emitDecoratorMetadata` emits `Object` for constructor params whose
       // type comes from an `import type` (or an interface) - the class value
@@ -139,7 +151,8 @@ export class Container {
           "design:paramtypes metadata). Use a value import for injected classes.",
       );
     }
-    const paramTypes = Reflect.getMetadata("design:paramtypes", TargetClass) || [];
+    const paramTypes =
+      Reflect.getMetadata("design:paramtypes", TargetClass) || [];
     const customTokens: Map<number, Token<any>> = Reflect.getMetadata(
       "ioc:inject_params",
       TargetClass,
@@ -181,7 +194,8 @@ const globalForContainer = globalThis as unknown as {
   __VEAP_CONTAINER__: Container | undefined;
 };
 
-export const container = globalForContainer.__VEAP_CONTAINER__ || new Container();
+export const container =
+  globalForContainer.__VEAP_CONTAINER__ || new Container();
 
 globalForContainer.__VEAP_CONTAINER__ = container;
 

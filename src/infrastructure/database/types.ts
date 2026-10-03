@@ -17,17 +17,19 @@ export type SystemPluginRecord = SystemPluginAttributes;
 export type SettingRecord = SettingAttributes;
 
 export type EmailVerificationRequest = EmailVerificationAttributes;
-export type AddEmailVerificationRequest = Partial<EmailVerificationAttributes> & {
-  email: string;
-  code: string;
-  userId: string;
-  expiresAt: Date;
-};
+export type AddEmailVerificationRequest =
+  Partial<EmailVerificationAttributes> & {
+    email: string;
+    code: string;
+    userId: string;
+    expiresAt: Date;
+  };
 
 export type PasswordResetSessionRecord = PasswordResetSessionAttributes;
-export type AddPasswordResetSession = Partial<PasswordResetSessionAttributes> & {
-  email: string;
-  code: string;
-  userId: string;
-  expiresAt: Date;
-};
+export type AddPasswordResetSession =
+  Partial<PasswordResetSessionAttributes> & {
+    email: string;
+    code: string;
+    userId: string;
+    expiresAt: Date;
+  };

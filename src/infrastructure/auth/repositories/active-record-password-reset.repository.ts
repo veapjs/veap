@@ -7,8 +7,12 @@ import type { PasswordResetSession as PasswordResetSessionEntity } from "../../.
 import { PasswordResetSession } from "../models/PasswordResetSession";
 
 /** `IPasswordResetRepository` adapter backed by `PasswordResetSession`. */
-export class ActiveRecordPasswordResetRepository implements IPasswordResetRepository {
-  async create(record: CreatePasswordResetRecord): Promise<PasswordResetSessionEntity> {
+export class ActiveRecordPasswordResetRepository
+  implements IPasswordResetRepository
+{
+  async create(
+    record: CreatePasswordResetRecord,
+  ): Promise<PasswordResetSessionEntity> {
     const session = await PasswordResetSession.create({
       id: record.id,
       email: record.email,
@@ -29,10 +33,9 @@ export class ActiveRecordPasswordResetRepository implements IPasswordResetReposi
 
     return {
       session: session.toJSON() as PasswordResetSessionEntity,
-      user: (typeof (user as any).toJSON === "function" ? (user as any).toJSON() : user) as Record<
-        string,
-        any
-      >,
+      user: (typeof (user as any).toJSON === "function"
+        ? (user as any).toJSON()
+        : user) as Record<string, any>,
     };
   }
 

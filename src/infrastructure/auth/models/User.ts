@@ -38,7 +38,14 @@ export class User extends Model<UserAttributes> {
    * User roles relation via users_to_roles pivot table.
    */
   roles() {
-    return this.belongsToMany(Role, "users_to_roles", "user_id", "role_id", "id", "id");
+    return this.belongsToMany(
+      Role,
+      "users_to_roles",
+      "user_id",
+      "role_id",
+      "id",
+      "id",
+    );
   }
 
   /**

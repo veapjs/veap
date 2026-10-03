@@ -11,7 +11,10 @@ import {
 import { MemoryCacheProvider } from "../cache/memory-cache.provider";
 import { ConfigService } from "../config/config.service";
 import { VeapConfigProvider } from "../config/veap-config.provider";
-import { NextCookieStore, NextRequestContext } from "../http/next-request-context";
+import {
+  NextCookieStore,
+  NextRequestContext,
+} from "../http/next-request-context";
 import { LoggerService, logger } from "../logging/console-logger";
 import { ServiceProvider } from "./service-provider";
 
@@ -94,6 +97,9 @@ export class KernelServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
-    logger.debug("veap:kernel", "Kernel core services registered successfully.");
+    logger.debug(
+      "veap:kernel",
+      "Kernel core services registered successfully.",
+    );
   }
 }

@@ -1,4 +1,7 @@
-import { type AuthRoutesConfig, DEFAULT_AUTH_ROUTES } from "../../domain/auth/types";
+import {
+  type AuthRoutesConfig,
+  DEFAULT_AUTH_ROUTES,
+} from "../../domain/auth/types";
 import { AppError } from "../../domain/errors/app-error";
 import type { AuthService } from "./services/auth.service";
 import type { EmailVerificationService } from "./services/email-verification.service";

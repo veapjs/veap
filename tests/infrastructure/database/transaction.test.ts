@@ -187,7 +187,10 @@ describe("Database Transaction (AsyncLocalStorage)", () => {
       // Verify that outer items were committed, but inner savepoint item was rolled back
       const rows = await db("test_items").select("*").orderBy("id", "asc");
       expect(rows).toHaveLength(2);
-      expect(rows.map((r) => r.name)).toEqual(["outer-preserved", "outer-subsequent"]);
+      expect(rows.map((r) => r.name)).toEqual([
+        "outer-preserved",
+        "outer-subsequent",
+      ]);
     });
   });
 });

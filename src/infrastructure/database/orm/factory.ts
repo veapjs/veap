@@ -27,7 +27,8 @@ export abstract class Factory<M extends Model = any> {
   protected modelClass: any;
   protected countNumber = 1;
   protected states: Array<
-    Record<string, any> | ((attributes: Record<string, any>) => Record<string, any>)
+    | Record<string, any>
+    | ((attributes: Record<string, any>) => Record<string, any>)
   > = [];
   protected sequenceItems: Array<Record<string, any>> = [];
 
@@ -54,7 +55,9 @@ export abstract class Factory<M extends Model = any> {
    * Applies an attribute state transformation to the factory.
    */
   state(
-    override: Record<string, any> | ((attributes: Record<string, any>) => Record<string, any>),
+    override:
+      | Record<string, any>
+      | ((attributes: Record<string, any>) => Record<string, any>),
   ): this {
     this.states.push(override);
     return this;
@@ -71,7 +74,10 @@ export abstract class Factory<M extends Model = any> {
   /**
    * Generates the raw attributes dictionary for a single model instance.
    */
-  async raw(override: Record<string, any> = {}, index = 0): Promise<Record<string, any>> {
+  async raw(
+    override: Record<string, any> = {},
+    index = 0,
+  ): Promise<Record<string, any>> {
     let attributes = await this.definition();
 
     // Apply sequence if provided
@@ -100,7 +106,9 @@ export abstract class Factory<M extends Model = any> {
    */
   async makeOne(override: Record<string, any> = {}, index = 0): Promise<M> {
     if (!this.modelClass) {
-      throw AppError.Internal("[veap:Factory] Model class is not defined for this factory.");
+      throw AppError.Internal(
+        "[veap:Factory] Model class is not defined for this factory.",
+      );
     }
     const attributes = await this.raw(override, index);
     return new this.modelClass(attributes, true);
@@ -152,7 +160,9 @@ export abstract class Factory<M extends Model = any> {
 class GenericFactory<M extends Model = any> extends Factory<M> {
   constructor(
     modelClass: any,
-    private definitionFn: () => Record<string, any> | Promise<Record<string, any>>,
+    private definitionFn: () =>
+      | Record<string, any>
+      | Promise<Record<string, any>>,
   ) {
     super(modelClass);
   }
@@ -166,7 +176,9 @@ export interface FactoryConstructor<M extends Model = any> {
   new (): Factory<M>;
   (count?: number): Factory<M>;
   count(amount: number): Factory<M>;
-  state(override: Record<string, any> | ((attrs: any) => Record<string, any>)): Factory<M>;
+  state(
+    override: Record<string, any> | ((attrs: any) => Record<string, any>),
+  ): Factory<M>;
   sequence(...items: Record<string, any>[]): Factory<M>;
   make(override?: Record<string, any>): Promise<M | M[]>;
   makeOne(override?: Record<string, any>): Promise<M>;
@@ -198,11 +210,15 @@ export function defineFactory<M extends Model = any>(
   // Attach static factory shortcuts
   factoryCallable.count = (amount: number) => factoryCallable().count(amount);
   factoryCallable.state = (override: any) => factoryCallable().state(override);
-  factoryCallable.sequence = (...items: any[]) => factoryCallable().sequence(...items);
+  factoryCallable.sequence = (...items: any[]) =>
+    factoryCallable().sequence(...items);
   factoryCallable.make = (override?: any) => factoryCallable().make(override);
-  factoryCallable.makeOne = (override?: any) => factoryCallable().makeOne(override);
-  factoryCallable.create = (override?: any) => factoryCallable().create(override);
-  factoryCallable.createOne = (override?: any) => factoryCallable().createOne(override);
+  factoryCallable.makeOne = (override?: any) =>
+    factoryCallable().makeOne(override);
+  factoryCallable.create = (override?: any) =>
+    factoryCallable().create(override);
+  factoryCallable.createOne = (override?: any) =>
+    factoryCallable().createOne(override);
 
   // Allow `new UserFactory()`
   Object.setPrototypeOf(factoryCallable, FactoryClass);

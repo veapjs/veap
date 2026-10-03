@@ -40,4 +40,6 @@ export interface SystemEvent<T = any> {
   source: string;
 }
 
-export type EventHandler<T = any> = (event: SystemEvent<T>) => Promise<void> | void;
+export type EventHandler<T = any> = (
+  event: SystemEvent<T>,
+) => Promise<void> | void;

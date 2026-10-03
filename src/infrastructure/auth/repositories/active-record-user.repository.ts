@@ -60,7 +60,10 @@ export class ActiveRecordUserRepository implements IUserRepository {
     await user.save();
   }
 
-  async setEmailVerifiedIfEmailMatches(id: string, email: string): Promise<boolean> {
+  async setEmailVerifiedIfEmailMatches(
+    id: string,
+    email: string,
+  ): Promise<boolean> {
     const updated = await User.where({ id, email }).update({
       emailVerifiedAt: new Date(),
     });

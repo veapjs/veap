@@ -2,10 +2,10 @@ import type { Model } from "../model";
 import type { ModelQueryBuilder } from "../query-builder";
 import { Relation } from "./relation";
 
-export class BelongsTo<Parent extends Model = any, Related extends Model = any> extends Relation<
-  Parent,
-  Related
-> {
+export class BelongsTo<
+  Parent extends Model = any,
+  Related extends Model = any,
+> extends Relation<Parent, Related> {
   query(): ModelQueryBuilder<Related> {
     const foreignKeyValue = this.parent.getAttribute(this.foreignKey);
     return this.related.query().where(this.localKey, foreignKeyValue);
@@ -35,7 +35,10 @@ export class BelongsTo<Parent extends Model = any, Related extends Model = any> 
       return;
     }
 
-    const results: Related[] = await this.related.query().whereIn(this.localKey, foreignKeys).get();
+    const results: Related[] = await this.related
+      .query()
+      .whereIn(this.localKey, foreignKeys)
+      .get();
 
     const lookup = new Map<any, Related>();
     for (const item of results) {

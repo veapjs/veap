@@ -55,7 +55,9 @@ export class ActiveRecordRoleRepository implements IRoleRepository {
   }
 
   async loadUserAccess(userId: string): Promise<UserAccess | null> {
-    const user = await User.query().with("roles.permissions", "permissions").find(userId);
+    const user = await User.query()
+      .with("roles.permissions", "permissions")
+      .find(userId);
 
     if (!user) return null;
 
@@ -66,12 +68,12 @@ export class ActiveRecordRoleRepository implements IRoleRepository {
       roles: roles.map((role) => ({
         id: role.id as string,
         name: role.name as string,
-        permissions: ((role.getRelation("permissions") as Permission[]) || []).map(
-          (permission) => ({
-            id: permission.id as string,
-            name: permission.name as string,
-          }),
-        ),
+        permissions: (
+          (role.getRelation("permissions") as Permission[]) || []
+        ).map((permission) => ({
+          id: permission.id as string,
+          name: permission.name as string,
+        })),
       })),
       directPermissions: direct.map((permission) => ({
         id: permission.id as string,

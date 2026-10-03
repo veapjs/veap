@@ -13,7 +13,8 @@ describe("LocalFileProvider Security", () => {
   beforeEach(() => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "veap-storage-test-"));
     config = {
-      get: (key: string) => (key === "FILE_STORAGE_FOLDER" ? tempDir : undefined),
+      get: (key: string) =>
+        key === "FILE_STORAGE_FOLDER" ? tempDir : undefined,
     } as any;
     provider = new LocalFileProvider(config);
   });
@@ -43,7 +44,9 @@ describe("LocalFileProvider Security", () => {
       });
       const result = await provider.upload(file);
       expect(result).toHaveProperty("error");
-      expect((result as any).error).toMatch(/not allowed for security reasons/i);
+      expect((result as any).error).toMatch(
+        /not allowed for security reasons/i,
+      );
     }
   });
 

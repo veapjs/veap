@@ -1,11 +1,17 @@
 import { addMinutes } from "date-fns";
-import { type ITokenGenerator, TOKEN_GENERATOR } from "../../../domain/auth/ports/token-generator";
+import {
+  type ITokenGenerator,
+  TOKEN_GENERATOR,
+} from "../../../domain/auth/ports/token-generator";
 import {
   EMAIL_VERIFICATION_REPOSITORY,
   type EmailVerificationRecord,
   type IEmailVerificationRepository,
 } from "../../../domain/auth/repositories/email-verification.repository";
-import { COOKIE_STORE, type ICookieStore } from "../../../domain/contracts/http-transport";
+import {
+  COOKIE_STORE,
+  type ICookieStore,
+} from "../../../domain/contracts/http-transport";
 import { Inject, Injectable } from "../../../domain/contracts/ioc";
 import { sendVerifyEmail } from "../../communication/mail";
 import { registerSecurityRequirement } from "../logic";
@@ -82,7 +88,9 @@ export class EmailVerificationService {
   /**
    * Sets the email verification request ID in a cookie.
    */
-  async setEmailVerificationRequestCookie(request: EmailVerificationRequestType): Promise<void> {
+  async setEmailVerificationRequestCookie(
+    request: EmailVerificationRequestType,
+  ): Promise<void> {
     await this.cookieStore.set("email_verification", request.id, {
       httpOnly: true,
       path: "/",

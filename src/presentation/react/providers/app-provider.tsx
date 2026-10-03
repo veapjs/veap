@@ -41,11 +41,16 @@ export const AppProvider = ({
     <ThemeProvider>
       <SWRConfig
         value={{
-          fetcher: (url: string) => fetch(url).then((response) => response.json()),
+          fetcher: (url: string) =>
+            fetch(url).then((response) => response.json()),
           revalidateIfStale: true,
         }}
       >
-        <AuthProvider initialSession={initialSession} prefix={prefix} routes={authRoutes}>
+        <AuthProvider
+          initialSession={initialSession}
+          prefix={prefix}
+          routes={authRoutes}
+        >
           <TooltipProvider>
             {children}
 

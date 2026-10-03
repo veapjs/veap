@@ -59,8 +59,14 @@ export class ModelQueryBuilder<M extends Model = any> {
 
           if (typeof fn === "function") {
             return (...args: any[]) => {
-              const result = fn.call(proto || target.modelClass, receiver, ...args);
-              return result === target || result === undefined ? receiver : result;
+              const result = fn.call(
+                proto || target.modelClass,
+                receiver,
+                ...args,
+              );
+              return result === target || result === undefined
+                ? receiver
+                : result;
             };
           }
         }
@@ -171,8 +177,12 @@ export class ModelQueryBuilder<M extends Model = any> {
       return;
     }
 
-    const colName = toSnakeCase(this.modelClass.deletedAtColumn || "deleted_at");
-    const column = this.modelClass?.table ? `${this.modelClass.table}.${colName}` : colName;
+    const colName = toSnakeCase(
+      this.modelClass.deletedAtColumn || "deleted_at",
+    );
+    const column = this.modelClass?.table
+      ? `${this.modelClass.table}.${colName}`
+      : colName;
 
     if (this._onlyTrashed) {
       this.knexBuilder.whereNotNull(column);
@@ -273,7 +283,9 @@ export class ModelQueryBuilder<M extends Model = any> {
   }
 
   select(...columns: any[]): this {
-    const converted = columns.map((col) => (typeof col === "string" ? toSnakeCase(col) : col));
+    const converted = columns.map((col) =>
+      typeof col === "string" ? toSnakeCase(col) : col,
+    );
     this.knexBuilder.select(...converted);
     return this;
   }
@@ -309,7 +321,12 @@ export class ModelQueryBuilder<M extends Model = any> {
     return this.offset(count);
   }
 
-  join(table: string, first: string, operatorOrSecond: string, second?: string): this {
+  join(
+    table: string,
+    first: string,
+    operatorOrSecond: string,
+    second?: string,
+  ): this {
     if (second === undefined) {
       this.knexBuilder.join(table, first, operatorOrSecond);
     } else {
@@ -318,7 +335,12 @@ export class ModelQueryBuilder<M extends Model = any> {
     return this;
   }
 
-  leftJoin(table: string, first: string, operatorOrSecond: string, second?: string): this {
+  leftJoin(
+    table: string,
+    first: string,
+    operatorOrSecond: string,
+    second?: string,
+  ): this {
     if (second === undefined) {
       this.knexBuilder.leftJoin(table, first, operatorOrSecond);
     } else {
@@ -383,7 +405,11 @@ export class ModelQueryBuilder<M extends Model = any> {
       const localKey = toSnakeCase(rel.localKey || "id");
       const typeColumn = toSnakeCase(rel.morphTypeColumn);
 
-      sub.join(pivotTable, `${relatedTable}.${relatedKey}`, `${pivotTable}.${relatedPivotKey}`);
+      sub.join(
+        pivotTable,
+        `${relatedTable}.${relatedKey}`,
+        `${pivotTable}.${relatedPivotKey}`,
+      );
       sub.where(`${pivotTable}.${typeColumn}`, rel.morphType);
       sub.whereRaw("CAST(?? AS TEXT) = CAST(?? AS TEXT)", [
         `${pivotTable}.${foreignPivotKey}`,
@@ -406,7 +432,10 @@ export class ModelQueryBuilder<M extends Model = any> {
         );
       });
       sub.where(`${pivotTable}.${typeColumn}`, rel.morphType);
-      sub.whereRaw("?? = ??", [`${pivotTable}.${relatedPivotKey}`, `${parentTable}.${localKey}`]);
+      sub.whereRaw("?? = ??", [
+        `${pivotTable}.${relatedPivotKey}`,
+        `${parentTable}.${localKey}`,
+      ]);
     } else if (rel instanceof BelongsToMany || rel.pivotTable) {
       const pivotTable = rel.pivotTable;
       const foreignPivotKey = toSnakeCase(rel.foreignPivotKey);
@@ -414,12 +443,22 @@ export class ModelQueryBuilder<M extends Model = any> {
       const relatedKey = toSnakeCase(rel.relatedKey || "id");
       const localKey = toSnakeCase(rel.localKey || "id");
 
-      sub.join(pivotTable, `${relatedTable}.${relatedKey}`, `${pivotTable}.${relatedPivotKey}`);
-      sub.whereRaw("?? = ??", [`${pivotTable}.${foreignPivotKey}`, `${parentTable}.${localKey}`]);
+      sub.join(
+        pivotTable,
+        `${relatedTable}.${relatedKey}`,
+        `${pivotTable}.${relatedPivotKey}`,
+      );
+      sub.whereRaw("?? = ??", [
+        `${pivotTable}.${foreignPivotKey}`,
+        `${parentTable}.${localKey}`,
+      ]);
     } else if (rel instanceof BelongsTo) {
       const foreignKey = toSnakeCase(rel.foreignKey);
       const localKey = toSnakeCase(rel.localKey || "id");
-      sub.whereRaw("?? = ??", [`${relatedTable}.${localKey}`, `${parentTable}.${foreignKey}`]);
+      sub.whereRaw("?? = ??", [
+        `${relatedTable}.${localKey}`,
+        `${parentTable}.${foreignKey}`,
+      ]);
     } else if (rel instanceof MorphMany || rel instanceof MorphOne) {
       const foreignKey = toSnakeCase((rel as any).idColumn || rel.foreignKey);
       const localKey = toSnakeCase(rel.localKey || "id");
@@ -433,7 +472,10 @@ export class ModelQueryBuilder<M extends Model = any> {
       // HasOne or HasMany
       const foreignKey = toSnakeCase(rel.foreignKey);
       const localKey = toSnakeCase(rel.localKey || "id");
-      sub.whereRaw("?? = ??", [`${relatedTable}.${foreignKey}`, `${parentTable}.${localKey}`]);
+      sub.whereRaw("?? = ??", [
+        `${relatedTable}.${foreignKey}`,
+        `${parentTable}.${localKey}`,
+      ]);
     }
 
     if (rel.related.softDeletes) {
@@ -458,10 +500,18 @@ export class ModelQueryBuilder<M extends Model = any> {
     callback?: (query: ModelQueryBuilder) => void,
   ): this {
     if (operator === ">=" && count === 1 && !callback) {
-      return boolean === "or" ? this.orWhereHas(relation) : this.whereHas(relation);
+      return boolean === "or"
+        ? this.orWhereHas(relation)
+        : this.whereHas(relation);
     }
-    if (((operator === "<" && count === 1) || (operator === "=" && count === 0)) && !callback) {
-      return boolean === "or" ? this.orWhereDoesntHave(relation) : this.whereDoesntHave(relation);
+    if (
+      ((operator === "<" && count === 1) ||
+        (operator === "=" && count === 0)) &&
+      !callback
+    ) {
+      return boolean === "or"
+        ? this.orWhereDoesntHave(relation)
+        : this.whereDoesntHave(relation);
     }
 
     const knex = getKnex();
@@ -493,7 +543,10 @@ export class ModelQueryBuilder<M extends Model = any> {
   /**
    * Adds a relationship existence condition with an optional callback constraint.
    */
-  whereHas(relation: string, callback?: (query: ModelQueryBuilder) => void): this {
+  whereHas(
+    relation: string,
+    callback?: (query: ModelQueryBuilder) => void,
+  ): this {
     this.knexBuilder.whereExists((sub) => {
       this.buildRelationSubquery(sub, relation, callback, false);
     });
@@ -503,7 +556,10 @@ export class ModelQueryBuilder<M extends Model = any> {
   /**
    * Adds an OR relationship existence condition with an optional callback constraint.
    */
-  orWhereHas(relation: string, callback?: (query: ModelQueryBuilder) => void): this {
+  orWhereHas(
+    relation: string,
+    callback?: (query: ModelQueryBuilder) => void,
+  ): this {
     this.knexBuilder.orWhereExists((sub) => {
       this.buildRelationSubquery(sub, relation, callback, false);
     });
@@ -513,7 +569,10 @@ export class ModelQueryBuilder<M extends Model = any> {
   /**
    * Adds a relationship absence condition with an optional callback constraint.
    */
-  whereDoesntHave(relation: string, callback?: (query: ModelQueryBuilder) => void): this {
+  whereDoesntHave(
+    relation: string,
+    callback?: (query: ModelQueryBuilder) => void,
+  ): this {
     this.knexBuilder.whereNotExists((sub) => {
       this.buildRelationSubquery(sub, relation, callback, false);
     });
@@ -523,7 +582,10 @@ export class ModelQueryBuilder<M extends Model = any> {
   /**
    * Adds an OR relationship absence condition with an optional callback constraint.
    */
-  orWhereDoesntHave(relation: string, callback?: (query: ModelQueryBuilder) => void): this {
+  orWhereDoesntHave(
+    relation: string,
+    callback?: (query: ModelQueryBuilder) => void,
+  ): this {
     this.knexBuilder.orWhereNotExists((sub) => {
       this.buildRelationSubquery(sub, relation, callback, false);
     });
@@ -554,7 +616,10 @@ export class ModelQueryBuilder<M extends Model = any> {
       | Record<string, ((q: ModelQueryBuilder) => void) | undefined>
     )[]
   ): this {
-    const normalized: Record<string, ((q: ModelQueryBuilder) => void) | undefined> = {};
+    const normalized: Record<
+      string,
+      ((q: ModelQueryBuilder) => void) | undefined
+    > = {};
 
     for (const item of relations) {
       if (typeof item === "string") {
@@ -620,7 +685,9 @@ export class ModelQueryBuilder<M extends Model = any> {
   async firstOrFail(): Promise<M> {
     const model = await this.first();
     if (!model) {
-      throw AppError.Internal(`[veap:ORM] Model ${this.modelClass.name} not found matching query.`);
+      throw AppError.Internal(
+        `[veap:ORM] Model ${this.modelClass.name} not found matching query.`,
+      );
     }
     return model;
   }
@@ -628,7 +695,10 @@ export class ModelQueryBuilder<M extends Model = any> {
   /**
    * Get the first record matching the attributes or instantiate it.
    */
-  async firstOrNew(attributes: Record<string, any>, values: Record<string, any> = {}): Promise<M> {
+  async firstOrNew(
+    attributes: Record<string, any>,
+    values: Record<string, any> = {},
+  ): Promise<M> {
     const existing = await this.where(attributes).first();
     if (existing) {
       return existing;
@@ -716,7 +786,9 @@ export class ModelQueryBuilder<M extends Model = any> {
     this.applyGlobalScopes();
     const col = toSnakeCase(column);
     const rows = await this.knexBuilder.select(col);
-    return rows.map((row: any) => (row[col] !== undefined ? row[col] : row[column]));
+    return rows.map((row: any) =>
+      row[col] !== undefined ? row[col] : row[column],
+    );
   }
 
   /**

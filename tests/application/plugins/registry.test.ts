@@ -79,7 +79,12 @@ describe("PluginRegistry", () => {
       debug: vi.fn(),
     };
 
-    registry = new PluginRegistry(repository, migrationRunner, eventBus, logger);
+    registry = new PluginRegistry(
+      repository,
+      migrationRunner,
+      eventBus,
+      logger,
+    );
   });
 
   describe("Registration", () => {
@@ -221,7 +226,8 @@ describe("PluginRegistry", () => {
           {
             point: "calculate:total",
             priority: 1,
-            handler: (val: number, ctx: { discount: number }) => val - ctx.discount,
+            handler: (val: number, ctx: { discount: number }) =>
+              val - ctx.discount,
           },
           {
             point: "calculate:total",
@@ -243,7 +249,11 @@ describe("PluginRegistry", () => {
       const initialValue = 100;
       const context = { discount: 10 };
       // (100 - 10) = 90; 90 * 1.2 = 108
-      const finalResult = await applyPluginFilters("calculate:total", initialValue, context);
+      const finalResult = await applyPluginFilters(
+        "calculate:total",
+        initialValue,
+        context,
+      );
 
       expect(finalResult).toBe(108);
     });
@@ -278,24 +288,39 @@ describe("PluginRegistry", () => {
       await registry.init();
 
       // Guest/user without admin role or delete permission
-      const regularExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["user"],
-        permissions: ["posts:read"],
-      });
+      const regularExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["user"],
+          permissions: ["posts:read"],
+        },
+      );
       expect(regularExts).toHaveLength(1);
 
       // Admin user
-      const adminExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["admin"],
-        permissions: ["posts:read"],
-      });
+      const adminExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["admin"],
+          permissions: ["posts:read"],
+        },
+      );
       expect(adminExts).toHaveLength(2);
 
       // User with all permissions
-      const privilegedExts = await registry.getExtensions("dashboard", "widgets", false, {
-        roles: ["admin"],
-        permissions: ["posts:read", "posts:delete"],
-      });
+      const privilegedExts = await registry.getExtensions(
+        "dashboard",
+        "widgets",
+        false,
+        {
+          roles: ["admin"],
+          permissions: ["posts:read", "posts:delete"],
+        },
+      );
       expect(privilegedExts).toHaveLength(3);
     });
   });
@@ -318,16 +343,19 @@ describe("PluginRegistry", () => {
       vi.spyOn(repository, "upsertStatus").mockRejectedValue(dbError);
 
       // togglePlugin should reject
-      await expect(registry.togglePlugin("faulty-plugin", true)).rejects.toThrow(
-        "Database deadlock / write failure",
-      );
+      await expect(
+        registry.togglePlugin("faulty-plugin", true),
+      ).rejects.toThrow("Database deadlock / write failure");
 
       // In-memory status must be rolled back to false (no split-brain)
       const afterStatus = await registry.getPluginStatus("faulty-plugin");
       expect(afterStatus?.enabled).toBe(false);
 
       // Event bus must NOT have published the toggle event
-      expect(eventBus.publish).not.toHaveBeenCalledWith("system:plugin:toggle", expect.anything());
+      expect(eventBus.publish).not.toHaveBeenCalledWith(
+        "system:plugin:toggle",
+        expect.anything(),
+      );
 
       // Error must be logged as error
       expect(logger.error).toHaveBeenCalledWith(
@@ -347,19 +375,23 @@ describe("PluginRegistry", () => {
 
       // Fail ONLY when update only contains lastStep, but allow enabled/installed transitions
       const originalUpsert = repository.upsertStatus.bind(repository);
-      vi.spyOn(repository, "upsertStatus").mockImplementation(async (id, update, meta) => {
-        if (
-          update.lastStep !== undefined &&
-          update.enabled === undefined &&
-          update.installed === undefined
-        ) {
-          throw new Error("Ephemeral step DB write timeout");
-        }
-        return originalUpsert(id, update, meta);
-      });
+      vi.spyOn(repository, "upsertStatus").mockImplementation(
+        async (id, update, meta) => {
+          if (
+            update.lastStep !== undefined &&
+            update.enabled === undefined &&
+            update.installed === undefined
+          ) {
+            throw new Error("Ephemeral step DB write timeout");
+          }
+          return originalUpsert(id, update, meta);
+        },
+      );
 
       // togglePlugin should still succeed even if progress steps failed to persist to DB
-      await expect(registry.togglePlugin("progress-plugin", true)).resolves.toBeUndefined();
+      await expect(
+        registry.togglePlugin("progress-plugin", true),
+      ).resolves.toBeUndefined();
 
       const finalStatus = await registry.getPluginStatus("progress-plugin");
       expect(finalStatus?.enabled).toBe(true);

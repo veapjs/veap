@@ -50,7 +50,10 @@ export async function getRolePermissions(roleId: string) {
   return authContext().rbac.getRolePermissions(roleId);
 }
 
-export async function assignPermissionToRole(roleId: string, permissionId: string): Promise<void> {
+export async function assignPermissionToRole(
+  roleId: string,
+  permissionId: string,
+): Promise<void> {
   return authContext().rbac.assignPermissionToRole(roleId, permissionId);
 }
 
@@ -63,15 +66,24 @@ export async function revokePermissionFromRole(
 
 // --- User Assignment ---
 
-export async function assignRoleToUser(userId: string, roleId: string): Promise<void> {
+export async function assignRoleToUser(
+  userId: string,
+  roleId: string,
+): Promise<void> {
   return authContext().rbac.assignRoleToUser(userId, roleId);
 }
 
-export async function revokeRoleFromUser(userId: string, roleId: string): Promise<void> {
+export async function revokeRoleFromUser(
+  userId: string,
+  roleId: string,
+): Promise<void> {
   return authContext().rbac.revokeRoleFromUser(userId, roleId);
 }
 
-export async function assignPermissionToUser(userId: string, permissionId: string): Promise<void> {
+export async function assignPermissionToUser(
+  userId: string,
+  permissionId: string,
+): Promise<void> {
   return authContext().rbac.assignPermissionToUser(userId, permissionId);
 }
 

@@ -42,7 +42,9 @@ export interface IHttpRequestContext {
  * Injection tokens. Global symbols keep them stable across HMR /
  * dual-package boundaries, like every other port token.
  */
-export const COOKIE_STORE: Token<ICookieStore> = Symbol.for("veap:kernel:cookie-store");
+export const COOKIE_STORE: Token<ICookieStore> = Symbol.for(
+  "veap:kernel:cookie-store",
+);
 
 export const REQUEST_CONTEXT: Token<IHttpRequestContext> = Symbol.for(
   "veap:kernel:request-context",

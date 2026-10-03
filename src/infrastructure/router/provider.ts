@@ -34,7 +34,8 @@ export class RouterServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
-    const routerService = await this.container.resolve<RouterService>(RouterService);
+    const routerService =
+      await this.container.resolve<RouterService>(RouterService);
 
     if (this.config?.rewrites) {
       for (const [from, to] of Object.entries(this.config.rewrites)) {
@@ -52,9 +53,14 @@ export class RouterServiceProvider extends ServiceProvider {
     });
 
     // Clear cache after plugin initialization finishes
-    eventBus.subscribe("system:plugins:init:end", "route-tree-cache-init", async () => {
-      const routerService = await this.container.resolve<RouterService>(RouterService);
-      await routerService.clearCache();
-    });
+    eventBus.subscribe(
+      "system:plugins:init:end",
+      "route-tree-cache-init",
+      async () => {
+        const routerService =
+          await this.container.resolve<RouterService>(RouterService);
+        await routerService.clearCache();
+      },
+    );
   }
 }

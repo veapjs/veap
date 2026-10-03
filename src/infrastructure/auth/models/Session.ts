@@ -32,7 +32,8 @@ export class Session extends Model<SessionAttributes> {
    * Session owner user relation.
    */
   user() {
-    const fk = this.getAttribute("user_id") !== undefined ? "user_id" : "userId";
+    const fk =
+      this.getAttribute("user_id") !== undefined ? "user_id" : "userId";
     return this.belongsTo(User, fk);
   }
 }

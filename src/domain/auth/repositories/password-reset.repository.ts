@@ -32,4 +32,6 @@ export interface IPasswordResetRepository {
 }
 
 /** Injection token for the password reset repository port. */
-export const PASSWORD_RESET_REPOSITORY = Symbol.for("veap:auth:password-reset-repository");
+export const PASSWORD_RESET_REPOSITORY = Symbol.for(
+  "veap:auth:password-reset-repository",
+);

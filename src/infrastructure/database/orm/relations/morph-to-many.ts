@@ -9,10 +9,10 @@ import { Relation } from "./relation";
  * owns the polymorphic side of the pivot table (e.g. BlogPost -> tags via taggables).
  * Pivot columns: ${morphName}_id, ${morphName}_type, ${relatedPivotKey}
  */
-export class MorphToMany<Parent extends Model = any, Related extends Model = any> extends Relation<
-  Parent,
-  Related
-> {
+export class MorphToMany<
+  Parent extends Model = any,
+  Related extends Model = any,
+> extends Relation<Parent, Related> {
   public morphType: string;
 
   constructor(

@@ -3,7 +3,10 @@ import { getKnex } from "../connection";
 /**
  * Lightweight SQL helper for migrations, compatible with sql`...` template strings.
  */
-export function sql(strings: TemplateStringsArray | string, ...values: any[]): any {
+export function sql(
+  strings: TemplateStringsArray | string,
+  ...values: any[]
+): any {
   if (typeof strings === "string") return strings;
   let result = strings[0];
   for (let i = 0; i < values.length; i++) {
@@ -139,7 +142,10 @@ export class ColumnBuilder {
           sql += ` DEFAULT ${this._default ? "TRUE" : "FALSE"}`;
         }
       } else {
-        const val = typeof this._default === "string" ? `'${this._default}'` : this._default;
+        const val =
+          typeof this._default === "string"
+            ? `'${this._default}'`
+            : this._default;
         sql += ` DEFAULT ${val}`;
       }
     }
@@ -202,7 +208,8 @@ export class Blueprint {
   }
 
   timestamp(name: string, precision?: number) {
-    const type = precision !== undefined ? `TIMESTAMP(${precision})` : "TIMESTAMP";
+    const type =
+      precision !== undefined ? `TIMESTAMP(${precision})` : "TIMESTAMP";
     return this.addColumn(type, name);
   }
 
@@ -288,7 +295,9 @@ export class Blueprint {
         columnDefs.push(`PRIMARY KEY("${this._primaryKeys.join('", "')}")`);
       } else {
         const pkName = `${this.tableName}_${this._primaryKeys.join("_")}_pk`;
-        columnDefs.push(`CONSTRAINT "${pkName}" PRIMARY KEY("${this._primaryKeys.join('", "')}")`);
+        columnDefs.push(
+          `CONSTRAINT "${pkName}" PRIMARY KEY("${this._primaryKeys.join('", "')}")`,
+        );
       }
     }
 
@@ -297,7 +306,9 @@ export class Blueprint {
         columnDefs.push(`UNIQUE("${uniqueCols.join('", "')}")`);
       } else {
         const uName = `${this.tableName}_${uniqueCols.join("_")}_uq`;
-        columnDefs.push(`CONSTRAINT "${uName}" UNIQUE("${uniqueCols.join('", "')}")`);
+        columnDefs.push(
+          `CONSTRAINT "${uName}" UNIQUE("${uniqueCols.join('", "')}")`,
+        );
       }
     }
 
@@ -389,7 +400,9 @@ export class Schema {
       return;
     }
 
-    await this.runQuery(`ALTER TABLE "${tableName}" DROP COLUMN IF EXISTS "${columnName}"`);
+    await this.runQuery(
+      `ALTER TABLE "${tableName}" DROP COLUMN IF EXISTS "${columnName}"`,
+    );
   }
 
   private async runQuery(query: string) {

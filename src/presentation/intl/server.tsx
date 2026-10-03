@@ -9,7 +9,12 @@ import { I18nProvider as ClientProvider } from "./client";
  * Smart Server Component that handles locale detection and message loading automatically.
  */
 export async function I18nProvider({ children }: PropsWithChildren) {
-  const { cookie: cookieName, default: defaultLocale, locales, timeZone } = await getIntlConfig();
+  const {
+    cookie: cookieName,
+    default: defaultLocale,
+    locales,
+    timeZone,
+  } = await getIntlConfig();
 
   let locale: string;
 
@@ -30,5 +35,9 @@ export async function I18nProvider({ children }: PropsWithChildren) {
 
   const messages = await getMessages(locale);
 
-  return React.createElement(ClientProvider, { locale, locales, messages, timeZone }, children);
+  return React.createElement(
+    ClientProvider,
+    { locale, locales, messages, timeZone },
+    children,
+  );
 }

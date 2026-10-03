@@ -1,7 +1,10 @@
 import { VEAP_CONFIG } from "../../domain/contracts";
 import { Inject, Injectable } from "../../domain/contracts/ioc";
 import type { IVeapConfigProvider } from "../../domain/contracts/veap-config";
-import type { PluginNavElement, PluginNavigationGroupMap } from "../../domain/plugins/types";
+import type {
+  PluginNavElement,
+  PluginNavigationGroupMap,
+} from "../../domain/plugins/types";
 import { authContext } from "../auth/context";
 import { pluginsContext } from "./context";
 import { PluginRegistry } from "./registry";
@@ -25,7 +28,9 @@ function filterNavItem(
 
   if (item.items && item.items.length > 0) {
     const filteredSubItems = item.items
-      .map((subItem) => filterNavItem(subItem as any, userRoles, userPermissions))
+      .map((subItem) =>
+        filterNavItem(subItem as any, userRoles, userPermissions),
+      )
       .filter((subItem: any): subItem is PluginNavElement => subItem !== null);
 
     return {
@@ -87,7 +92,10 @@ export class NavigationService {
 
             for (const rawItem of items) {
               const item = filterNavItem(rawItem, userRoles, userPermissions);
-              if (item && !groups[groupName].some((existing) => existing.url === item.url)) {
+              if (
+                item &&
+                !groups[groupName].some((existing) => existing.url === item.url)
+              ) {
                 groups[groupName].push(item);
               }
             }
@@ -134,7 +142,9 @@ export class NavigationService {
       return items.map((item) => ({
         ...item,
         url: prefixUrl(item.url),
-        items: item.items ? processItems(item.items as PluginNavElement[]) : undefined,
+        items: item.items
+          ? processItems(item.items as PluginNavElement[])
+          : undefined,
       })) as PluginNavElement[];
     };
 
@@ -193,10 +203,14 @@ export async function getPluginNavigationGrouped(type: "admin" | "settings") {
   return pluginsContext().navigation.getNavigationGrouped(type);
 }
 
-export async function getVeapPluginNavigationGrouped(type: "admin" | "settings") {
+export async function getVeapPluginNavigationGrouped(
+  type: "admin" | "settings",
+) {
   return pluginsContext().navigation.getVeapNavigationGrouped(type);
 }
 
-export async function getPluginNavigation(type: "public" = "public"): Promise<PluginNavElement[]> {
+export async function getPluginNavigation(
+  type: "public" = "public",
+): Promise<PluginNavElement[]> {
   return pluginsContext().navigation.getPublicNavigation();
 }

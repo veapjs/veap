@@ -7,7 +7,11 @@ import { PluginRegistry } from "../plugins/registry";
 function deepMerge(target: any, source: any) {
   const result = { ...target };
   for (const key of Object.keys(source)) {
-    if (source[key] instanceof Object && key in target && target[key] instanceof Object) {
+    if (
+      source[key] instanceof Object &&
+      key in target &&
+      target[key] instanceof Object
+    ) {
       result[key] = deepMerge(target[key], source[key]);
     } else {
       result[key] = source[key];
@@ -30,7 +34,10 @@ export class IntlService {
     if (!this.registeredMessages[locale]) {
       this.registeredMessages[locale] = {};
     }
-    this.registeredMessages[locale] = deepMerge(this.registeredMessages[locale], messages);
+    this.registeredMessages[locale] = deepMerge(
+      this.registeredMessages[locale],
+      messages,
+    );
   }
 
   public async getMessages(locale: string, searchDirectories?: string[]) {

@@ -16,7 +16,14 @@ export class Role extends Model<RoleAttributes> {
    * Users assigned to this role.
    */
   users() {
-    return this.belongsToMany(User, "users_to_roles", "role_id", "user_id", "id", "id");
+    return this.belongsToMany(
+      User,
+      "users_to_roles",
+      "role_id",
+      "user_id",
+      "id",
+      "id",
+    );
   }
 
   /**

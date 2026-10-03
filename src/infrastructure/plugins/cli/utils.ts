@@ -42,7 +42,12 @@ export function regeneratePluginsRegistry(rootDir: string) {
 
       if (!isPlugin) {
         // Check node_modules package.json
-        const depPkgPath = path.join(rootDir, "node_modules", depName, "package.json");
+        const depPkgPath = path.join(
+          rootDir,
+          "node_modules",
+          depName,
+          "package.json",
+        );
         if (fs.existsSync(depPkgPath)) {
           try {
             const depPkg = JSON.parse(fs.readFileSync(depPkgPath, "utf-8"));
@@ -57,14 +62,29 @@ export function regeneratePluginsRegistry(rootDir: string) {
           .replace(/^@veap\//, "")
           .replace(/^@veap\//, "")
           .replace(/^@contractor\//, "");
-        const localPluginPkgPath = path.join(rootDir, "plugins", cleanName, "package.json");
-        const localModulePkgPath = path.join(rootDir, "modules", cleanName, "package.json");
+        const localPluginPkgPath = path.join(
+          rootDir,
+          "plugins",
+          cleanName,
+          "package.json",
+        );
+        const localModulePkgPath = path.join(
+          rootDir,
+          "modules",
+          cleanName,
+          "package.json",
+        );
 
         for (const candidatePath of [localPluginPkgPath, localModulePkgPath]) {
           if (fs.existsSync(candidatePath)) {
             try {
-              const depPkg = JSON.parse(fs.readFileSync(candidatePath, "utf-8"));
-              if (depPkg.veap?.type === "plugin" || depPkg.veap?.type === "module") {
+              const depPkg = JSON.parse(
+                fs.readFileSync(candidatePath, "utf-8"),
+              );
+              if (
+                depPkg.veap?.type === "plugin" ||
+                depPkg.veap?.type === "module"
+              ) {
                 isPlugin = true;
                 break;
               }
@@ -106,6 +126,10 @@ export function regeneratePluginsRegistry(rootDir: string) {
   }
   fs.writeFileSync(pluginsGenPath, code, "utf-8");
   console.log(
-    "[Veap CLI] Regenerated " + pluginsGenPath + " with " + pluginsFound.length + " plugins.",
+    "[Veap CLI] Regenerated " +
+      pluginsGenPath +
+      " with " +
+      pluginsFound.length +
+      " plugins.",
   );
 }

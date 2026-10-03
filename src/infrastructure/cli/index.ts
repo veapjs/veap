@@ -31,7 +31,10 @@ async function main() {
   const cli = cliService.program;
 
   cli
-    .command("init [name]", "Initialize a new Veap project (asks for details when omitted)")
+    .command(
+      "init [name]",
+      "Initialize a new Veap project (asks for details when omitted)",
+    )
     .option("--docker", "Initialize Docker configuration")
     .option("--skip-install", "Skip dependencies installation")
     .option(

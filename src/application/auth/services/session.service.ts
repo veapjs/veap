@@ -1,6 +1,9 @@
 import { isIP } from "node:net";
 import { addDays } from "date-fns";
-import { type ITokenGenerator, TOKEN_GENERATOR } from "../../../domain/auth/ports/token-generator";
+import {
+  type ITokenGenerator,
+  TOKEN_GENERATOR,
+} from "../../../domain/auth/ports/token-generator";
 import {
   type ISessionRepository,
   SESSION_REPOSITORY,
@@ -72,13 +75,15 @@ export class SessionService {
     const baseSessionAttributes = record.session;
 
     // STRICTLY remove non-serializable and sensitive fields (including camelCase recoveryCode)
-    const { password, recovery_code, recoveryCode, ...safeUserRest } = baseUserAttributes;
+    const { password, recovery_code, recoveryCode, ...safeUserRest } =
+      baseUserAttributes;
     const safeUser = {
       ...safeUserRest,
       id: baseUserAttributes.id || safeUserRest.id,
     };
 
-    const expiresAt = baseSessionAttributes.expiresAt ?? baseSessionAttributes.expires_at;
+    const expiresAt =
+      baseSessionAttributes.expiresAt ?? baseSessionAttributes.expires_at;
 
     // Check if session is expired
     if (new Date() > new Date(expiresAt as any)) {
@@ -103,7 +108,9 @@ export class SessionService {
       safeUser as User,
       sessionWithFlags as SessionType,
     );
-    const augmentedSession = await augmentSession(sessionWithFlags as SessionType);
+    const augmentedSession = await augmentSession(
+      sessionWithFlags as SessionType,
+    );
 
     // ENSURE PLAIN OBJECTS for Client Components
     return {
@@ -142,7 +149,10 @@ export class SessionService {
   /**
    * Sets the session token in a cookie.
    */
-  public async setSessionTokenCookie(token: string, expiresAt: Date): Promise<void> {
+  public async setSessionTokenCookie(
+    token: string,
+    expiresAt: Date,
+  ): Promise<void> {
     await this.cookieStore.set("session", token, {
       httpOnly: true,
       path: "/",
@@ -219,7 +229,10 @@ export class SessionService {
   /**
    * Get all active sessions for a user.
    */
-  public async getUserSessions(userId: string, currentSessionId: string): Promise<UserSession[]> {
+  public async getUserSessions(
+    userId: string,
+    currentSessionId: string,
+  ): Promise<UserSession[]> {
     const sessions = await this.sessions.findByUserId(userId);
 
     const augmentedSessions = await Promise.all(
@@ -250,7 +263,10 @@ export class SessionService {
   /**
    * Invalidate all sessions for a user except the specified current one.
    */
-  public async invalidateOtherSessions(userId: string, currentSessionId: string): Promise<void> {
+  public async invalidateOtherSessions(
+    userId: string,
+    currentSessionId: string,
+  ): Promise<void> {
     await this.sessions.removeOtherUserSessions(userId, currentSessionId);
   }
 }

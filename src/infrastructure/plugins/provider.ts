@@ -1,5 +1,8 @@
 import { bindPluginsContext } from "../../application/plugins/context";
-import { ensurePluginsInitialized, registerPlugins } from "../../application/plugins/facade";
+import {
+  ensurePluginsInitialized,
+  registerPlugins,
+} from "../../application/plugins/facade";
 import { NavigationService } from "../../application/plugins/navigation";
 import { PluginRegistry } from "../../application/plugins/registry";
 import {
@@ -66,30 +69,42 @@ export class PluginServiceProvider extends ServiceProvider {
         .option("--local", "Install as a local plugin (cloning code from Git)")
         .option("--skip-install", "Skip dependencies installation")
         .action(async (plugin: string, options: any) => {
-          const { addPlugin } = await import(/* webpackIgnore: true */ "./cli/add.js");
+          const { addPlugin } = await import(
+            /* webpackIgnore: true */ "./cli/add.js"
+          );
           await addPlugin(plugin, options);
         });
 
-      cli.command("register", "Regenerate the plugins registry file").action(async () => {
-        const { findProjectRoot } = await import(
-          /* webpackIgnore: true */ "../../infrastructure/cli/utils.js"
-        );
-        const { regeneratePluginsRegistry } = await import(
-          /* webpackIgnore: true */ "./cli/utils.js"
-        );
-        const rootDir = findProjectRoot(process.cwd());
-        regeneratePluginsRegistry(rootDir);
-      });
+      cli
+        .command("register", "Regenerate the plugins registry file")
+        .action(async () => {
+          const { findProjectRoot } = await import(
+            /* webpackIgnore: true */ "../../infrastructure/cli/utils.js"
+          );
+          const { regeneratePluginsRegistry } = await import(
+            /* webpackIgnore: true */ "./cli/utils.js"
+          );
+          const rootDir = findProjectRoot(process.cwd());
+          regeneratePluginsRegistry(rootDir);
+        });
 
       cli
-        .command("eject <package>", "Eject an installed plugin to local workspace folder")
+        .command(
+          "eject <package>",
+          "Eject an installed plugin to local workspace folder",
+        )
         .action(async (pkg: string) => {
-          const { ejectPackage } = await import(/* webpackIgnore: true */ "./cli/eject.js");
+          const { ejectPackage } = await import(
+            /* webpackIgnore: true */ "./cli/eject.js"
+          );
           await ejectPackage(pkg);
         });
 
       cli
-        .command("make:plugin <name>", "Generate a new plugin with the given name")
+        .command(
+          "make:plugin <name>",
+          "Generate a new plugin with the given name",
+        )
         .option("--skip-install", "Skip dependencies installation")
         .action(async (name: string, options: any) => {
           const { generatePlugin } = await import(

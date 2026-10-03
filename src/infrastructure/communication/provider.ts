@@ -33,8 +33,12 @@ export class CommunicationServiceProvider extends ServiceProvider {
       useFactory: (config: ConfigService) =>
         new NodemailerMailService({
           getService: () => config.get("MAIL_SERVICE"),
-          getUsername: () => config.get("GOOGLE_SMTP_APP_USERNAME") ?? config.get("MAIL_USERNAME"),
-          getPassword: () => config.get("GOOGLE_SMTP_APP_PASSWORD") ?? config.get("MAIL_PASSWORD"),
+          getUsername: () =>
+            config.get("GOOGLE_SMTP_APP_USERNAME") ??
+            config.get("MAIL_USERNAME"),
+          getPassword: () =>
+            config.get("GOOGLE_SMTP_APP_PASSWORD") ??
+            config.get("MAIL_PASSWORD"),
           getFromAddress: () => config.get("MAIL_FROM_ADDRESS"),
         }),
       inject: [ConfigService],
@@ -60,7 +64,10 @@ export class CommunicationServiceProvider extends ServiceProvider {
     });
     bindCommunicationContext({ mailer });
 
-    logger.debug("veap:communication", `Mail transport bound: ${mailer.constructor.name}`);
+    logger.debug(
+      "veap:communication",
+      `Mail transport bound: ${mailer.constructor.name}`,
+    );
   }
 
   private async selectTransport(config: ConfigService): Promise<IMailer> {
@@ -80,8 +87,12 @@ export class CommunicationServiceProvider extends ServiceProvider {
     }
 
     const hasSmtpCredentials =
-      Boolean(config.get("GOOGLE_SMTP_APP_USERNAME") || config.get("MAIL_USERNAME")) &&
-      Boolean(config.get("GOOGLE_SMTP_APP_PASSWORD") || config.get("MAIL_PASSWORD"));
+      Boolean(
+        config.get("GOOGLE_SMTP_APP_USERNAME") || config.get("MAIL_USERNAME"),
+      ) &&
+      Boolean(
+        config.get("GOOGLE_SMTP_APP_PASSWORD") || config.get("MAIL_PASSWORD"),
+      );
 
     if (!transport && !hasSmtpCredentials) {
       logger.warn(

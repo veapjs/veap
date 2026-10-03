@@ -2,7 +2,10 @@
 
 import { AuthService } from "../../../application/auth/services/auth.service";
 import type { AuthResponse, SessionFlags } from "../../../domain/auth/types";
-import type { LoginInput, RegisterInput } from "../../../domain/auth/validation";
+import type {
+  LoginInput,
+  RegisterInput,
+} from "../../../domain/auth/validation";
 import { ok, type Result } from "../../../domain/errors/result";
 import { app } from "../../../infrastructure/ioc/container";
 import { handleActionError } from "../../../presentation/errors/handler";

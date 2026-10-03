@@ -13,7 +13,9 @@ import { Permission } from "../models/Permission";
 export class ActiveRecordPermissionRepository implements IPermissionRepository {
   async findAll(): Promise<PermissionRecord[]> {
     const permissions = await Permission.query().orderBy("name", "asc").get();
-    return permissions.map((permission) => permission.toJSON() as PermissionRecord);
+    return permissions.map(
+      (permission) => permission.toJSON() as PermissionRecord,
+    );
   }
 
   async findById(id: string): Promise<PermissionRecord | undefined> {

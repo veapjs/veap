@@ -4,10 +4,10 @@ import type { ModelQueryBuilder } from "../query-builder";
 import { MorphMap } from "./morph-map";
 import { Relation } from "./relation";
 
-export class MorphTo<Child extends Model = any, Parent extends Model = any> extends Relation<
-  Child,
-  Parent
-> {
+export class MorphTo<
+  Child extends Model = any,
+  Parent extends Model = any,
+> extends Relation<Child, Parent> {
   constructor(
     parent: Child,
     public morphName: string,
@@ -89,7 +89,10 @@ export class MorphTo<Child extends Model = any, Parent extends Model = any> exte
       }
 
       const pk = modelClass.primaryKey || "id";
-      const parents: Parent[] = await modelClass.query().whereIn(pk, Array.from(idSet)).get();
+      const parents: Parent[] = await modelClass
+        .query()
+        .whereIn(pk, Array.from(idSet))
+        .get();
 
       for (const parent of parents) {
         const id = parent.getAttribute(pk);

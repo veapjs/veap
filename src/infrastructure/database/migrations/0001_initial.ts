@@ -33,29 +33,57 @@ export async function up(db: any, schema: Schema) {
 
   // 4. Users to Roles (Pivot)
   await schema.createTable("users_to_roles", (table) => {
-    table.text("user_id").notNull().references("users", "id").onDelete("CASCADE");
-    table.text("role_id").notNull().references("roles", "id").onDelete("CASCADE");
+    table
+      .text("user_id")
+      .notNull()
+      .references("users", "id")
+      .onDelete("CASCADE");
+    table
+      .text("role_id")
+      .notNull()
+      .references("roles", "id")
+      .onDelete("CASCADE");
     table.primary(["user_id", "role_id"]);
   });
 
   // 5. Users to Permissions (Pivot)
   await schema.createTable("users_to_permissions", (table) => {
-    table.text("user_id").notNull().references("users", "id").onDelete("CASCADE");
-    table.text("permission_id").notNull().references("permissions", "id").onDelete("CASCADE");
+    table
+      .text("user_id")
+      .notNull()
+      .references("users", "id")
+      .onDelete("CASCADE");
+    table
+      .text("permission_id")
+      .notNull()
+      .references("permissions", "id")
+      .onDelete("CASCADE");
     table.primary(["user_id", "permission_id"]);
   });
 
   // 6. Roles to Permissions (Pivot)
   await schema.createTable("roles_to_permissions", (table) => {
-    table.text("role_id").notNull().references("roles", "id").onDelete("CASCADE");
-    table.text("permission_id").notNull().references("permissions", "id").onDelete("CASCADE");
+    table
+      .text("role_id")
+      .notNull()
+      .references("roles", "id")
+      .onDelete("CASCADE");
+    table
+      .text("permission_id")
+      .notNull()
+      .references("permissions", "id")
+      .onDelete("CASCADE");
     table.primary(["role_id", "permission_id"]);
   });
 
   // 7. Sessions table
   await schema.createTable("sessions", (table) => {
     table.text("id").primaryKey();
-    table.text("user_id").notNull().references("users", "id").onDelete("CASCADE");
+    table
+      .text("user_id")
+      .notNull()
+      .references("users", "id")
+      .onDelete("CASCADE");
     table.json("metadata");
     table.timestamp("expires_at").notNull();
     table.timestamp("created_at").notNull().defaultNow();
@@ -67,7 +95,11 @@ export async function up(db: any, schema: Schema) {
     table.text("id").primaryKey();
     table.text("email").notNull();
     table.text("code").notNull();
-    table.text("user_id").notNull().references("users", "id").onDelete("CASCADE");
+    table
+      .text("user_id")
+      .notNull()
+      .references("users", "id")
+      .onDelete("CASCADE");
     table.timestamp("expires_at").notNull();
     table.timestamp("created_at").notNull().defaultNow();
     table.timestamp("updated_at");
@@ -79,7 +111,11 @@ export async function up(db: any, schema: Schema) {
     table.text("email").notNull();
     table.text("code").notNull();
     table.boolean("email_verified").default(false);
-    table.text("user_id").notNull().references("users", "id").onDelete("CASCADE");
+    table
+      .text("user_id")
+      .notNull()
+      .references("users", "id")
+      .onDelete("CASCADE");
     table.timestamp("expires_at").notNull();
     table.timestamp("created_at").notNull().defaultNow();
     table.timestamp("updated_at");

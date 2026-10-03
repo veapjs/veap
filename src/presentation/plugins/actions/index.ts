@@ -14,10 +14,15 @@ export async function getPluginExtensionsAction(
   const userRoles = user?.roles || [];
   const userPermissions = user?.permissions || [];
 
-  return pluginsContext().registry.getExtensions(target, point, includeDisabled, {
-    roles: userRoles,
-    permissions: userPermissions,
-  });
+  return pluginsContext().registry.getExtensions(
+    target,
+    point,
+    includeDisabled,
+    {
+      roles: userRoles,
+      permissions: userPermissions,
+    },
+  );
 }
 
 export async function getPluginWidgetsAction(area: string) {
