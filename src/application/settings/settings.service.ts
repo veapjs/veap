@@ -1,9 +1,9 @@
-import { Inject, Injectable } from "../../domain/contracts/ioc";
 import { CACHE_PROVIDER } from "../../domain/contracts";
 import type { ICacheProvider } from "../../domain/contracts/cache";
+import { Inject, Injectable } from "../../domain/contracts/ioc";
 import {
-  SETTINGS_REPOSITORY,
   type ISettingsRepository,
+  SETTINGS_REPOSITORY,
 } from "../../domain/settings/settings.repository";
 
 /**

@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type {
+  ApiMiddleware,
+  VeapMiddleware,
+  VeapMiddlewareContext,
+} from "../../../src/domain/plugins/types";
 import {
   ApiEnsuredAuth,
   ApiSameOrigin,
   EnsuredAuth,
   EnsuredGuest,
   EnsuredUser,
-  SameOrigin,
-  SkipSecurity,
   runApiPipeline,
   runPipeline,
+  SameOrigin,
+  SkipSecurity,
 } from "../../../src/presentation/router/api/middlewares";
-import type {
-  ApiMiddleware,
-  VeapMiddleware,
-  VeapMiddlewareContext,
-} from "../../../src/domain/plugins/types";
 
 const mockRedirect = vi.fn();
 vi.mock("next/navigation", () => ({
@@ -115,9 +115,7 @@ describe("Router Middlewares", () => {
 
       await EnsuredGuest(ctx, next);
 
-      expect(mockRedirect).toHaveBeenCalledWith(
-        "https://example.com/dashboard",
-      );
+      expect(mockRedirect).toHaveBeenCalledWith("https://example.com/dashboard");
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -360,9 +358,7 @@ describe("Router Middlewares", () => {
       };
       const next = vi.fn();
 
-      await expect(SameOrigin(ctx, next)).rejects.toThrow(
-        "Cross-origin request rejected",
-      );
+      await expect(SameOrigin(ctx, next)).rejects.toThrow("Cross-origin request rejected");
       expect(next).not.toHaveBeenCalled();
     });
 
@@ -380,9 +376,7 @@ describe("Router Middlewares", () => {
       };
       const next = vi.fn();
 
-      await expect(SameOrigin(ctx, next)).rejects.toThrow(
-        "Cross-origin request rejected",
-      );
+      await expect(SameOrigin(ctx, next)).rejects.toThrow("Cross-origin request rejected");
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -488,13 +482,7 @@ describe("Router Middlewares", () => {
       });
 
       expect(result).toBe("page-content");
-      expect(order).toEqual([
-        "m1-start",
-        "m2-start",
-        "final",
-        "m2-end",
-        "m1-end",
-      ]);
+      expect(order).toEqual(["m1-start", "m2-start", "final", "m2-end", "m1-end"]);
     });
 
     it("allows a middleware to short-circuit the pipeline", async () => {

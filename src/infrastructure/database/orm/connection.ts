@@ -1,8 +1,8 @@
-import { AppError } from "../../../domain/errors/app-error";
 import { AsyncLocalStorage } from "node:async_hooks";
 import fs from "node:fs";
 import path from "node:path";
 import knex, { type Knex } from "knex";
+import { AppError } from "../../../domain/errors/app-error";
 import { debug, warn } from "../../logging";
 
 export interface DatabaseConfig extends Knex.Config {
@@ -16,8 +16,7 @@ const globalForDb = globalThis as any;
  */
 export const transactionStorage: AsyncLocalStorage<Knex.Transaction> =
   globalForDb.__VEAP_TRANSACTION_STORAGE__ ||
-  (globalForDb.__VEAP_TRANSACTION_STORAGE__ =
-    new AsyncLocalStorage<Knex.Transaction>());
+  (globalForDb.__VEAP_TRANSACTION_STORAGE__ = new AsyncLocalStorage<Knex.Transaction>());
 
 /**
  * Returns the currently active transaction if inside a transaction() callback.
@@ -72,9 +71,7 @@ export type PostgresSslConfig =
  *     or via URL parameters: `sslmode=no-verify` or `rejectUnauthorized=false`.
  * - Custom CA bundle can be passed via `caCert` (e.g. from `DATABASE_SSL_CA`).
  */
-export function resolvePostgresSslConfig(
-  options: PostgresSslOptions,
-): PostgresSslConfig {
+export function resolvePostgresSslConfig(options: PostgresSslOptions): PostgresSslConfig {
   const { databaseUrl, isProd, rejectUnauthorizedEnv, caCert } = options;
 
   if (databaseUrl.includes("sslmode=disable")) {
@@ -94,8 +91,7 @@ export function resolvePostgresSslConfig(
   let rejectUnauthorized = true;
 
   if (rejectUnauthorizedEnv !== undefined) {
-    rejectUnauthorized =
-      rejectUnauthorizedEnv !== "false" && rejectUnauthorizedEnv !== "0";
+    rejectUnauthorized = rejectUnauthorizedEnv !== "false" && rejectUnauthorizedEnv !== "0";
   } else if (
     databaseUrl.includes("sslmode=no-verify") ||
     databaseUrl.includes("rejectUnauthorized=false")
@@ -133,11 +129,7 @@ export function resolveSqliteFilename(filename: string): string {
     !!process.env.AWS_LAMBDA_FUNCTION_NAME ||
     !!process.env.LAMBDA_TASK_ROOT;
 
-  if (
-    isServerless &&
-    !clean.startsWith("/tmp") &&
-    !clean.startsWith(":memory:")
-  ) {
+  if (isServerless && !clean.startsWith("/tmp") && !clean.startsWith(":memory:")) {
     const base = clean.split(/[\/\\]/).pop() || "dev.sqlite";
     const redirected = `/tmp/${base}`;
     warn(
@@ -154,10 +146,9 @@ export function resolveSqliteFilename(filename: string): string {
     // better-sqlite3 does not create missing directories. Relative paths
     // resolve against the process working directory, same as before.
     try {
-      fs.mkdirSync(
-        path.dirname(path.resolve(/*turbopackIgnore: true*/ clean)),
-        { recursive: true },
-      );
+      fs.mkdirSync(path.dirname(path.resolve(/*turbopackIgnore: true*/ clean)), {
+        recursive: true,
+      });
     } catch {
       // Read-only filesystem etc. Let the driver surface its own error.
     }

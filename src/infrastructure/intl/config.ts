@@ -1,5 +1,5 @@
-import { getVeapConfig } from "../config/config.loader";
 import { DEFAULT_INTL_CONFIG } from "../../domain/intl/constants";
+import { getVeapConfig } from "../config/config.loader";
 
 /**
  * Loads the intl configuration by merging the defaults with values from veap.config.ts.

@@ -1,13 +1,11 @@
 import { cache } from "react";
 import { app } from "../../infrastructure/ioc/container";
-import { RouterService } from "./router.service";
 import { matchRoute } from "./matcher";
+import { RouterService } from "./router.service";
 
 export { matchRoute };
 
-export async function getPluginsWithHomepage(): Promise<
-  { id: string; name: string }[]
-> {
+export async function getPluginsWithHomepage(): Promise<{ id: string; name: string }[]> {
   return (await app(RouterService)).getPluginsWithHomepage();
 }
 

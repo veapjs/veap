@@ -1,20 +1,15 @@
 import { cookies } from "next/headers";
 import React, { type PropsWithChildren } from "react";
-import { I18nProvider as ClientProvider } from "./client";
 import { getIntlConfig } from "../../infrastructure/intl/config";
 import { detectLocale } from "../../infrastructure/intl/detection";
 import { getMessages } from "../../infrastructure/intl/loader";
+import { I18nProvider as ClientProvider } from "./client";
 
 /**
  * Smart Server Component that handles locale detection and message loading automatically.
  */
 export async function I18nProvider({ children }: PropsWithChildren) {
-  const {
-    cookie: cookieName,
-    default: defaultLocale,
-    locales,
-    timeZone,
-  } = await getIntlConfig();
+  const { cookie: cookieName, default: defaultLocale, locales, timeZone } = await getIntlConfig();
 
   let locale: string;
 
@@ -35,9 +30,5 @@ export async function I18nProvider({ children }: PropsWithChildren) {
 
   const messages = await getMessages(locale);
 
-  return React.createElement(
-    ClientProvider,
-    { locale, locales, messages, timeZone },
-    children,
-  );
+  return React.createElement(ClientProvider, { locale, locales, messages, timeZone }, children);
 }

@@ -1,5 +1,5 @@
-import { ApiEnsuredAuth, runApiPipeline } from "./middlewares";
 import type { RouteTree } from "../../../application/router/route-tree";
+import { ApiEnsuredAuth, runApiPipeline } from "./middlewares";
 import { collectApiMiddlewares, collectAuthRequirements } from "./utils";
 
 export async function handleVeapApiRequest(
@@ -20,15 +20,14 @@ export async function handleVeapApiRequest(
   }
 
   if (!match.isExact || !match.node.route) {
-    return new Response(
-      JSON.stringify({ error: "Method Not Allowed or Not Found" }),
-      { status: 404, headers: { "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ error: "Method Not Allowed or Not Found" }), {
+      status: 404,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   const method = request.method;
-  const handler =
-    match.node.route[method] || match.node.route[method.toLowerCase()];
+  const handler = match.node.route[method] || match.node.route[method.toLowerCase()];
 
   if (!handler) {
     return new Response(JSON.stringify({ error: "Method Not Allowed" }), {

@@ -1,11 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { warn } from "../../logging";
-import type {
-  IStorageProvider,
-  StorageResult,
-} from "../../../domain/storage/types";
+import type { IStorageProvider, StorageResult } from "../../../domain/storage/types";
 import { ConfigService } from "../../../infrastructure/config/config.service";
+import { warn } from "../../logging";
 
 const DANGEROUS_EXTENSIONS = new Set([
   ".html",
@@ -134,17 +131,12 @@ export class LocalFileProvider implements IStorageProvider {
       const absolutePath = path.isAbsolute(filePath)
         ? filePath
         : path.resolve(/*turbopackIgnore: true*/ filePath);
-      const absoluteStorageFolder = path.resolve(
-        /*turbopackIgnore: true*/ storageFolder,
-      );
+      const absoluteStorageFolder = path.resolve(/*turbopackIgnore: true*/ storageFolder);
 
       // Security check: ensure filePath is strictly inside the storage folder to prevent directory traversal
       const relative = path.relative(absoluteStorageFolder, absolutePath);
       if (relative.startsWith("..") || path.isAbsolute(relative)) {
-        warn(
-          "veap:storage",
-          `Directory traversal attempt blocked: ${absolutePath}`,
-        );
+        warn("veap:storage", `Directory traversal attempt blocked: ${absolutePath}`);
         return false;
       }
 

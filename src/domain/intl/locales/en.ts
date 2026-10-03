@@ -4,11 +4,9 @@ export default {
   "Verify your email address with your code: {{ code }}":
     "Verify your email address with your code: {{ code }}",
   "Password Reset": "Password Reset",
-  "Verify password reset with code: {{ code }}":
-    "Verify password reset with code: {{ code }}",
+  "Verify password reset with code: {{ code }}": "Verify password reset with code: {{ code }}",
   "Recovery Code": "Recovery Code",
-  "Your recovery code is: {{ recoveryCode }}":
-    "Your recovery code is: {{ recoveryCode }}",
+  "Your recovery code is: {{ recoveryCode }}": "Your recovery code is: {{ recoveryCode }}",
   "Your 2FA Code": "Your 2FA Code",
   "Your verification code is: {{ code }}. It will expire in 10 minutes.":
     "Your verification code is: {{ code }}. It will expire in 10 minutes.",

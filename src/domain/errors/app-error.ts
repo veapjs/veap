@@ -44,10 +44,7 @@ export class AppError extends Error implements IAppError {
     return new AppError("RATE_LIMITED", message, details);
   }
 
-  static Internal(
-    message: string = "Internal Server Error",
-    details?: unknown,
-  ) {
+  static Internal(message: string = "Internal Server Error", details?: unknown) {
     return new AppError("INTERNAL_SERVER_ERROR", message, details);
   }
 

@@ -1,15 +1,13 @@
-import { EmailVerification } from "../models/EmailVerification";
 import type {
   CreateEmailVerificationRecord,
   EmailVerificationRecord,
   IEmailVerificationRepository,
 } from "../../../domain/auth/repositories/email-verification.repository";
+import { EmailVerification } from "../models/EmailVerification";
 
 /** `IEmailVerificationRepository` adapter backed by `EmailVerification`. */
 export class ActiveRecordEmailVerificationRepository implements IEmailVerificationRepository {
-  async create(
-    record: CreateEmailVerificationRecord,
-  ): Promise<EmailVerificationRecord> {
+  async create(record: CreateEmailVerificationRecord): Promise<EmailVerificationRecord> {
     const request = await EmailVerification.create({
       userId: record.userId,
       code: record.code,
@@ -20,10 +18,7 @@ export class ActiveRecordEmailVerificationRepository implements IEmailVerificati
     return request.toJSON() as EmailVerificationRecord;
   }
 
-  async findForUser(
-    userId: string,
-    id: string,
-  ): Promise<EmailVerificationRecord | null> {
+  async findForUser(userId: string, id: string): Promise<EmailVerificationRecord | null> {
     const request = await EmailVerification.where({
       id,
       user_id: userId,

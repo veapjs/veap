@@ -9,13 +9,13 @@ vi.hoisted(() => {
   process.env.ENCRYPTION_KEY = "MDEyMzQ1Njc4OWFiY2RlZg==";
 });
 
+import { PASSWORD_HASHER } from "../../../src/domain/auth/ports/password-hasher";
+import { AesSecretCipher } from "../../../src/infrastructure/auth/adapters/aes-secret-cipher";
 import { BcryptPasswordHasher } from "../../../src/infrastructure/auth/adapters/bcrypt-password-hasher";
 import { OsloTokenGenerator } from "../../../src/infrastructure/auth/adapters/oslo-token-generator";
-import { AesSecretCipher } from "../../../src/infrastructure/auth/adapters/aes-secret-cipher";
-import { Container } from "../../../src/infrastructure/ioc/container";
-import { ConfigService } from "../../../src/infrastructure/config/config.service";
 import { AuthServiceProvider } from "../../../src/infrastructure/auth/provider";
-import { PASSWORD_HASHER } from "../../../src/domain/auth/ports/password-hasher";
+import { ConfigService } from "../../../src/infrastructure/config/config.service";
+import { Container } from "../../../src/infrastructure/ioc/container";
 
 /**
  * Cryptographic adapters - the concrete implementations behind the
@@ -35,9 +35,7 @@ describe("BcryptPasswordHasher", () => {
   it("round-trips hash → verify", async () => {
     const hash = await hasher.hash("correct horse battery staple");
     expect(hash).not.toBe("correct horse battery staple");
-    await expect(
-      hasher.verify(hash, "correct horse battery staple"),
-    ).resolves.toBe(true);
+    await expect(hasher.verify(hash, "correct horse battery staple")).resolves.toBe(true);
   });
 
   it("rejects a wrong password", async () => {
@@ -78,12 +76,8 @@ describe("BcryptPasswordHasher", () => {
     const strictHasher = new BcryptPasswordHasher(undefined, 12);
     expect(strictHasher.minLength).toBe(12);
 
-    await expect(strictHasher.validateStrength("12345678")).resolves.toBe(
-      false,
-    );
-    await expect(strictHasher.validateStrength("123456789012")).resolves.toBe(
-      true,
-    );
+    await expect(strictHasher.validateStrength("12345678")).resolves.toBe(false);
+    await expect(strictHasher.validateStrength("123456789012")).resolves.toBe(true);
   });
 
   it("reads configuration from process.env when arguments are omitted", () => {
@@ -188,8 +182,7 @@ describe("AuthServiceProvider PASSWORD_HASHER binding", () => {
     const provider = new AuthServiceProvider(container);
     provider.register();
 
-    const hasher =
-      await container.resolve<BcryptPasswordHasher>(PASSWORD_HASHER);
+    const hasher = await container.resolve<BcryptPasswordHasher>(PASSWORD_HASHER);
     expect(hasher).toBeInstanceOf(BcryptPasswordHasher);
     expect(hasher.rounds).toBe(10);
     expect(hasher.minLength).toBe(8);

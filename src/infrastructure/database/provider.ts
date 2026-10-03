@@ -1,15 +1,15 @@
-import { ServiceProvider } from "../../infrastructure/providers/service-provider";
-import { ConfigService } from "../../infrastructure/config/config.service";
+import knex from "knex";
 import { DATABASE } from "../../domain/contracts/token";
+import { ConfigService } from "../../infrastructure/config/config.service";
+import { debug } from "../../infrastructure/logging/console-logger";
+import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 import {
   initDatabase,
-  setKnex,
   isSqliteDatabase,
-  resolveSqliteFilename,
   resolvePostgresSslConfig,
+  resolveSqliteFilename,
+  setKnex,
 } from "./orm/connection";
-import knex from "knex";
-import { debug } from "../../infrastructure/logging/console-logger";
 
 export class DatabaseServiceProvider extends ServiceProvider {
   register(): void {
@@ -26,10 +26,7 @@ export class DatabaseServiceProvider extends ServiceProvider {
       const isSqlite = isSqliteDatabase(databaseUrl);
       const client = isSqlite ? "better-sqlite3" : "pg";
 
-      debug(
-        "veap:database",
-        `Auto-initializing Knex from DATABASE_URL with client: ${client}`,
-      );
+      debug("veap:database", `Auto-initializing Knex from DATABASE_URL with client: ${client}`);
 
       const ssl = resolvePostgresSslConfig({
         databaseUrl,

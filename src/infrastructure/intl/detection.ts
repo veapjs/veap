@@ -3,10 +3,7 @@ import Negotiator from "negotiator";
 import { cookies, headers } from "next/headers";
 import { getIntlConfig } from "./config";
 
-export async function detectLocale(
-  supportedLocales: string[],
-  defaultLocale: string,
-) {
+export async function detectLocale(supportedLocales: string[], defaultLocale: string) {
   try {
     const headerList = await headers();
     const languages = new Negotiator({
@@ -21,11 +18,7 @@ export async function detectLocale(
 }
 
 export async function getCurrentLocale() {
-  const {
-    cookie: cookieName,
-    default: defaultLocale,
-    locales,
-  } = await getIntlConfig();
+  const { cookie: cookieName, default: defaultLocale, locales } = await getIntlConfig();
   try {
     const cookieStore = await cookies();
     const cookieValue = cookieStore.get(cookieName)?.value;

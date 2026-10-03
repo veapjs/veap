@@ -1,5 +1,5 @@
-import type { IVeapConfigProvider } from "../../domain/contracts/veap-config";
 import type { VeapConfig } from "../../domain/config";
+import type { IVeapConfigProvider } from "../../domain/contracts/veap-config";
 import { getVeapConfig } from "./config.loader";
 
 /**

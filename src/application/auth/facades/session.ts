@@ -1,21 +1,19 @@
 "use server";
 
-import { authContext } from "../context";
+import { cache } from "react";
 import type {
   AuthSession,
-  Session as SessionType,
   SessionFlags,
+  Session as SessionType,
   UserSession,
 } from "../../../domain/auth/types";
-import { cache } from "react";
+import { authContext } from "../context";
 
 export async function getIPAddress(): Promise<string | null> {
   return authContext().session.getIPAddress();
 }
 
-export async function validateSessionToken(
-  token: string,
-): Promise<AuthSession> {
+export async function validateSessionToken(token: string): Promise<AuthSession> {
   return authContext().session.validateSessionToken(token);
 }
 
@@ -31,10 +29,7 @@ export async function invalidateUserSessions(userId: string): Promise<void> {
   return authContext().session.invalidateUserSessions(userId);
 }
 
-export async function setSessionTokenCookie(
-  token: string,
-  expiresAt: Date,
-): Promise<void> {
+export async function setSessionTokenCookie(token: string, expiresAt: Date): Promise<void> {
   return authContext().session.setSessionTokenCookie(token, expiresAt);
 }
 
@@ -54,9 +49,7 @@ export async function createSession(
   return authContext().session.createSession(token, userId, flags);
 }
 
-export async function updateSessionMetadata(
-  flags: SessionFlags,
-): Promise<void> {
+export async function updateSessionMetadata(flags: SessionFlags): Promise<void> {
   return authContext().session.updateSessionMetadata(flags);
 }
 
@@ -75,8 +68,5 @@ export async function invalidateOtherSessions(
   userId: string,
   currentSessionId: string,
 ): Promise<void> {
-  return authContext().session.invalidateOtherSessions(
-    userId,
-    currentSessionId,
-  );
+  return authContext().session.invalidateOtherSessions(userId, currentSessionId);
 }

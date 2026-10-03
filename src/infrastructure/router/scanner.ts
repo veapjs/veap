@@ -1,7 +1,7 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { debug } from "../logging";
 import type { RouteNode } from "../../application/router/route-tree";
+import { debug } from "../logging";
 
 // ---------------------------------------------------------------------------
 // File conventions
@@ -68,10 +68,7 @@ function segmentSortOrder(segment: string): number {
 /**
  * Finds the first matching file from a list of candidates in a directory.
  */
-function findRouteFile(
-  dir: string,
-  candidates: readonly string[],
-): string | null {
+function findRouteFile(dir: string, candidates: readonly string[]): string | null {
   for (const candidate of candidates) {
     const fullPath = path.join(dir, candidate);
     if (fs.existsSync(fullPath)) return fullPath;
@@ -144,10 +141,7 @@ async function scanDirectory(
       if (dynamicImport) {
         // Calculate relative path from baseAppDir (e.g. "(marketing)/about/page.js")
         // We use path.posix to ensure forward slashes for the import string
-        const relPath = path
-          .relative(baseAppDir, filePath)
-          .split(path.sep)
-          .join("/");
+        const relPath = path.relative(baseAppDir, filePath).split(path.sep).join("/");
         mod = await dynamicImport(relPath);
       } else {
         // Fallback to bypass bundler (breaks HMR and next/link)
@@ -205,9 +199,7 @@ async function scanDirectory(
     return node;
   }
 
-  const childDirs = entries.filter(
-    (e) => e.isDirectory() && !shouldSkipDir(e.name),
-  );
+  const childDirs = entries.filter((e) => e.isDirectory() && !shouldSkipDir(e.name));
 
   const children: RouteNode[] = [];
   const parallelRoutes: Record<string, RouteNode> = {};
@@ -226,9 +218,7 @@ async function scanDirectory(
       );
     } else {
       const childSegment = dirNameToSegment(childDir.name);
-      children.push(
-        await scanDirectory(childPath, childSegment, baseAppDir, dynamicImport),
-      );
+      children.push(await scanDirectory(childPath, childSegment, baseAppDir, dynamicImport));
     }
   }
 
@@ -329,10 +319,8 @@ export async function globToTree(
       if (key === "page" || key === "layout" || key === "route") {
         if (mod.auth !== undefined) current.auth = mod.auth;
         if (mod.roles !== undefined) current.roles = mod.roles;
-        if (mod.permissions !== undefined)
-          current.permissions = mod.permissions;
-        if (mod.middlewares !== undefined)
-          current.middlewares = mod.middlewares;
+        if (mod.permissions !== undefined) current.permissions = mod.permissions;
+        if (mod.middlewares !== undefined) current.middlewares = mod.middlewares;
       }
     }
   }
@@ -374,10 +362,7 @@ interface ImportEntry {
  * @param importPrefix - The import path prefix (e.g., `"./app"`)
  * @returns The generated TypeScript source code
  */
-export function generateRouteManifest(
-  appDir: string,
-  importPrefix: string,
-): string {
+export function generateRouteManifest(appDir: string, importPrefix: string): string {
   const imports: ImportEntry[] = [];
   const tree = scanDirectoryForManifest(appDir, "", importPrefix, imports, []);
 
@@ -416,10 +401,7 @@ function scanDirectoryForManifest(
   props.push(`segment: ${JSON.stringify(segment)}`);
 
   // Build a unique suffix for import names based on path
-  const nameSuffix =
-    pathParts.length === 0
-      ? "root"
-      : pathParts.map(sanitizeImportName).join("_");
+  const nameSuffix = pathParts.length === 0 ? "root" : pathParts.map(sanitizeImportName).join("_");
 
   // Discover route files
   for (const [key, candidates] of Object.entries(ROUTE_FILES)) {
@@ -465,13 +447,10 @@ function scanDirectoryForManifest(
     if (childDir.name.startsWith("@")) {
       // Parallel slot
       const slotName = childDir.name.slice(1);
-      const slotLiteral = scanDirectoryForManifest(
-        childPath,
-        slotName,
-        importPrefix,
-        imports,
-        [...pathParts, childDir.name],
-      );
+      const slotLiteral = scanDirectoryForManifest(childPath, slotName, importPrefix, imports, [
+        ...pathParts,
+        childDir.name,
+      ]);
       parallelLiterals.push(`${JSON.stringify(slotName)}: ${slotLiteral}`);
     } else {
       const childSegment = dirNameToSegment(childDir.name);
@@ -491,9 +470,7 @@ function scanDirectoryForManifest(
   }
 
   if (parallelLiterals.length > 0) {
-    props.push(
-      `parallelRoutes: {\n    ${parallelLiterals.join(",\n    ")},\n  }`,
-    );
+    props.push(`parallelRoutes: {\n    ${parallelLiterals.join(",\n    ")},\n  }`);
   }
 
   return `{\n  ${props.join(",\n  ")},\n}`;

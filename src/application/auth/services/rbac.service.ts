@@ -1,16 +1,16 @@
-import { Inject, Injectable } from "../../../domain/contracts/ioc";
 import {
-  PERMISSION_REPOSITORY,
   type IPermissionRepository,
+  PERMISSION_REPOSITORY,
   type PermissionRecord,
 } from "../../../domain/auth/repositories/permission.repository";
 import {
-  ROLE_REPOSITORY,
   type AccessGrant,
   type IRoleRepository,
+  ROLE_REPOSITORY,
   type RoleRecord,
 } from "../../../domain/auth/repositories/role.repository";
 import type { User } from "../../../domain/auth/types";
+import { Inject, Injectable } from "../../../domain/contracts/ioc";
 
 /**
  * Core RBAC use cases. Persistence lives behind the role/permission
@@ -62,17 +62,11 @@ export class RbacService {
     return await this.roles.getPermissions(roleId);
   }
 
-  async assignPermissionToRole(
-    roleId: string,
-    permissionId: string,
-  ): Promise<void> {
+  async assignPermissionToRole(roleId: string, permissionId: string): Promise<void> {
     await this.permissions.assignToRole(roleId, permissionId);
   }
 
-  async revokePermissionFromRole(
-    roleId: string,
-    permissionId: string,
-  ): Promise<void> {
+  async revokePermissionFromRole(roleId: string, permissionId: string): Promise<void> {
     await this.permissions.revokeFromRole(roleId, permissionId);
   }
 
@@ -84,17 +78,11 @@ export class RbacService {
     await this.roles.revokeFromUser(userId, roleId);
   }
 
-  async assignPermissionToUser(
-    userId: string,
-    permissionId: string,
-  ): Promise<void> {
+  async assignPermissionToUser(userId: string, permissionId: string): Promise<void> {
     await this.permissions.assignToUser(userId, permissionId);
   }
 
-  async revokePermissionFromUser(
-    userId: string,
-    permissionId: string,
-  ): Promise<void> {
+  async revokePermissionFromUser(userId: string, permissionId: string): Promise<void> {
     await this.permissions.revokeFromUser(userId, permissionId);
   }
 

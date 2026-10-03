@@ -1,10 +1,10 @@
-import { Session } from "../models/Session";
 import type {
   CreateSessionRecord,
   ISessionRepository,
   SessionWithUser,
 } from "../../../domain/auth/repositories/session.repository";
 import type { Session as SessionEntity } from "../../../domain/auth/types";
+import { Session } from "../models/Session";
 
 /**
  * `ISessionRepository` adapter backed by the `Session` ActiveRecord model.
@@ -33,9 +33,7 @@ export class ActiveRecordSessionRepository implements ISessionRepository {
 
     return {
       session: session.toJSON() as SessionEntity,
-      user: (typeof user.toJSON === "function"
-        ? user.toJSON()
-        : user) as Record<string, any>,
+      user: (typeof user.toJSON === "function" ? user.toJSON() : user) as Record<string, any>,
     };
   }
 
@@ -49,10 +47,7 @@ export class ActiveRecordSessionRepository implements ISessionRepository {
     return sessions.map((session) => session.toJSON() as SessionEntity);
   }
 
-  async updateMetadata(
-    id: string,
-    metadata: Record<string, any>,
-  ): Promise<void> {
+  async updateMetadata(id: string, metadata: Record<string, any>): Promise<void> {
     await Session.where("id", id).update({
       metadata,
       updatedAt: new Date(),
@@ -67,13 +62,7 @@ export class ActiveRecordSessionRepository implements ISessionRepository {
     await Session.where("user_id", userId).delete();
   }
 
-  async removeOtherUserSessions(
-    userId: string,
-    currentSessionId: string,
-  ): Promise<void> {
-    await Session.where("user_id", userId)
-      .toKnex()
-      .where("id", "!=", currentSessionId)
-      .delete();
+  async removeOtherUserSessions(userId: string, currentSessionId: string): Promise<void> {
+    await Session.where("user_id", userId).toKnex().where("id", "!=", currentSessionId).delete();
   }
 }

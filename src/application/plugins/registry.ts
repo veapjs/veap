@@ -1,23 +1,21 @@
-import { Inject, Injectable } from "../../domain/contracts/ioc";
-
-import { AppError } from "../../domain/errors/app-error";
+import { EVENT_BUS, LOGGER } from "../../domain/contracts";
 import type { IEventBus } from "../../domain/contracts/event-bus";
+import { Inject, Injectable } from "../../domain/contracts/ioc";
 import type { ILogger } from "../../domain/contracts/logger";
-import type { IPlugin } from "../../domain/plugins/types";
+import { AppError } from "../../domain/errors/app-error";
 import {
-  MIGRATION_RUNNER,
-  PLUGIN_REPOSITORY,
   type IMigrationRunner,
   type IPluginRepository,
+  MIGRATION_RUNNER,
+  PLUGIN_REPOSITORY,
   type PluginRuntimeStatus,
 } from "../../domain/plugins/repositories/plugin.repository";
-import { EVENT_BUS, LOGGER } from "../../domain/contracts";
+import type { IPlugin } from "../../domain/plugins/types";
 
 /**
  * Normalizes an npm dependency string (e.g. "@veap/media-plugin") to a registered plugin id (e.g. "media-plugin").
  */
-const resolveDependencyId = (depId: string): string =>
-  depId.replace(/^@[^/]+\//, "");
+const resolveDependencyId = (depId: string): string => depId.replace(/^@[^/]+\//, "");
 
 @Injectable()
 export class PluginRegistry {
@@ -81,8 +79,7 @@ export class PluginRegistry {
       this.logger.info("PluginRegistry", `"${id}" step: ${update.lastStep}`);
     }
 
-    const isStateTransition =
-      update.enabled !== undefined || update.installed !== undefined;
+    const isStateTransition = update.enabled !== undefined || update.installed !== undefined;
 
     try {
       await this.repository.upsertStatus(id, update, {
@@ -100,11 +97,7 @@ export class PluginRegistry {
         throw e;
       } else {
         // Ephemeral progress steps (lastStep) can safely fail without aborting
-        this.logger.warn(
-          "PluginRegistry",
-          `DB step sync failed for "${id}":`,
-          e,
-        );
+        this.logger.warn("PluginRegistry", `DB step sync failed for "${id}":`, e);
       }
     }
   }
@@ -121,9 +114,7 @@ export class PluginRegistry {
     const visit = (plugin: IPlugin) => {
       if (visited.has(plugin.manifest.id)) return;
       if (processing.has(plugin.manifest.id)) {
-        throw AppError.Internal(
-          `Circular dependency detected: ${plugin.manifest.id}`,
-        );
+        throw AppError.Internal(`Circular dependency detected: ${plugin.manifest.id}`);
       }
 
       processing.add(plugin.manifest.id);
@@ -175,14 +166,12 @@ export class PluginRegistry {
         });
 
         // 1. Sync with database
-        const pluginValues = Array.from(this.plugins.values()).map(
-          (plugin) => ({
-            id: plugin.manifest.id,
-            enabled: plugin.manifest.system ?? false,
-            installed: plugin.manifest.system ?? false,
-            system: plugin.manifest.system ?? false,
-          }),
-        );
+        const pluginValues = Array.from(this.plugins.values()).map((plugin) => ({
+          id: plugin.manifest.id,
+          enabled: plugin.manifest.system ?? false,
+          installed: plugin.manifest.system ?? false,
+          system: plugin.manifest.system ?? false,
+        }));
 
         if (pluginValues.length > 0) {
           try {
@@ -213,19 +202,14 @@ export class PluginRegistry {
         }
 
         // 3. Sort plugins by dependencies
-        const sortedPlugins = this.sortPlugins(
-          Array.from(this.plugins.values()),
-        );
+        const sortedPlugins = this.sortPlugins(Array.from(this.plugins.values()));
 
         // 4. Initialize enabled plugins
         for (const plugin of sortedPlugins) {
           const status = this.pluginStatus.get(plugin.manifest.id);
           if (status?.enabled) {
             if (plugin.migrations && plugin.migrations.length > 0) {
-              await this.migrationRunner.run(
-                plugin.manifest.id,
-                plugin.migrations as any,
-              );
+              await this.migrationRunner.run(plugin.manifest.id, plugin.migrations as any);
             }
 
             if (!status.installed) {
@@ -245,10 +229,7 @@ export class PluginRegistry {
 
         this.initialized = true;
 
-        this.logger.info(
-          "veap:plugins",
-          `Initialized with ${this.plugins.size} plugins`,
-        );
+        this.logger.info("veap:plugins", `Initialized with ${this.plugins.size} plugins`);
 
         await this.eventBus.publish("system:plugins:init:end", {
           timestamp: Date.now(),
@@ -324,10 +305,7 @@ export class PluginRegistry {
         installed: dbp?.installed ?? memStatus?.installed ?? false,
         // In production, the DB is the only shared truth between processes.
         // We use DB's lastStep first, then memory, then "Processing..." indicator.
-        lastStep:
-          dbp?.lastStep ??
-          memStatus?.lastStep ??
-          (isProcessing ? "Processing..." : null),
+        lastStep: dbp?.lastStep ?? memStatus?.lastStep ?? (isProcessing ? "Processing..." : null),
       };
     } catch (_e) {
       // Fallback to in-memory if DB fails
@@ -335,8 +313,7 @@ export class PluginRegistry {
         ...plugin.manifest,
         enabled: memStatus?.enabled ?? false,
         installed: memStatus?.installed ?? false,
-        lastStep:
-          memStatus?.lastStep ?? (isProcessing ? "Processing..." : null),
+        lastStep: memStatus?.lastStep ?? (isProcessing ? "Processing..." : null),
       };
     }
   }
@@ -359,9 +336,7 @@ export class PluginRegistry {
     context?: { roles?: string[]; permissions?: string[] },
   ) {
     const extensions = [];
-    const pluginsToScan = includeDisabled
-      ? this.getPlugins()
-      : this.getEnabledPlugins();
+    const pluginsToScan = includeDisabled ? this.getPlugins() : this.getEnabledPlugins();
 
     for (const plugin of pluginsToScan) {
       if (plugin.extensions) {
@@ -377,9 +352,7 @@ export class PluginRegistry {
                 }
               }
               if (e.permissions && e.permissions.length > 0) {
-                if (
-                  !e.permissions.every((perm) => userPermissions.includes(perm))
-                ) {
+                if (!e.permissions.every((perm) => userPermissions.includes(perm))) {
                   return false;
                 }
               }
@@ -393,10 +366,7 @@ export class PluginRegistry {
     return extensions.sort((a, b) => (a.priority ?? 100) - (b.priority ?? 100));
   }
 
-  public async getWidgets(
-    area: string,
-    context?: { roles?: string[]; permissions?: string[] },
-  ) {
+  public async getWidgets(area: string, context?: { roles?: string[]; permissions?: string[] }) {
     const widgets = [];
     for (const plugin of this.getEnabledPlugins()) {
       if (plugin.widgets) {
@@ -412,9 +382,7 @@ export class PluginRegistry {
                 }
               }
               if (w.permissions && w.permissions.length > 0) {
-                if (
-                  !w.permissions.every((perm) => userPermissions.includes(perm))
-                ) {
+                if (!w.permissions.every((perm) => userPermissions.includes(perm))) {
                   return false;
                 }
               }
@@ -468,16 +436,12 @@ export class PluginRegistry {
         // 2. Aktywacja pluginów wymaganych
         for (const depId of dependencies) {
           const depPlugin = this.findPlugin(depId);
-          const canonicalDepId =
-            depPlugin?.manifest.id ?? resolveDependencyId(depId);
+          const canonicalDepId = depPlugin?.manifest.id ?? resolveDependencyId(depId);
           const depStatus = this.pluginStatus.get(canonicalDepId);
           if (!depStatus?.enabled) {
             const depName = depPlugin?.manifest.name || canonicalDepId;
 
-            await this.updateStep(
-              id,
-              `Waiting for dependency activation: ${depName}`,
-            );
+            await this.updateStep(id, `Waiting for dependency activation: ${depName}`);
             // Recursive call for dependencies
             await this.togglePlugin(canonicalDepId, true, context);
             await this.delay();
@@ -518,14 +482,8 @@ export class PluginRegistry {
         );
         for (const dependent of dependents) {
           const depStatus = this.pluginStatus.get(dependent.manifest.id);
-          if (
-            depStatus?.enabled &&
-            !this.processingPlugins.has(dependent.manifest.id)
-          ) {
-            await this.updateStep(
-              id,
-              `Deactivating dependent plugin: ${dependent.manifest.name}`,
-            );
+          if (depStatus?.enabled && !this.processingPlugins.has(dependent.manifest.id)) {
+            await this.updateStep(id, `Deactivating dependent plugin: ${dependent.manifest.name}`);
             await this.togglePlugin(dependent.manifest.id, false, context);
             await this.delay();
           }
@@ -545,11 +503,7 @@ export class PluginRegistry {
           try {
             await this.migrationRunner.rollback(id, plugin.migrations as any);
           } catch (e) {
-            this.logger.error(
-              "PluginRegistry",
-              `Rollback failed for ${id}:`,
-              e,
-            );
+            this.logger.error("PluginRegistry", `Rollback failed for ${id}:`, e);
           }
         }
 
@@ -561,8 +515,7 @@ export class PluginRegistry {
         const dependencies = plugin.manifest.dependencies || [];
         for (const depId of dependencies) {
           const depPlugin = this.findPlugin(depId);
-          const canonicalDepId =
-            depPlugin?.manifest.id ?? resolveDependencyId(depId);
+          const canonicalDepId = depPlugin?.manifest.id ?? resolveDependencyId(depId);
           const depStatus = this.pluginStatus.get(canonicalDepId);
           if (depStatus?.enabled) {
             // Check if anyone else is using this dependency (excluding those in the middle of deactivation)
@@ -572,19 +525,14 @@ export class PluginRegistry {
                 this.pluginStatus.get(p.manifest.id)?.enabled &&
                 !this.processingPlugins.has(p.manifest.id) &&
                 p.manifest.dependencies?.some(
-                  (dep) =>
-                    resolveDependencyId(dep) ===
-                    resolveDependencyId(canonicalDepId),
+                  (dep) => resolveDependencyId(dep) === resolveDependencyId(canonicalDepId),
                 ),
             );
 
             if (!otherDependents) {
               const depName = depPlugin?.manifest.name || canonicalDepId;
 
-              await this.updateStep(
-                id,
-                `Cleaning up unused dependency: ${depName}`,
-              );
+              await this.updateStep(id, `Cleaning up unused dependency: ${depName}`);
               await this.togglePlugin(canonicalDepId, false, context);
               await this.delay();
             }
@@ -598,10 +546,7 @@ export class PluginRegistry {
       // Ensure lastStep is cleared at the end of a SUCCESSFUL toggle
       await this.updateStep(id, null);
     } catch (error) {
-      this.logger.warn(
-        "veap:plugins",
-        `Error toggling plugin ${id}: ${(error as Error).message}`,
-      );
+      this.logger.warn("veap:plugins", `Error toggling plugin ${id}: ${(error as Error).message}`);
       await this.updateStep(id, `Error: ${(error as Error).message}`);
       throw error;
     } finally {
@@ -635,9 +580,7 @@ export class PluginRegistry {
     for (const plugin of this.getEnabledPlugins()) {
       if (plugin.extensions) {
         if (
-          plugin.extensions.some(
-            (e) => e.target === target && (point ? e.point === point : true),
-          )
+          plugin.extensions.some((e) => e.target === target && (point ? e.point === point : true))
         )
           return true;
       }
@@ -666,14 +609,14 @@ export class PluginRegistry {
 // `export * from "../application/plugins/registry"` in the entry barrels
 // working for all module-level helpers.
 export {
-  registerPlugins,
-  ensurePluginsInitialized,
   applyPluginFilters,
-  togglePluginState,
-  hasPluginHooks,
-  hasPluginExtension,
+  ensurePluginsInitialized,
   getPluginConfig,
-  updatePluginConfig,
-  getPluginsStatus,
   getPluginStatus,
+  getPluginsStatus,
+  hasPluginExtension,
+  hasPluginHooks,
+  registerPlugins,
+  togglePluginState,
+  updatePluginConfig,
 } from "./facade";

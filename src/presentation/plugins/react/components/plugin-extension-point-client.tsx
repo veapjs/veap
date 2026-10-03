@@ -17,17 +17,11 @@ export interface PluginExtensionPointClientProps {
   as?: React.ElementType;
 }
 
-export function usePluginExtensions(
-  target: string,
-  point: string,
-  includeDisabled = false,
-) {
+export function usePluginExtensions(target: string, point: string, includeDisabled = false) {
   const [extensions, setExtensions] = useState<any[]>([]);
 
   const fetchExtensions = useCallback(() => {
-    getPluginExtensionsAction(target, point, includeDisabled).then(
-      setExtensions,
-    );
+    getPluginExtensionsAction(target, point, includeDisabled).then(setExtensions);
   }, [target, point, includeDisabled]);
 
   useEffect(() => {

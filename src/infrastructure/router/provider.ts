@@ -1,8 +1,8 @@
-import { ServiceProvider } from "../../infrastructure/providers/service-provider";
+import type * as React from "react";
 import { eventBus } from "../../application/events/event-bus";
 import { RouterService } from "../../application/router/router.service";
 import { SITE_LAYOUT } from "../../domain/contracts/token";
-import type * as React from "react";
+import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 
 export interface RouterConfig {
   rewrites?: Record<string, string>;
@@ -34,8 +34,7 @@ export class RouterServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
-    const routerService =
-      await this.container.resolve<RouterService>(RouterService);
+    const routerService = await this.container.resolve<RouterService>(RouterService);
 
     if (this.config?.rewrites) {
       for (const [from, to] of Object.entries(this.config.rewrites)) {
@@ -53,14 +52,9 @@ export class RouterServiceProvider extends ServiceProvider {
     });
 
     // Clear cache after plugin initialization finishes
-    eventBus.subscribe(
-      "system:plugins:init:end",
-      "route-tree-cache-init",
-      async () => {
-        const routerService =
-          await this.container.resolve<RouterService>(RouterService);
-        await routerService.clearCache();
-      },
-    );
+    eventBus.subscribe("system:plugins:init:end", "route-tree-cache-init", async () => {
+      const routerService = await this.container.resolve<RouterService>(RouterService);
+      await routerService.clearCache();
+    });
   }
 }

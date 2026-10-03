@@ -4,10 +4,7 @@ import { getIntlConfig } from "./config";
 import { detectLocale } from "./detection";
 import { getMessages } from "./loader";
 
-export async function getTranslation(
-  localeOverride?: string,
-  timeZoneOverride?: string,
-) {
+export async function getTranslation(localeOverride?: string, timeZoneOverride?: string) {
   const {
     cookie: cookieName,
     default: defaultLocale,

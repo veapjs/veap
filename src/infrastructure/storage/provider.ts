@@ -1,9 +1,8 @@
-import { ServiceProvider } from "../../infrastructure/providers/service-provider";
-import { isSystemInstalled } from "../../infrastructure/auth/setup";
-import { LocalFileProvider } from "./providers/local";
 import { StorageService } from "../../application/storage/storage.service";
-
+import { isSystemInstalled } from "../../infrastructure/auth/setup";
 import { ConfigService } from "../../infrastructure/config/config.service";
+import { ServiceProvider } from "../../infrastructure/providers/service-provider";
+import { LocalFileProvider } from "./providers/local";
 
 export class StorageServiceProvider extends ServiceProvider {
   register(): void {

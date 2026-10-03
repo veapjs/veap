@@ -1,6 +1,6 @@
+import { User } from "../../../infrastructure/auth/models/User";
 import type { CastType } from "../../../infrastructure/database/orm/casts";
 import { Model } from "../../../infrastructure/database/orm/model";
-import { User } from "../../../infrastructure/auth/models/User";
 
 export interface SystemUserWidgetAttributes {
   userId: string;

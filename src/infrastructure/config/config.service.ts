@@ -1,12 +1,10 @@
-import { Injectable } from "../ioc/decorators";
 import { z } from "zod";
-import { AppError } from "../../domain/errors/app-error";
 import type { IConfigService } from "../../domain/contracts/config";
+import { AppError } from "../../domain/errors/app-error";
+import { Injectable } from "../ioc/decorators";
 
 export const envSchema = z.object({
-  NODE_ENV: z
-    .enum(["development", "production", "test"])
-    .default("development"),
+  NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
   DATABASE_URL: z.string().url().optional(),
   DATABASE_SSL_REJECT_UNAUTHORIZED: z.string().optional(),
   DATABASE_SSL_CA: z.string().optional(),

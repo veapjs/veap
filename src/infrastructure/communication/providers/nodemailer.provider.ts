@@ -3,12 +3,8 @@
 // never reach it because the communication entry is a server entry.
 import type { SendMailOptions, Transporter } from "nodemailer";
 import nodemailer from "nodemailer";
-
+import type { MailMessage, MailRecipient } from "../../../domain/communication/mail-message";
 import type { IMailer } from "../../../domain/communication/mailer";
-import type {
-  MailMessage,
-  MailRecipient,
-} from "../../../domain/communication/mail-message";
 
 /**
  * SMTP transport (Nodemailer) implementing the {@link IMailer} port.
@@ -33,8 +29,7 @@ export class NodemailerMailService implements IMailer {
     getFromAddress: () => string | undefined;
   }) {
     this.fromAddress =
-      config.getFromAddress() ||
-      (config.getUsername() ? `Veap <${config.getUsername()}>` : "Veap");
+      config.getFromAddress() || (config.getUsername() ? `Veap <${config.getUsername()}>` : "Veap");
 
     this.transporter = nodemailer.createTransport({
       service: config.getService(),

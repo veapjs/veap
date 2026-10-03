@@ -1,6 +1,5 @@
-import { decryptToString, encryptString } from "../utils/encryption";
-
 import type { ISecretCipher } from "../../../domain/auth/ports/secret-cipher";
+import { decryptToString, encryptString } from "../utils/encryption";
 
 /**
  * AES-GCM adapter for the {@link ISecretCipher} port.

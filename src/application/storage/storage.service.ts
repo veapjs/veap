@@ -1,10 +1,7 @@
-import { Inject, Injectable } from "../../domain/contracts/ioc";
 import { LOGGER } from "../../domain/contracts";
+import { Inject, Injectable } from "../../domain/contracts/ioc";
 import type { ILogger } from "../../domain/contracts/logger";
-import type {
-  IStorageProvider,
-  StorageResult,
-} from "../../domain/storage/types";
+import type { IStorageProvider, StorageResult } from "../../domain/storage/types";
 
 @Injectable()
 export class StorageService {
@@ -52,10 +49,7 @@ export class StorageService {
     const provider = this.providers.get(id);
 
     if (!provider) {
-      this.logger.warn(
-        "veap:storage",
-        `No storage provider available (local fallback failed)`,
-      );
+      this.logger.warn("veap:storage", `No storage provider available (local fallback failed)`);
       return { error: "No storage provider available (local fallback failed)" };
     }
 
@@ -80,10 +74,7 @@ export class StorageService {
     }
 
     if (!provider.delete) {
-      this.logger.warn(
-        "veap:storage",
-        `Storage provider "${id}" does not support deletion`,
-      );
+      this.logger.warn("veap:storage", `Storage provider "${id}" does not support deletion`);
       return false;
     }
 

@@ -19,5 +19,4 @@ export interface IConfigService {
  * boundaries, the same reason the container keys class tokens with
  * `Symbol.for(...)`.
  */
-export const CONFIG_SERVICE: Token<IConfigService> =
-  Symbol.for("veap:kernel:config");
+export const CONFIG_SERVICE: Token<IConfigService> = Symbol.for("veap:kernel:config");

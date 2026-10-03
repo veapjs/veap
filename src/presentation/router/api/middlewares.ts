@@ -1,15 +1,15 @@
-import { checkSecurity } from "../../../application/auth/logic";
-import { getCurrentSession } from "../../../application/auth/facades/session";
-import { getAuthRoutes } from "../../../application/auth/facades/routes";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { getAuthRoutes } from "../../../application/auth/facades/routes";
+import { getCurrentSession } from "../../../application/auth/facades/session";
+import { checkSecurity } from "../../../application/auth/logic";
 import { AppError } from "../../../domain/errors/app-error";
-import { verifySameOrigin } from "../../../infrastructure/http/next-request-context";
 import type {
   ApiMiddleware,
   VeapMiddleware,
   VeapMiddlewareContext,
 } from "../../../domain/plugins/types";
+import { verifySameOrigin } from "../../../infrastructure/http/next-request-context";
 
 export const EnsuredGuest: VeapMiddleware = async (ctx, next) => {
   const { user, session } = await getCurrentSession();
@@ -47,8 +47,7 @@ export const EnsuredUser: VeapMiddleware = async (_ctx, next) => {
  * (from the page itself) are still enforced by the pipeline below.
  */
 export const SkipSecurity: VeapMiddleware = async (ctx, next) => {
-  (ctx as VeapMiddlewareContext & { __skipSecurity?: boolean }).__skipSecurity =
-    true;
+  (ctx as VeapMiddlewareContext & { __skipSecurity?: boolean }).__skipSecurity = true;
   return await next();
 };
 
@@ -76,11 +75,7 @@ export const EnsuredAuth: VeapMiddleware = async (ctx, next) => {
   return await next();
 };
 
-export const ApiEnsuredAuth: ApiMiddleware = async (
-  _request,
-  context,
-  next,
-) => {
+export const ApiEnsuredAuth: ApiMiddleware = async (_request, context, next) => {
   const { user, session } = await getCurrentSession();
 
   if (!user || !session) {
@@ -140,13 +135,10 @@ export const SameOrigin: VeapMiddleware = async (_ctx, next) => {
  */
 export const ApiSameOrigin: ApiMiddleware = async (request, _context, next) => {
   if (!verifySameOrigin(request)) {
-    return new Response(
-      JSON.stringify({ error: "Forbidden: Cross-origin request rejected" }),
-      {
-        status: 403,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
+    return new Response(JSON.stringify({ error: "Forbidden: Cross-origin request rejected" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   return await next();

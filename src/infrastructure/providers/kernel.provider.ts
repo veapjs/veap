@@ -1,22 +1,19 @@
-import { ServiceProvider } from "./service-provider";
-import { eventBus, EventBus } from "../../application/events/event-bus";
-import { logger, LoggerService } from "../logging/console-logger";
-import { ConfigService } from "../config/config.service";
-import { MemoryCacheProvider } from "../cache/memory-cache.provider";
+import { EventBus, eventBus } from "../../application/events/event-bus";
 import {
   CACHE_PROVIDER,
   CONFIG_SERVICE,
+  COOKIE_STORE,
   EVENT_BUS,
   LOGGER,
-  VEAP_CONFIG,
-  COOKIE_STORE,
   REQUEST_CONTEXT,
+  VEAP_CONFIG,
 } from "../../domain/contracts";
+import { MemoryCacheProvider } from "../cache/memory-cache.provider";
+import { ConfigService } from "../config/config.service";
 import { VeapConfigProvider } from "../config/veap-config.provider";
-import {
-  NextCookieStore,
-  NextRequestContext,
-} from "../http/next-request-context";
+import { NextCookieStore, NextRequestContext } from "../http/next-request-context";
+import { LoggerService, logger } from "../logging/console-logger";
+import { ServiceProvider } from "./service-provider";
 
 export class KernelServiceProvider extends ServiceProvider {
   register(): void {
@@ -97,9 +94,6 @@ export class KernelServiceProvider extends ServiceProvider {
   }
 
   async boot(): Promise<void> {
-    logger.debug(
-      "veap:kernel",
-      "Kernel core services registered successfully.",
-    );
+    logger.debug("veap:kernel", "Kernel core services registered successfully.");
   }
 }

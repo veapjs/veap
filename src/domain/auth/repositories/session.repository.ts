@@ -39,10 +39,7 @@ export interface ISessionRepository {
   removeByUserId(userId: string): Promise<void>;
 
   /** Removes every session of a user except `currentSessionId`. */
-  removeOtherUserSessions(
-    userId: string,
-    currentSessionId: string,
-  ): Promise<void>;
+  removeOtherUserSessions(userId: string, currentSessionId: string): Promise<void>;
 }
 
 /** Injection token for the session repository port. */

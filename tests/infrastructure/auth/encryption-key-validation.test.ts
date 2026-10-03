@@ -52,17 +52,12 @@ describe("ENCRYPTION_KEY configuration contract", () => {
     vi.resetModules();
 
     const { encryptString, decryptToString } = await import(MODULE_PATH);
-    expect(decryptToString(encryptString("recovery-code"))).toBe(
-      "recovery-code",
-    );
+    expect(decryptToString(encryptString("recovery-code"))).toBe("recovery-code");
   });
 
   it("accepts a 32-byte key (AES-256 round-trip)", async () => {
     // Base64 of 32 ASCII bytes.
-    vi.stubEnv(
-      "ENCRYPTION_KEY",
-      Buffer.from("a".repeat(32), "ascii").toString("base64"),
-    );
+    vi.stubEnv("ENCRYPTION_KEY", Buffer.from("a".repeat(32), "ascii").toString("base64"));
     vi.resetModules();
 
     const { encryptString, decryptToString } = await import(MODULE_PATH);

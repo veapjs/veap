@@ -1,5 +1,13 @@
 // Re-export client-safe plugins
 
+// Navigation
+export * from "../application/plugins/breadcrumbs";
+export { getPluginBreadcrumbs as getBreadcrumbs } from "../application/plugins/breadcrumbs";
+export {
+  getPathPrefix,
+  getPluginNavigation as getPublicNavigation,
+  getVeapPluginNavigationGrouped as getVeapModuleNavigationGrouped,
+} from "../application/plugins/navigation";
 // Core: Registry
 export * from "../application/plugins/registry";
 // Core: Compatibility Aliases
@@ -15,15 +23,6 @@ export {
   updatePluginConfig as updateModuleConfig,
 } from "../application/plugins/registry";
 export { PluginManifestSchema as ModuleManifestSchema } from "../domain/plugins/types";
-export * from "./plugins";
-// Navigation
-export * from "../application/plugins/breadcrumbs";
-export { getPluginBreadcrumbs as getBreadcrumbs } from "../application/plugins/breadcrumbs";
-export {
-  getVeapPluginNavigationGrouped as getVeapModuleNavigationGrouped,
-  getPathPrefix,
-  getPluginNavigation as getPublicNavigation,
-} from "../application/plugins/navigation";
 // UI (Server versions)
 export {
   PluginExtensionPoint,
@@ -34,3 +33,4 @@ export {
   PluginWidgetArea as WidgetArea,
 } from "../presentation/plugins/react/components/plugin-widget-area";
 export { WidgetComposer } from "../presentation/plugins/react/components/widget-composer";
+export * from "./plugins";

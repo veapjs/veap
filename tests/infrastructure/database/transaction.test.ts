@@ -1,3 +1,4 @@
+import type { Knex } from "knex";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import {
   getActiveTransaction,
@@ -6,7 +7,6 @@ import {
   setKnex,
   transaction,
 } from "../../../src/infrastructure/database/orm/connection";
-import type { Knex } from "knex";
 
 describe("Database Transaction (AsyncLocalStorage)", () => {
   let db: Knex;
@@ -187,10 +187,7 @@ describe("Database Transaction (AsyncLocalStorage)", () => {
       // Verify that outer items were committed, but inner savepoint item was rolled back
       const rows = await db("test_items").select("*").orderBy("id", "asc");
       expect(rows).toHaveLength(2);
-      expect(rows.map((r) => r.name)).toEqual([
-        "outer-preserved",
-        "outer-subsequent",
-      ]);
+      expect(rows.map((r) => r.name)).toEqual(["outer-preserved", "outer-subsequent"]);
     });
   });
 });

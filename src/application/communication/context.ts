@@ -1,5 +1,5 @@
-import { AppError } from "../../domain/errors/app-error";
 import type { IMailer } from "../../domain/communication/mailer";
+import { AppError } from "../../domain/errors/app-error";
 
 /**
  * Typed boundary between the communication use cases and their consumers

@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, it } from "vitest";
-
-import type { MailMessage } from "../../../src/domain/communication/mail-message";
 import {
   bindCommunicationContext,
   communicationContext,
@@ -16,6 +14,7 @@ import {
   getMailTranslator,
   setMailTranslatorFactory,
 } from "../../../src/application/communication/translator";
+import type { MailMessage } from "../../../src/domain/communication/mail-message";
 
 /**
  * Mailables - where email semantics live.
@@ -29,10 +28,7 @@ import {
 const interpolatingTranslator = () =>
   Promise.resolve((key: string, params?: Record<string, unknown>) =>
     params
-      ? Object.entries(params).reduce(
-          (acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)),
-          key,
-        )
+      ? Object.entries(params).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)), key)
       : key,
   );
 
@@ -82,9 +78,7 @@ describe("mailables", () => {
     await send2FACode("u@x.dev", "654321");
 
     expect(sent[0].subject).toBe("Your 2FA Code");
-    expect(sent[0].text).toBe(
-      "Your verification code is: 654321. It will expire in 10 minutes.",
-    );
+    expect(sent[0].text).toBe("Your verification code is: 654321. It will expire in 10 minutes.");
   });
 
   it("sendMail forwards arbitrary messages to the bound port", async () => {

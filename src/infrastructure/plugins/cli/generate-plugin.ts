@@ -5,20 +5,14 @@ import * as p from "@clack/prompts";
 import chalk from "chalk";
 import ora from "ora";
 import {
-  findProjectRoot,
-  processStubs,
-} from "../../../infrastructure/cli/utils.js";
-import { stubPath } from "../../../infrastructure/cli/stubs.js";
-import { regeneratePluginsRegistry } from "./utils.js";
-import {
   applyDockerfileForPackageManager,
   detectPackageManager,
 } from "../../../infrastructure/cli/package-manager.js";
+import { stubPath } from "../../../infrastructure/cli/stubs.js";
+import { findProjectRoot, processStubs } from "../../../infrastructure/cli/utils.js";
+import { regeneratePluginsRegistry } from "./utils.js";
 
-export async function generatePlugin(
-  name: string,
-  options?: { skipInstall?: boolean },
-) {
+export async function generatePlugin(name: string, options?: { skipInstall?: boolean }) {
   const rootDir = findProjectRoot(process.cwd());
   const pluginDir = path.join(rootDir, "plugins", `${name}-plugin`);
 
@@ -58,9 +52,7 @@ export async function generatePlugin(
     spin.succeed("Plugin files generated.");
 
     if (!options?.skipInstall) {
-      const spinner = ora(
-        "📦 Installing dependencies (pnpm install)...",
-      ).start();
+      const spinner = ora("📦 Installing dependencies (pnpm install)...").start();
       execSync("pnpm install", { cwd: rootDir, stdio: "inherit" });
       spinner.succeed("Dependencies installed.");
     }

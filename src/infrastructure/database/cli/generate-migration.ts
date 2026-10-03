@@ -23,9 +23,7 @@ async function updateIndexFile(migrationsDir: string) {
 
   // Get all .ts files except index.ts
   const files = await fs.readdir(migrationsDir);
-  const migrationFiles = files
-    .filter((f) => f.endsWith(".ts") && f !== "index.ts")
-    .sort();
+  const migrationFiles = files.filter((f) => f.endsWith(".ts") && f !== "index.ts").sort();
 
   const imports: string[] = [];
   const exports: string[] = [];
@@ -50,10 +48,7 @@ export const appMigrations = [
 
 export async function generateMigration(name: string) {
   try {
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[-:T]/g, "")
-      .slice(0, 14);
+    const timestamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 14);
     const fileName = `${timestamp}_${name}`;
 
     let tableName = name;
@@ -61,9 +56,7 @@ export async function generateMigration(name: string) {
       tableName = name.replace("create_", "").replace("_table", "");
     }
 
-    const content = stub
-      .replace(/{{name}}/g, fileName)
-      .replace(/{{tableName}}/g, tableName);
+    const content = stub.replace(/{{name}}/g, fileName).replace(/{{tableName}}/g, tableName);
 
     const migrationsDir = path.join(process.cwd(), "migrations");
 

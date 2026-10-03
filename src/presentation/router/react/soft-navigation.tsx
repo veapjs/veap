@@ -3,11 +3,7 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 
-export function SoftNavigationInterceptor({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function SoftNavigationInterceptor({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   React.useEffect(() => {
@@ -29,11 +25,7 @@ export function SoftNavigationInterceptor({
       const href = anchor.getAttribute("href");
 
       // Only intercept internal links
-      if (
-        href?.startsWith("/") &&
-        !href.startsWith("//") &&
-        anchor.target !== "_blank"
-      ) {
+      if (href?.startsWith("/") && !href.startsWith("//") && anchor.target !== "_blank") {
         e.preventDefault();
         router.push(href);
       }

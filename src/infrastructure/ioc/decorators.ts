@@ -3,4 +3,4 @@
  * `domain/contracts/ioc.ts` (same reasoning as the `Token` type); the
  * infrastructure layer only exposes them.
  */
-export { Injectable, Inject } from "../../domain/contracts/ioc.js";
+export { Inject, Injectable } from "../../domain/contracts/ioc.js";

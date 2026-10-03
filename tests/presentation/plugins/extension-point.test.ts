@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
 import React from "react";
-import { PluginExtensionPoint } from "../../../src/presentation/plugins/react/components/plugin-extension-point";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { bindPluginsContext } from "../../../src/application/plugins/context";
+import { PluginExtensionPoint } from "../../../src/presentation/plugins/react/components/plugin-extension-point";
 
 vi.mock("../../../src/application/auth/facades/session", () => ({
   getCurrentSession: vi.fn().mockResolvedValue({ user: null }),

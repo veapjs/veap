@@ -1,5 +1,5 @@
-import type { IMailer } from "../../../domain/communication/mailer";
 import type { MailMessage } from "../../../domain/communication/mail-message";
+import type { IMailer } from "../../../domain/communication/mailer";
 
 /**
  * Console transport implementing the {@link IMailer} port.
@@ -14,9 +14,7 @@ export class ConsoleMailService implements IMailer {
 
   public async sendMail(message: MailMessage): Promise<void> {
     const to = Array.isArray(message.to)
-      ? message.to
-          .map((r) => (typeof r === "string" ? r : r.address))
-          .join(", ")
+      ? message.to.map((r) => (typeof r === "string" ? r : r.address)).join(", ")
       : typeof message.to === "string"
         ? message.to
         : message.to.address;
@@ -27,9 +25,7 @@ export class ConsoleMailService implements IMailer {
         `subject="${message.subject}"`,
         message.text ? `text="${message.text}"` : null,
         message.html ? `(html ${message.html.length} bytes)` : null,
-        message.attachments?.length
-          ? `(attachments: ${message.attachments.length})`
-          : null,
+        message.attachments?.length ? `(attachments: ${message.attachments.length})` : null,
       ]
         .filter(Boolean)
         .join(" "),

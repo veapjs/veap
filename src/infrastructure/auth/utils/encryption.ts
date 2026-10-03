@@ -30,11 +30,7 @@ if (key.length !== 16 && key.length !== 24 && key.length !== 32) {
 
 /** AES-GCM variant matching the configured key size. */
 const ALGORITHM =
-  key.length === 16
-    ? "aes-128-gcm"
-    : key.length === 24
-      ? "aes-192-gcm"
-      : "aes-256-gcm";
+  key.length === 16 ? "aes-128-gcm" : key.length === 24 ? "aes-192-gcm" : "aes-256-gcm";
 
 /**
  * Encrypts data using AES-GCM.

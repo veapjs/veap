@@ -4,11 +4,11 @@ vi.hoisted(() => {
   process.env.ENCRYPTION_KEY = "MDEyMzQ1Njc4OWFiY2RlZg==";
 });
 
-import { Application } from "../../../src/infrastructure/composition/application";
-import { container } from "../../../src/infrastructure/ioc/container";
 import { getAuthRoutes } from "../../../src/application/auth/context";
 import { RouterService } from "../../../src/application/router/router.service";
 import { DEFAULT_AUTH_ROUTES } from "../../../src/domain/auth/types";
+import { Application } from "../../../src/infrastructure/composition/application";
+import { container } from "../../../src/infrastructure/ioc/container";
 
 describe("Auth Routes Configuration and Rewrites", () => {
   beforeEach(() => {

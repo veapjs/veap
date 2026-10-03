@@ -22,10 +22,7 @@ export class Setting extends Model<SettingAttributes> {
   /**
    * Helper to quickly get a setting by key.
    */
-  static async getValue<T = any>(
-    key: string,
-    defaultValue: T | null = null,
-  ): Promise<T | null> {
+  static async getValue<T = any>(key: string, defaultValue: T | null = null): Promise<T | null> {
     const setting = await this.where("key", key).first();
     return setting ? (setting.getAttribute("value") as T) : defaultValue;
   }

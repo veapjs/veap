@@ -17,13 +17,13 @@ import {
   useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Button, cn } from "@veap/ui";
 import { Icon } from "@iconify/react";
-import { useTranslation } from "../../../intl/client";
+import { Button, cn } from "@veap/ui";
 import { Grip, Trash, UnfoldHorizontal, UnfoldVertical } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "../../../intl/client";
 import { saveUserWidgetsState } from "../../actions";
 
 interface WidgetState {
@@ -94,9 +94,7 @@ function handleGlobalKeyDown(e: KeyboardEvent) {
     const target = e.target as HTMLElement | null;
     const isInputField =
       target &&
-      (target.tagName === "INPUT" ||
-        target.tagName === "TEXTAREA" ||
-        target.isContentEditable);
+      (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
 
     if (isInputField && !e.metaKey && !e.altKey) {
       return;
@@ -219,14 +217,9 @@ function SortableWidget({
   onResizeRow: (id: string, newRowSpan: number) => void;
   maxColumns: number;
 }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const { t } = useTranslation();
 
@@ -275,11 +268,7 @@ function SortableWidget({
             type="button"
             className="hover:bg-muted text-destructive cursor-pointer rounded p-1"
             onClick={() => onToggle(id)}
-            title={
-              isSpacer
-                ? t("widgets.remove-spacer")
-                : t("widgets.disable-widget")
-            }
+            title={isSpacer ? t("widgets.remove-spacer") : t("widgets.disable-widget")}
           >
             <Trash className="h-4 w-4" />
           </button>
@@ -314,8 +303,8 @@ export function WidgetComposerClient({
   const [widgetsState, setWidgetsState] = useState<WidgetState[]>(() =>
     computeInitialState(userState, defaultWidgets, columns),
   );
-  const [savedWidgetsState, setSavedWidgetsState] = useState<WidgetState[]>(
-    () => computeInitialState(userState, defaultWidgets, columns),
+  const [savedWidgetsState, setSavedWidgetsState] = useState<WidgetState[]>(() =>
+    computeInitialState(userState, defaultWidgets, columns),
   );
   const [isSaving, setIsSaving] = useState(false);
 
@@ -384,23 +373,16 @@ export function WidgetComposerClient({
   };
 
   const resizeWidget = (id: string, newColSpan: number) => {
-    setWidgetsState((items) =>
-      items.map((i) => (i.id === id ? { ...i, colSpan: newColSpan } : i)),
-    );
+    setWidgetsState((items) => items.map((i) => (i.id === id ? { ...i, colSpan: newColSpan } : i)));
   };
 
   const resizeRowWidget = (id: string, newRowSpan: number) => {
-    setWidgetsState((items) =>
-      items.map((i) => (i.id === id ? { ...i, rowSpan: newRowSpan } : i)),
-    );
+    setWidgetsState((items) => items.map((i) => (i.id === id ? { ...i, rowSpan: newRowSpan } : i)));
   };
 
   const addSpacer = () => {
     const newId = `spacer-${Date.now()}`;
-    setWidgetsState((items) => [
-      ...items,
-      { id: newId, enabled: true, colSpan: 1, rowSpan: 1 },
-    ]);
+    setWidgetsState((items) => [...items, { id: newId, enabled: true, colSpan: 1, rowSpan: 1 }]);
   };
 
   const handleCancel = () => {
@@ -423,9 +405,7 @@ export function WidgetComposerClient({
   };
 
   const enabledWidgets = widgetsState.filter((w) => w.enabled);
-  const disabledWidgets = widgetsState.filter(
-    (w) => !w.enabled && !w.id.startsWith("spacer-"),
-  );
+  const disabledWidgets = widgetsState.filter((w) => !w.enabled && !w.id.startsWith("spacer-"));
 
   if (defaultWidgets.length === 0) {
     return null;
@@ -443,24 +423,13 @@ export function WidgetComposerClient({
         <div className="border-primary/20 flex flex-wrap items-center justify-between gap-3 border-b border-dashed pb-3">
           <div className="flex items-center gap-2">
             <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase">
-              <Icon
-                icon="solar:widget-add-linear"
-                className="text-primary h-4 w-4"
-              />
+              <Icon icon="solar:widget-add-linear" className="text-primary h-4 w-4" />
               {slot.replace(/-/g, " ")}
             </span>
           </div>
           <div className="ml-auto flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={addSpacer}
-              className="squircle text-xs"
-            >
-              <Icon
-                icon="solar:programming-linear"
-                className="mr-1.5 h-3.5 w-3.5"
-              />
+            <Button variant="outline" size="sm" onClick={addSpacer} className="squircle text-xs">
+              <Icon icon="solar:programming-linear" className="mr-1.5 h-3.5 w-3.5" />
               {t("widgets.add-spacer")}
             </Button>
             <Button
@@ -472,31 +441,17 @@ export function WidgetComposerClient({
               <Icon icon="solar:restart-bold" className="mr-1.5 h-3.5 w-3.5" />
               {t("widgets.reset-layout")}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCancel}
-              className="squircle text-xs"
-            >
+            <Button variant="outline" size="sm" onClick={handleCancel} className="squircle text-xs">
               {t("widgets.cancel")}
             </Button>
-            <Button
-              size="sm"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="squircle text-xs"
-            >
+            <Button size="sm" onClick={handleSave} disabled={isSaving} className="squircle text-xs">
               {isSaving ? t("widgets.saving") : t("widgets.save-layout")}
             </Button>
           </div>
         </div>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div
           className="grid grid-cols-1 gap-6 xl:grid-flow-row-dense"
           style={{
@@ -510,24 +465,17 @@ export function WidgetComposerClient({
                 ? "minmax(120px, auto)"
                 : undefined,
             gridAutoFlow:
-              typeof window !== "undefined" && window.innerWidth >= 640
-                ? "row dense"
-                : undefined,
+              typeof window !== "undefined" && window.innerWidth >= 640 ? "row dense" : undefined,
           }}
         >
-          <SortableContext
-            items={enabledWidgets.map((w) => w.id)}
-            strategy={rectSortingStrategy}
-          >
+          <SortableContext items={enabledWidgets.map((w) => w.id)} strategy={rectSortingStrategy}>
             {enabledWidgets.map((ws) => {
               const isSpacer = ws.id.startsWith("spacer-");
               const widgetDef = isSpacer
                 ? {
                     id: ws.id,
                     name: "Spacer",
-                    component: (
-                      <div className="invisible h-full min-h-[100px] w-full" />
-                    ),
+                    component: <div className="invisible h-full min-h-[100px] w-full" />,
                   }
                 : defaultWidgets.find((w) => w.id === ws.id);
 
@@ -554,24 +502,14 @@ export function WidgetComposerClient({
 
       {isEditMode && disabledWidgets.length > 0 && (
         <div className="bg-muted/30 mt-4 rounded-xl border p-4">
-          <h4 className="mb-3 text-sm font-medium">
-            {t("widgets.available-widgets")}
-          </h4>
+          <h4 className="mb-3 text-sm font-medium">{t("widgets.available-widgets")}</h4>
           <div className="flex flex-wrap gap-2">
             {disabledWidgets.map((ws) => {
               const widgetDef = defaultWidgets.find((w) => w.id === ws.id);
               if (!widgetDef) return null;
               return (
-                <Button
-                  key={ws.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => toggleWidget(ws.id)}
-                >
-                  <Icon
-                    icon="solar:add-circle-linear"
-                    className="mr-2 h-4 w-4"
-                  />
+                <Button key={ws.id} variant="outline" size="sm" onClick={() => toggleWidget(ws.id)}>
+                  <Icon icon="solar:add-circle-linear" className="mr-2 h-4 w-4" />
                   {widgetDef.name}
                 </Button>
               );

@@ -1,31 +1,19 @@
-import { AppError } from "../../../domain/errors/app-error";
+import { type IPasswordHasher, PASSWORD_HASHER } from "../../../domain/auth/ports/password-hasher";
+import type { AuthResponse, SessionFlags } from "../../../domain/auth/types";
+import type { LoginInput, RegisterInput } from "../../../domain/auth/validation";
+import { loginSchema, registerSchema } from "../../../domain/auth/validation";
+import { CACHE_PROVIDER, type ICacheProvider } from "../../../domain/contracts/cache";
 import { Inject, Injectable } from "../../../domain/contracts/ioc";
-import {
-  CACHE_PROVIDER,
-  type ICacheProvider,
-} from "../../../domain/contracts/cache";
+import { AppError } from "../../../domain/errors/app-error";
 import { eventBus } from "../../events/event-bus";
 import { authValidators, performFullUserAugmentation } from "../logic";
-import type {
-  LoginInput,
-  RegisterInput,
-} from "../../../domain/auth/validation";
-import { loginSchema, registerSchema } from "../../../domain/auth/validation";
-import type { AuthResponse, SessionFlags } from "../../../domain/auth/types";
-import {
-  PASSWORD_HASHER,
-  type IPasswordHasher,
-} from "../../../domain/auth/ports/password-hasher";
-import { UserService } from "./user.service";
-import { SessionService } from "./session.service";
 import { EmailVerificationService } from "./email-verification.service";
+import { SessionService } from "./session.service";
+import { UserService } from "./user.service";
 
 @Injectable()
 export class AuthService {
-  private failedAttempts = new Map<
-    string,
-    { count: number; expiresAt: number }
-  >();
+  private failedAttempts = new Map<string, { count: number; expiresAt: number }>();
 
   constructor(
     private userService: UserService,
@@ -83,16 +71,13 @@ export class AuthService {
 
     // Check rate limits for email and IP
     const ip = await this.sessionService.getIPAddress();
-    const isEmailBlocked = await this.isRateLimited(
-      `login:email:${normalizedEmail}`,
-    );
+    const isEmailBlocked = await this.isRateLimited(`login:email:${normalizedEmail}`);
     const isIpBlocked = ip ? await this.isRateLimited(`login:ip:${ip}`) : false;
 
     if (isEmailBlocked || isIpBlocked) {
       return {
         status: "ERROR",
-        message:
-          "Too many failed login attempts. Please try again in 15 minutes.",
+        message: "Too many failed login attempts. Please try again in 15 minutes.",
       };
     }
 
@@ -127,15 +112,8 @@ export class AuthService {
 
     const sessionFlags: SessionFlags = {};
     const sessionToken = await this.sessionService.generateSessionToken();
-    const session = await this.sessionService.createSession(
-      sessionToken,
-      user.id,
-      sessionFlags,
-    );
-    await this.sessionService.setSessionTokenCookie(
-      sessionToken,
-      session.expiresAt,
-    );
+    const session = await this.sessionService.createSession(sessionToken, user.id, sessionFlags);
+    await this.sessionService.setSessionTokenCookie(sessionToken, session.expiresAt);
 
     const fullUser = await performFullUserAugmentation(user);
 
@@ -171,31 +149,21 @@ export class AuthService {
     }
 
     const user = await this.userService.createUser(email, username, password);
-    const verificationRequest =
-      await this.emailVerificationService.createEmailVerificationRequest(
-        user.id,
-        user.email,
-      );
+    const verificationRequest = await this.emailVerificationService.createEmailVerificationRequest(
+      user.id,
+      user.email,
+    );
 
     await this.emailVerificationService.sendVerificationEmail(
       verificationRequest.email,
       verificationRequest.code,
     );
-    await this.emailVerificationService.setEmailVerificationRequestCookie(
-      verificationRequest,
-    );
+    await this.emailVerificationService.setEmailVerificationRequestCookie(verificationRequest);
 
     const sessionFlags: SessionFlags = {};
     const sessionToken = await this.sessionService.generateSessionToken();
-    const session = await this.sessionService.createSession(
-      sessionToken,
-      user.id,
-      sessionFlags,
-    );
-    await this.sessionService.setSessionTokenCookie(
-      sessionToken,
-      session.expiresAt,
-    );
+    const session = await this.sessionService.createSession(sessionToken, user.id, sessionFlags);
+    await this.sessionService.setSessionTokenCookie(sessionToken, session.expiresAt);
 
     const fullUser = await performFullUserAugmentation(user);
     await eventBus.publish("system:auth:signup", {
@@ -219,15 +187,8 @@ export class AuthService {
    */
   public async finalizeLogin(userId: string, flags: SessionFlags) {
     const sessionToken = await this.sessionService.generateSessionToken();
-    const session = await this.sessionService.createSession(
-      sessionToken,
-      userId,
-      flags,
-    );
-    await this.sessionService.setSessionTokenCookie(
-      sessionToken,
-      session.expiresAt,
-    );
+    const session = await this.sessionService.createSession(sessionToken, userId, flags);
+    await this.sessionService.setSessionTokenCookie(sessionToken, session.expiresAt);
 
     const user = await this.userService.getUserById(userId);
 

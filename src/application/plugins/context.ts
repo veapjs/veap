@@ -1,6 +1,6 @@
 import { AppError } from "../../domain/errors/app-error";
-import type { PluginRegistry } from "./registry";
 import type { NavigationService } from "./navigation";
+import type { PluginRegistry } from "./registry";
 
 /**
  * Typed boundary between the plugins use cases and the modules that consume

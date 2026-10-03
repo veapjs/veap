@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-
-import { Container } from "../../../src/infrastructure/ioc/container";
-import { Injectable, Inject } from "../../../src/domain/contracts/ioc";
+import { Inject, Injectable } from "../../../src/domain/contracts/ioc";
 import { AppError } from "../../../src/domain/errors/app-error";
+import { Container } from "../../../src/infrastructure/ioc/container";
 
 /**
  * IoC Container - the composition mechanics of the whole system.
@@ -143,9 +142,7 @@ describe("Container", () => {
     const error = await container.resolve(MISSING).catch((e) => e as Error);
     expect(error).toBeInstanceOf(AppError);
     expect((error as AppError).code).toBe("INTERNAL_SERVER_ERROR");
-    expect((error as AppError).message).toContain(
-      "No provider found for token",
-    );
+    expect((error as AppError).message).toContain("No provider found for token");
   });
 
   it("guards against `import type` dependencies that erase to the Object token", async () => {

@@ -34,13 +34,10 @@ export async function addPlugin(
   if (options?.local) {
     // Local installation from Git URL or npm package
     let gitUrl = pluginArg;
-    const isGitUrl =
-      /^(git|http|https|github):/.test(pluginArg) || pluginArg.endsWith(".git");
+    const isGitUrl = /^(git|http|https|github):/.test(pluginArg) || pluginArg.endsWith(".git");
 
     if (!isGitUrl) {
-      const spinUrl = ora(
-        `Fetching Git repository URL for package ${pluginArg}...`,
-      ).start();
+      const spinUrl = ora(`Fetching Git repository URL for package ${pluginArg}...`).start();
       try {
         const output = execSync(`npm view ${pluginArg} repository.url`, {
           stdio: "pipe",
@@ -80,9 +77,7 @@ export async function addPlugin(
       process.exit(1);
     }
 
-    const spin = ora(
-      `Cloning repository ${gitUrl} to plugins/${repoName}...`,
-    ).start();
+    const spin = ora(`Cloning repository ${gitUrl} to plugins/${repoName}...`).start();
     try {
       execSync(`git clone ${gitUrl} "${pluginDir}"`, { stdio: "ignore" });
       spin.succeed(`Cloned repository to plugins/${repoName}`);
@@ -95,9 +90,7 @@ export async function addPlugin(
 
     if (fs.existsSync(pluginPkgJsonPath)) {
       try {
-        const pluginPkg = JSON.parse(
-          fs.readFileSync(pluginPkgJsonPath, "utf-8"),
-        );
+        const pluginPkg = JSON.parse(fs.readFileSync(pluginPkgJsonPath, "utf-8"));
         const pluginName = pluginPkg.name || repoName;
 
         // Add to root package.json as workspace dependency
@@ -106,21 +99,16 @@ export async function addPlugin(
           const rootPkg = JSON.parse(fs.readFileSync(rootPkgPath, "utf-8"));
           rootPkg.dependencies = rootPkg.dependencies || {};
           rootPkg.dependencies[pluginName] = "workspace:*";
-          fs.writeFileSync(
-            rootPkgPath,
-            `${JSON.stringify(rootPkg, null, 2)}\n`,
-            "utf-8",
-          );
+          fs.writeFileSync(rootPkgPath, `${JSON.stringify(rootPkg, null, 2)}\n`, "utf-8");
         }
 
         // Run install to link the workspace package
         if (!options?.skipInstall) {
-          const { detectPackageManager } =
-            await import("../../../infrastructure/cli/package-manager.js");
+          const { detectPackageManager } = await import(
+            "../../../infrastructure/cli/package-manager.js"
+          );
           const pm = detectPackageManager(rootDir);
-          const installSpin = ora(
-            `Linking local plugin with ${pm} install...`,
-          ).start();
+          const installSpin = ora(`Linking local plugin with ${pm} install...`).start();
           try {
             execSync(`${pm} install`, { cwd: rootDir, stdio: "ignore" });
             installSpin.succeed("Plugin linked successfully.");
@@ -133,8 +121,9 @@ export async function addPlugin(
   } else {
     // NPM installation via package manager
     if (!options?.skipInstall) {
-      const { detectPackageManager } =
-        await import("../../../infrastructure/cli/package-manager.js");
+      const { detectPackageManager } = await import(
+        "../../../infrastructure/cli/package-manager.js"
+      );
       const pm = detectPackageManager(rootDir);
       const installCmd = pm === "npm" ? "install" : "add";
       const workspaceFlag = pm === "npm" ? "" : "-w";
@@ -178,9 +167,7 @@ export async function addPlugin(
   }
 
   if (!fs.existsSync(pluginPkgJsonPath)) {
-    console.error(
-      `Error: Cannot find package.json for plugin at ${pluginPkgJsonPath}`,
-    );
+    console.error(`Error: Cannot find package.json for plugin at ${pluginPkgJsonPath}`);
     process.exit(1);
   }
 
@@ -195,9 +182,7 @@ export async function addPlugin(
       envContent = fs.readFileSync(envPath, "utf-8");
     }
 
-    console.log(
-      `\n ⚙️  Configuring environment variables for ${pluginPkg.name || pluginArg}:`,
-    );
+    console.log(`\n ⚙️  Configuring environment variables for ${pluginPkg.name || pluginArg}:`);
     // biome-ignore lint/suspicious/noExplicitAny: <ignore>
     for (const [varName, varConfig] of Object.entries(VeapConfig.env) as any) {
       const regex = new RegExp(`^${varName}=`, "m");
@@ -211,9 +196,7 @@ export async function addPlugin(
       let value = "";
 
       while (true) {
-        value = await askQuestion(
-          `? Enter value for ${varName} - ${desc}${reqStr}: `,
-        );
+        value = await askQuestion(`? Enter value for ${varName} - ${desc}${reqStr}: `);
         if (varConfig.required && !value.trim()) {
           console.log(`  Error: ${varName} is required.`);
           continue;
@@ -229,9 +212,7 @@ export async function addPlugin(
 
   // 2. Install dependencies recursively
   if (VeapConfig.dependencies && Array.isArray(VeapConfig.dependencies)) {
-    console.log(
-      `\n📦 Installing dependencies for ${pluginPkg.name || pluginArg}...`,
-    );
+    console.log(`\n📦 Installing dependencies for ${pluginPkg.name || pluginArg}...`);
     for (const dep of VeapConfig.dependencies) {
       await addPlugin(dep, options);
     }

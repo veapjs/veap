@@ -18,20 +18,13 @@ export interface CreateEmailVerificationRecord {
 
 /** Email verification request persistence port. */
 export interface IEmailVerificationRepository {
-  create(
-    record: CreateEmailVerificationRecord,
-  ): Promise<EmailVerificationRecord>;
+  create(record: CreateEmailVerificationRecord): Promise<EmailVerificationRecord>;
 
   /** Finds a single request scoped to its owner. */
-  findForUser(
-    userId: string,
-    id: string,
-  ): Promise<EmailVerificationRecord | null>;
+  findForUser(userId: string, id: string): Promise<EmailVerificationRecord | null>;
 
   removeByUserId(userId: string): Promise<void>;
 }
 
 /** Injection token for the email verification repository port. */
-export const EMAIL_VERIFICATION_REPOSITORY = Symbol.for(
-  "veap:auth:email-verification-repository",
-);
+export const EMAIL_VERIFICATION_REPOSITORY = Symbol.for("veap:auth:email-verification-repository");

@@ -1,14 +1,7 @@
-import type { ILogger } from "../../domain/contracts/logger";
-import type {
-  EventHandler,
-  SystemEvent,
-  SystemEventsMap,
-} from "../../domain/events/types";
-import type {
-  IEventBus,
-  PublishOptions,
-} from "../../domain/contracts/event-bus";
+import type { IEventBus, PublishOptions } from "../../domain/contracts/event-bus";
 import { Injectable } from "../../domain/contracts/ioc";
+import type { ILogger } from "../../domain/contracts/logger";
+import type { EventHandler, SystemEvent, SystemEventsMap } from "../../domain/events/types";
 
 /**
  * EventBus (Pub/Sub) - Global Singleton Pattern.
@@ -63,18 +56,12 @@ export class EventBus implements IEventBus {
     }
 
     eventHandlers?.set(subscriberId, handler as EventHandler);
-    this.log.debug(
-      "veap:event",
-      `Subscriber "${subscriberId}" added for "${String(eventType)}"`,
-    );
+    this.log.debug("veap:event", `Subscriber "${subscriberId}" added for "${String(eventType)}"`);
   }
 
   public unsubscribe(eventType: string, subscriberId: string): void {
     this.handlers.get(eventType)?.delete(subscriberId);
-    this.log.debug(
-      "veap:event",
-      `Subscriber "${subscriberId}" removed from "${eventType}"`,
-    );
+    this.log.debug("veap:event", `Subscriber "${subscriberId}" removed from "${eventType}"`);
   }
 
   public clearAll(): void {
@@ -95,10 +82,7 @@ export class EventBus implements IEventBus {
     const handlers = Array.from(eventHandlers.values());
 
     // Only log essential publish events to keep console clean
-    if (
-      process.env.NODE_ENV !== "production" &&
-      !type.startsWith("system:plugins:")
-    ) {
+    if (process.env.NODE_ENV !== "production" && !type.startsWith("system:plugins:")) {
       this.log.debug(
         "veap:event",
         `Publishing "${String(eventType)}" to ${handlers.length} subscribers`,
@@ -126,11 +110,7 @@ export class EventBus implements IEventBus {
           ) {
             throw error;
           }
-          this.log.error(
-            "veap:event",
-            `Handler Error for ${String(eventType)}:`,
-            error,
-          );
+          this.log.error("veap:event", `Handler Error for ${String(eventType)}:`, error);
           if (options?.strict) {
             errors.push(error);
           }

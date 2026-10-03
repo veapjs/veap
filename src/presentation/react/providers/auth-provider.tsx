@@ -1,20 +1,14 @@
 "use client";
 
 import { PageLoader } from "@veap/ui/shared/page-loader";
+import { createContext, type ReactNode, useContext, useEffect, useState } from "react";
+import { mutate } from "swr";
 import {
   type AuthRoutesConfig,
   type AuthSession,
   DEFAULT_AUTH_ROUTES,
 } from "../../../domain/auth/types";
 import { PathPrefixContext } from "../../plugins/react/context/path-prefix-context";
-import {
-  createContext,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import { mutate } from "swr";
 
 export interface AuthContextValue {
   user: AuthSession["user"] | null | undefined;
@@ -25,9 +19,7 @@ export interface AuthContextValue {
   routes: AuthRoutesConfig;
 }
 
-export const AuthContext = createContext<AuthContextValue | undefined>(
-  undefined,
-);
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({
   children,
@@ -72,9 +64,7 @@ export function AuthProvider({
         routes,
       }}
     >
-      <PathPrefixContext.Provider value={prefix}>
-        {children}
-      </PathPrefixContext.Provider>
+      <PathPrefixContext.Provider value={prefix}>{children}</PathPrefixContext.Provider>
     </AuthContext.Provider>
   );
 }

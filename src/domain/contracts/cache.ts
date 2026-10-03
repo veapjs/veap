@@ -15,5 +15,4 @@ export interface ICacheProvider {
  * `Symbol.for(...)`. (Historical name kept: the first cache provider was
  * registered under the string key "CacheProvider".)
  */
-export const CACHE_PROVIDER: Token<ICacheProvider> =
-  Symbol.for("veap:kernel:cache");
+export const CACHE_PROVIDER: Token<ICacheProvider> = Symbol.for("veap:kernel:cache");

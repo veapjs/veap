@@ -1,6 +1,6 @@
 import type { IPlugin } from "../../domain/plugins/types";
-import { PluginRegistry } from "./registry";
 import { pluginsContext } from "./context";
+import { PluginRegistry } from "./registry";
 
 /**
  * Module-level helpers over the {@link PluginRegistry}.
@@ -30,11 +30,7 @@ export const applyPluginFilters = async <T = any>(
   return result;
 };
 
-export const togglePluginState = async (
-  id: string,
-  enabled: boolean,
-  context?: any,
-) => {
+export const togglePluginState = async (id: string, enabled: boolean, context?: any) => {
   await pluginsContext().registry.togglePlugin(id, enabled, context);
 };
 

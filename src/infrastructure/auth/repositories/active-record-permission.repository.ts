@@ -1,10 +1,10 @@
-import { getKnex } from "../../database";
-import { Permission } from "../models/Permission";
 import type {
   CreatePermissionRecord,
   IPermissionRepository,
   PermissionRecord,
 } from "../../../domain/auth/repositories/permission.repository";
+import { getKnex } from "../../database";
+import { Permission } from "../models/Permission";
 
 /**
  * `IPermissionRepository` adapter backed by the `Permission` ActiveRecord model
@@ -13,9 +13,7 @@ import type {
 export class ActiveRecordPermissionRepository implements IPermissionRepository {
   async findAll(): Promise<PermissionRecord[]> {
     const permissions = await Permission.query().orderBy("name", "asc").get();
-    return permissions.map(
-      (permission) => permission.toJSON() as PermissionRecord,
-    );
+    return permissions.map((permission) => permission.toJSON() as PermissionRecord);
   }
 
   async findById(id: string): Promise<PermissionRecord | undefined> {

@@ -1,9 +1,9 @@
 "use client";
-import { AppError } from "../../domain/errors/app-error";
 
 import * as React from "react";
 import { createContext, useContext } from "react";
 import { createTranslator } from "../../application/intl/translator";
+import { AppError } from "../../domain/errors/app-error";
 import type { AbstractIntlMessages } from "../../domain/intl/types";
 
 type ContextType = {
@@ -15,9 +15,7 @@ type ContextType = {
 
 const CONTEXT_SYMBOL = Symbol.for("veap-intl-context");
 
-const IntlContext =
-  (globalThis as any)[CONTEXT_SYMBOL] ||
-  createContext<ContextType | null>(null);
+const IntlContext = (globalThis as any)[CONTEXT_SYMBOL] || createContext<ContextType | null>(null);
 
 if (!(globalThis as any)[CONTEXT_SYMBOL]) {
   (globalThis as any)[CONTEXT_SYMBOL] = IntlContext;
@@ -28,8 +26,7 @@ export function I18nProvider({
   locale,
   locales = ["en"],
   messages,
-  timeZone = process.env.NEXT_PUBLIC_INTL_TIMEZONE ||
-    process.env.NEXT_PUBLIC_TIMEZONE,
+  timeZone = process.env.NEXT_PUBLIC_INTL_TIMEZONE || process.env.NEXT_PUBLIC_TIMEZONE,
 }: React.PropsWithChildren<{
   locale: string;
   locales?: string[];
@@ -57,9 +54,7 @@ export function useLocale() {
 export function useSupportedLocales() {
   const context = useContext(IntlContext) as ContextType | null;
   if (!context) {
-    throw AppError.Internal(
-      "useSupportedLocales must be used within I18nProvider",
-    );
+    throw AppError.Internal("useSupportedLocales must be used within I18nProvider");
   }
   return context.locales;
 }

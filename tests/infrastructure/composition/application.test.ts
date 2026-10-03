@@ -5,8 +5,8 @@ vi.hoisted(() => {
 });
 
 import { Application } from "../../../src/infrastructure/composition/application";
-import { ServiceProvider } from "../../../src/infrastructure/providers/service-provider";
 import { logger } from "../../../src/infrastructure/logging/console-logger";
+import { ServiceProvider } from "../../../src/infrastructure/providers/service-provider";
 
 describe("Application.bootstrap error handling", () => {
   beforeEach(() => {
@@ -30,9 +30,7 @@ describe("Application.bootstrap error handling", () => {
   });
 
   it("re-throws error and logs when a provider throws in boot()", async () => {
-    const loggerErrorSpy = vi
-      .spyOn(logger, "error")
-      .mockImplementation(() => {});
+    const loggerErrorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const bootError = new Error("Database connection failed");
 
@@ -43,9 +41,7 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([FailingProvider])
-      .create();
+    const app = Application.configure().withProviders([FailingProvider]).create();
 
     await expect(app.bootstrap()).rejects.toThrow("Database connection failed");
 
@@ -71,9 +67,7 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([FailingProvider])
-      .create();
+    const app = Application.configure().withProviders([FailingProvider]).create();
 
     await expect(app.bootstrap()).rejects.toThrow("Registration error");
 
@@ -83,9 +77,7 @@ describe("Application.bootstrap error handling", () => {
   });
 
   it("re-throws NEXT_REDIRECT without logging it as critical error", async () => {
-    const loggerErrorSpy = vi
-      .spyOn(logger, "error")
-      .mockImplementation(() => {});
+    const loggerErrorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const redirectError = Object.assign(new Error("NEXT_REDIRECT"), {
       digest: "NEXT_REDIRECT;replace;/install;307;",
@@ -98,18 +90,14 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([RedirectingProvider])
-      .create();
+    const app = Application.configure().withProviders([RedirectingProvider]).create();
 
     await expect(app.bootstrap()).rejects.toThrow("NEXT_REDIRECT");
     expect(loggerErrorSpy).not.toHaveBeenCalled();
   });
 
   it("re-throws NEXT_NOT_FOUND without logging it as critical error", async () => {
-    const loggerErrorSpy = vi
-      .spyOn(logger, "error")
-      .mockImplementation(() => {});
+    const loggerErrorSpy = vi.spyOn(logger, "error").mockImplementation(() => {});
 
     const notFoundError = Object.assign(new Error("NEXT_NOT_FOUND"), {
       digest: "NEXT_NOT_FOUND",
@@ -122,9 +110,7 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([NotFoundProvider])
-      .create();
+    const app = Application.configure().withProviders([NotFoundProvider]).create();
 
     await expect(app.bootstrap()).rejects.toThrow("NEXT_NOT_FOUND");
     expect(loggerErrorSpy).not.toHaveBeenCalled();
@@ -141,9 +127,7 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([DelayedFailingProvider])
-      .create();
+    const app = Application.configure().withProviders([DelayedFailingProvider]).create();
 
     const first = app.bootstrap();
     const second = app.bootstrap();
@@ -170,9 +154,7 @@ describe("Application.bootstrap error handling", () => {
       }
     }
 
-    const app = Application.configure()
-      .withProviders([TransientProvider])
-      .create();
+    const app = Application.configure().withProviders([TransientProvider]).create();
 
     // First attempt fails
     await expect(app.bootstrap()).rejects.toThrow("Transient network failure");

@@ -1,6 +1,5 @@
-import type { Token } from "./token";
-
 import type { VeapConfig } from "../config";
+import type { Token } from "./token";
 
 /**
  * Read-only access to the application config (`veap.config.ts`).
@@ -19,6 +18,4 @@ export interface IVeapConfigProvider {
  * boundaries, the same reason the container keys class tokens with
  * `Symbol.for(...)`.
  */
-export const VEAP_CONFIG: Token<IVeapConfigProvider> = Symbol.for(
-  "veap:kernel:veap-config",
-);
+export const VEAP_CONFIG: Token<IVeapConfigProvider> = Symbol.for("veap:kernel:veap-config");

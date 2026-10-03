@@ -1,13 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { matchRoute } from "../../../src/application/router/matcher";
 import {
-  RouteTree,
   extractParamName,
   isCatchAllSegment,
   isDynamicSegment,
   isGroupSegment,
   isOptionalCatchAllSegment,
   isParallelSlot,
+  RouteTree,
   resolveMagicPrefix,
 } from "../../../src/application/router/route-tree";
 
@@ -86,10 +86,7 @@ describe("matchRoute", () => {
   });
 
   it("matches multiple dynamic parameters", () => {
-    const result = matchRoute(
-      "/org/:orgId/users/:userId",
-      "/org/acme/users/42",
-    );
+    const result = matchRoute("/org/:orgId/users/:userId", "/org/acme/users/42");
     expect(result).toEqual({ orgId: "acme", userId: "42" });
   });
 

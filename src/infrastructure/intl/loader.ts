@@ -1,6 +1,6 @@
-import { container } from "../ioc/container";
 import { IntlService } from "../../application/intl/intl.service";
 import type { AbstractIntlMessages } from "../../domain/intl/types";
+import { container } from "../ioc/container";
 
 async function getService() {
   return container.resolve(IntlService);

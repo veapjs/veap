@@ -1,44 +1,37 @@
-import { ServiceProvider } from "../../infrastructure/providers/service-provider";
-import { isSystemInstalled } from "./setup";
 import { bindAuthContext } from "../../application/auth/context";
+import { AuthService } from "../../application/auth/services/auth.service";
 import { EmailVerificationService } from "../../application/auth/services/email-verification.service";
 import { PasswordResetService } from "../../application/auth/services/password-reset.service";
 import { RbacService } from "../../application/auth/services/rbac.service";
-import { AuthService } from "../../application/auth/services/auth.service";
-import { UserService } from "../../application/auth/services/user.service";
 import { SessionService } from "../../application/auth/services/session.service";
-
-import { USER_REPOSITORY } from "../../domain/auth/repositories/user.repository";
-import { ROLE_REPOSITORY } from "../../domain/auth/repositories/role.repository";
-import { PERMISSION_REPOSITORY } from "../../domain/auth/repositories/permission.repository";
-import { SESSION_REPOSITORY } from "../../domain/auth/repositories/session.repository";
-import { PASSWORD_RESET_REPOSITORY } from "../../domain/auth/repositories/password-reset.repository";
+import { UserService } from "../../application/auth/services/user.service";
+import { RouterService } from "../../application/router/router.service";
+import { PASSWORD_HASHER, SECRET_CIPHER, TOKEN_GENERATOR } from "../../domain/auth/ports";
 import { EMAIL_VERIFICATION_REPOSITORY } from "../../domain/auth/repositories/email-verification.repository";
-
-import { ActiveRecordUserRepository } from "./repositories/active-record-user.repository";
-import { ActiveRecordRoleRepository } from "./repositories/active-record-role.repository";
-import { ActiveRecordPermissionRepository } from "./repositories/active-record-permission.repository";
-import { ActiveRecordSessionRepository } from "./repositories/active-record-session.repository";
-import { ActiveRecordPasswordResetRepository } from "./repositories/active-record-password-reset.repository";
-import { ActiveRecordEmailVerificationRepository } from "./repositories/active-record-email-verification.repository";
-
-import {
-  PASSWORD_HASHER,
-  SECRET_CIPHER,
-  TOKEN_GENERATOR,
-} from "../../domain/auth/ports";
-import { ConfigService } from "../config/config.service";
-import { BcryptPasswordHasher } from "./adapters/bcrypt-password-hasher";
-import { OsloTokenGenerator } from "./adapters/oslo-token-generator";
-import { AesSecretCipher } from "./adapters/aes-secret-cipher";
+import { PASSWORD_RESET_REPOSITORY } from "../../domain/auth/repositories/password-reset.repository";
+import { PERMISSION_REPOSITORY } from "../../domain/auth/repositories/permission.repository";
+import { ROLE_REPOSITORY } from "../../domain/auth/repositories/role.repository";
+import { SESSION_REPOSITORY } from "../../domain/auth/repositories/session.repository";
+import { USER_REPOSITORY } from "../../domain/auth/repositories/user.repository";
 import {
   type AuthConfig,
   type AuthRoutesConfig,
   DEFAULT_AUTH_ROUTES,
 } from "../../domain/auth/types";
 import { AUTH_ROUTES } from "../../domain/contracts/token";
-import { RouterService } from "../../application/router/router.service";
+import { ServiceProvider } from "../../infrastructure/providers/service-provider";
+import { ConfigService } from "../config/config.service";
 import type { Container } from "../ioc/container";
+import { AesSecretCipher } from "./adapters/aes-secret-cipher";
+import { BcryptPasswordHasher } from "./adapters/bcrypt-password-hasher";
+import { OsloTokenGenerator } from "./adapters/oslo-token-generator";
+import { ActiveRecordEmailVerificationRepository } from "./repositories/active-record-email-verification.repository";
+import { ActiveRecordPasswordResetRepository } from "./repositories/active-record-password-reset.repository";
+import { ActiveRecordPermissionRepository } from "./repositories/active-record-permission.repository";
+import { ActiveRecordRoleRepository } from "./repositories/active-record-role.repository";
+import { ActiveRecordSessionRepository } from "./repositories/active-record-session.repository";
+import { ActiveRecordUserRepository } from "./repositories/active-record-user.repository";
+import { isSystemInstalled } from "./setup";
 
 export class AuthServiceProvider extends ServiceProvider {
   private config?: AuthConfig;
@@ -180,8 +173,7 @@ export class AuthServiceProvider extends ServiceProvider {
 
     // Automatically register router rewrites if custom routes differ from default virtual paths
     if (this.container.has(RouterService)) {
-      const routerService =
-        await this.container.resolve<RouterService>(RouterService);
+      const routerService = await this.container.resolve<RouterService>(RouterService);
       if (routes.signIn !== DEFAULT_AUTH_ROUTES.signIn) {
         routerService.addRewrite(routes.signIn, DEFAULT_AUTH_ROUTES.signIn);
       }
@@ -189,29 +181,18 @@ export class AuthServiceProvider extends ServiceProvider {
         routerService.addRewrite(routes.signUp, DEFAULT_AUTH_ROUTES.signUp);
       }
       if (routes.forgotPassword !== DEFAULT_AUTH_ROUTES.forgotPassword) {
-        routerService.addRewrite(
-          routes.forgotPassword,
-          DEFAULT_AUTH_ROUTES.forgotPassword,
-        );
+        routerService.addRewrite(routes.forgotPassword, DEFAULT_AUTH_ROUTES.forgotPassword);
       }
       if (routes.resetPassword !== DEFAULT_AUTH_ROUTES.resetPassword) {
-        routerService.addRewrite(
-          routes.resetPassword,
-          DEFAULT_AUTH_ROUTES.resetPassword,
-        );
+        routerService.addRewrite(routes.resetPassword, DEFAULT_AUTH_ROUTES.resetPassword);
       }
       if (routes.verifyEmail !== DEFAULT_AUTH_ROUTES.verifyEmail) {
-        routerService.addRewrite(
-          routes.verifyEmail,
-          DEFAULT_AUTH_ROUTES.verifyEmail,
-        );
+        routerService.addRewrite(routes.verifyEmail, DEFAULT_AUTH_ROUTES.verifyEmail);
       }
     }
 
     if (await isSystemInstalled()) {
-      const emailService = await this.container.resolve(
-        EmailVerificationService,
-      );
+      const emailService = await this.container.resolve(EmailVerificationService);
       await emailService.initEmailVerification();
     }
   }

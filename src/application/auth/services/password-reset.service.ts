@@ -1,28 +1,19 @@
 import { addMinutes } from "date-fns";
-import { sendResetPassword } from "../../communication/mail";
-import { augmentPasswordResetSession } from "../augment";
-import { performFullUserAugmentation } from "../logic";
+import { type ITokenGenerator, TOKEN_GENERATOR } from "../../../domain/auth/ports/token-generator";
+import {
+  type IPasswordResetRepository,
+  PASSWORD_RESET_REPOSITORY,
+} from "../../../domain/auth/repositories/password-reset.repository";
 import type {
   PasswordResetAuthSession,
   PasswordResetSession as PasswordResetSessionType,
 } from "../../../domain/auth/types";
-import {
-  TOKEN_GENERATOR,
-  type ITokenGenerator,
-} from "../../../domain/auth/ports/token-generator";
+import { CACHE_PROVIDER, type ICacheProvider } from "../../../domain/contracts/cache";
+import { COOKIE_STORE, type ICookieStore } from "../../../domain/contracts/http-transport";
 import { Inject, Injectable } from "../../../domain/contracts/ioc";
-import {
-  COOKIE_STORE,
-  type ICookieStore,
-} from "../../../domain/contracts/http-transport";
-import {
-  PASSWORD_RESET_REPOSITORY,
-  type IPasswordResetRepository,
-} from "../../../domain/auth/repositories/password-reset.repository";
-import {
-  CACHE_PROVIDER,
-  type ICacheProvider,
-} from "../../../domain/contracts/cache";
+import { sendResetPassword } from "../../communication/mail";
+import { augmentPasswordResetSession } from "../augment";
+import { performFullUserAugmentation } from "../logic";
 
 interface DummyResetSession {
   id: string;
@@ -35,10 +26,7 @@ const dummySessions = new Map<string, DummyResetSession>();
 
 @Injectable()
 export class PasswordResetService {
-  private inMemoryAttempts = new Map<
-    string,
-    { count: number; expiresAt: number }
-  >();
+  private inMemoryAttempts = new Map<string, { count: number; expiresAt: number }>();
 
   constructor(
     @Inject(PASSWORD_RESET_REPOSITORY)
@@ -92,9 +80,7 @@ export class PasswordResetService {
     return session;
   }
 
-  async validatePasswordResetSessionToken(
-    token: string,
-  ): Promise<PasswordResetAuthSession> {
+  async validatePasswordResetSessionToken(token: string): Promise<PasswordResetAuthSession> {
     const sessionId = this.tokens.hashToken(token);
 
     const record = await this.sessions.findWithUser(sessionId);
@@ -139,9 +125,7 @@ export class PasswordResetService {
     const { password, recovery_code, ...safeUser } = baseUser;
 
     const user = await performFullUserAugmentation(safeUser as any);
-    const session = await augmentPasswordResetSession(
-      baseSession as PasswordResetSessionType,
-    );
+    const session = await augmentPasswordResetSession(baseSession as PasswordResetSessionType);
 
     return { session, user };
   }
@@ -163,8 +147,7 @@ export class PasswordResetService {
         await this.deletePasswordResetSessionTokenCookie();
         return {
           valid: false,
-          error:
-            "Too many failed attempts. Password reset request has been cancelled.",
+          error: "Too many failed attempts. Password reset request has been cancelled.",
         };
       }
       return { valid: false, error: "Incorrect code" };
@@ -203,8 +186,7 @@ export class PasswordResetService {
       this.inMemoryAttempts.delete(sessionId);
       return {
         valid: false,
-        error:
-          "Too many failed attempts. Password reset request has been cancelled.",
+        error: "Too many failed attempts. Password reset request has been cancelled.",
       };
     }
 
@@ -218,9 +200,7 @@ export class PasswordResetService {
     return { valid: true };
   }
 
-  async setPasswordResetSessionAsEmailVerified(
-    sessionId: string,
-  ): Promise<void> {
+  async setPasswordResetSessionAsEmailVerified(sessionId: string): Promise<void> {
     await this.sessions.setEmailVerified(sessionId);
   }
 
@@ -244,10 +224,7 @@ export class PasswordResetService {
     return result;
   }
 
-  async setPasswordResetSessionTokenCookie(
-    token: string,
-    expiresAt: Date,
-  ): Promise<void> {
+  async setPasswordResetSessionTokenCookie(token: string, expiresAt: Date): Promise<void> {
     await this.cookieStore.set("password_reset_session", token, {
       expires: expiresAt,
       sameSite: "lax",

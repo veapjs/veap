@@ -1,9 +1,9 @@
-import { SystemPlugin } from "../models/SystemPlugin";
 import type {
   IPluginRepository,
   PluginStatusRecord,
   UpsertPluginStatusRecord,
 } from "../../../domain/plugins/repositories/plugin.repository";
+import { SystemPlugin } from "../models/SystemPlugin";
 
 /**
  * `IPluginRepository` adapter backed by the `SystemPlugin` ActiveRecord model
@@ -73,12 +73,9 @@ export class ActiveRecordPluginRepository implements IPluginRepository {
     const existing = await SystemPlugin.find(id);
 
     if (existing) {
-      if (update.enabled !== undefined)
-        existing.setAttribute("enabled", update.enabled);
-      if (update.installed !== undefined)
-        existing.setAttribute("installed", update.installed);
-      if (update.lastStep !== undefined)
-        existing.setAttribute("lastStep", update.lastStep);
+      if (update.enabled !== undefined) existing.setAttribute("enabled", update.enabled);
+      if (update.installed !== undefined) existing.setAttribute("installed", update.installed);
+      if (update.lastStep !== undefined) existing.setAttribute("lastStep", update.lastStep);
       existing.setAttribute("updatedAt", new Date());
       await existing.save();
       return;

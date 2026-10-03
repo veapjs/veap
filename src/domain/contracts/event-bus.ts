@@ -1,6 +1,5 @@
-import type { Token } from "./token";
-
 import type { EventHandler, SystemEventsMap } from "../events/types";
+import type { Token } from "./token";
 
 /**
  * Options for publishing events.

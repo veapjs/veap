@@ -7,24 +7,12 @@
  * automatically from filesystem conventions.
  */
 
-// --- React Components ---
-export { RouterErrorBoundary } from "../presentation/router/react/error-boundary";
-export { VeapRouter } from "../presentation/router/react/renderer";
-export { withRouter } from "../presentation/router/react/with-router";
-
-// --- API & Middlewares ---
-export { handleVeapApiRequest } from "../presentation/router/api/handler";
 export {
-  ApiSameOrigin,
-  EnsuredAuth,
-  EnsuredGuest,
-  EnsuredUser,
-  SameOrigin,
-  SkipSecurity,
-} from "../presentation/router/api/middlewares";
-
-// --- Engine ---
-export type { RouterConfig } from "../infrastructure/router/provider";
+  addRouteRewrite,
+  getPluginsWithHomepage,
+  getRouteRewrites,
+} from "../application/router/discovery";
+export { matchRoute } from "../application/router/matcher";
 export type {
   LayoutChainEntry,
   MatchResult,
@@ -41,16 +29,25 @@ export {
   resolveMagicPrefix,
   segmentMatchesUrlPart,
 } from "../application/router/route-tree";
-export { matchRoute } from "../application/router/matcher";
-
+// --- Engine ---
+export type { RouterConfig } from "../infrastructure/router/provider";
 // --- Discovery ---
 export {
   discoverRoutes,
   generateRouteManifest,
   globToTree,
 } from "../infrastructure/router/scanner";
+// --- API & Middlewares ---
+export { handleVeapApiRequest } from "../presentation/router/api/handler";
 export {
-  addRouteRewrite,
-  getPluginsWithHomepage,
-  getRouteRewrites,
-} from "../application/router/discovery";
+  ApiSameOrigin,
+  EnsuredAuth,
+  EnsuredGuest,
+  EnsuredUser,
+  SameOrigin,
+  SkipSecurity,
+} from "../presentation/router/api/middlewares";
+// --- React Components ---
+export { RouterErrorBoundary } from "../presentation/router/react/error-boundary";
+export { VeapRouter } from "../presentation/router/react/renderer";
+export { withRouter } from "../presentation/router/react/with-router";

@@ -24,14 +24,10 @@
  * ```
  */
 
-import type { UserPermission, UserRole } from "../../domain/auth/types";
-import type {
-  ApiMiddleware,
-  BreadcrumbValue,
-  VeapMiddleware,
-} from "../../domain/plugins/types";
 import type { Metadata } from "next";
 import type * as React from "react";
+import type { UserPermission, UserRole } from "../../domain/auth/types";
+import type { ApiMiddleware, BreadcrumbValue, VeapMiddleware } from "../../domain/plugins/types";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -265,10 +261,7 @@ export function extractParamName(segment: string): string {
  * - Group segments `(name)` never directly match a URL part (they are transparent).
  * - Catch-all and optional catch-all are handled separately in the matching algorithm.
  */
-export function segmentMatchesUrlPart(
-  segment: string,
-  urlPart: string,
-): boolean {
+export function segmentMatchesUrlPart(segment: string, urlPart: string): boolean {
   // Group segments are transparent - they don't consume URL parts
   if (isGroupSegment(segment)) {
     return false;
@@ -300,10 +293,7 @@ function createRootNode(): RouteNode {
 /**
  * Builds a {@link LayoutChainEntry} from a given {@link RouteNode}.
  */
-function buildChainEntry(
-  node: RouteNode,
-  consumedSegments: string[],
-): LayoutChainEntry {
+function buildChainEntry(node: RouteNode, consumedSegments: string[]): LayoutChainEntry {
   const entry: LayoutChainEntry = {};
 
   if (node.layout) entry.layout = node.layout;
@@ -447,10 +437,7 @@ function matchRecursive(
 
     // Check optional catch-all children (they can match zero segments)
     for (const child of children) {
-      if (
-        isOptionalCatchAllSegment(child.segment) &&
-        (child.page || child.route)
-      ) {
+      if (isOptionalCatchAllSegment(child.segment) && (child.page || child.route)) {
         const paramName = extractParamName(child.segment);
         const entry = buildChainEntry(child, currentMatched);
         return {
@@ -527,10 +514,7 @@ function matchRecursive(
     if (isCatchAllSegment(child.segment) && (child.page || child.route)) {
       const paramName = extractParamName(child.segment);
       const caughtSegments = remainingSegments;
-      const entry = buildChainEntry(child, [
-        ...currentMatched,
-        ...caughtSegments,
-      ]);
+      const entry = buildChainEntry(child, [...currentMatched, ...caughtSegments]);
       return {
         node: child,
         params: {
@@ -545,16 +529,10 @@ function matchRecursive(
 
   // ── 4. Optional catch-all `[[...param]]` children (0+ segments) ──────
   for (const child of children) {
-    if (
-      isOptionalCatchAllSegment(child.segment) &&
-      (child.page || child.route)
-    ) {
+    if (isOptionalCatchAllSegment(child.segment) && (child.page || child.route)) {
       const paramName = extractParamName(child.segment);
       const caughtSegments = remainingSegments;
-      const entry = buildChainEntry(child, [
-        ...currentMatched,
-        ...caughtSegments,
-      ]);
+      const entry = buildChainEntry(child, [...currentMatched, ...caughtSegments]);
       return {
         node: child,
         params: {
@@ -637,10 +615,7 @@ function cloneNode(node: RouteNode): RouteNode {
  * If the prefix contains multiple segments (e.g., "admin/dashboard"), it builds
  * a chain of nodes, placing the original node's properties on the innermost segment.
  */
-export function resolveMagicPrefix(
-  node: RouteNode,
-  prefixPath: string,
-): RouteNode {
+export function resolveMagicPrefix(node: RouteNode, prefixPath: string): RouteNode {
   const clone: RouteNode = { ...node };
 
   if (clone.children) {
@@ -726,10 +701,7 @@ export class RouteTree {
    * @param to - Target virtual route path (e.g. `"/signin"`).
    */
   addRewrite(from: string, to: string): this {
-    this.rewrites.set(
-      this.normalizeRewritePath(from),
-      this.normalizeRewritePath(to),
-    );
+    this.rewrites.set(this.normalizeRewritePath(from), this.normalizeRewritePath(to));
     return this;
   }
 
@@ -778,15 +750,8 @@ export class RouteTree {
     return path;
   }
 
-  private matchRewritePattern(
-    fromPattern: string,
-    path: string,
-  ): Record<string, string> | null {
-    if (
-      !fromPattern.includes(":") &&
-      !fromPattern.includes("[") &&
-      !fromPattern.includes("*")
-    ) {
+  private matchRewritePattern(fromPattern: string, path: string): Record<string, string> | null {
+    if (!fromPattern.includes(":") && !fromPattern.includes("[") && !fromPattern.includes("*")) {
       return null;
     }
 
@@ -798,11 +763,7 @@ export class RouteTree {
       const fromPart = fromParts[i];
 
       // Catch-all or wildcard at the end
-      if (
-        fromPart === "*" ||
-        fromPart.startsWith(":path*") ||
-        fromPart.startsWith("[...")
-      ) {
+      if (fromPart === "*" || fromPart.startsWith(":path*") || fromPart.startsWith("[...")) {
         const remaining = pathParts.slice(i).join("/");
         params["path"] = remaining;
         params["*"] = remaining;
@@ -835,10 +796,7 @@ export class RouteTree {
     return params;
   }
 
-  private applyRewritePattern(
-    toPattern: string,
-    params: Record<string, string>,
-  ): string {
+  private applyRewritePattern(toPattern: string, params: Record<string, string>): string {
     let result = toPattern;
 
     for (const [key, value] of Object.entries(params)) {
@@ -922,18 +880,14 @@ export class RouteTree {
     if (source.notFound) target.notFound = source.notFound;
     if (source.default) target.default = source.default;
     if (source.route) target.route = source.route;
-    if (source.generateMetadata)
-      target.generateMetadata = source.generateMetadata;
+    if (source.generateMetadata) target.generateMetadata = source.generateMetadata;
     if (source.breadcrumb !== undefined) target.breadcrumb = source.breadcrumb;
     if (source.id !== undefined) target.id = source.id;
     if (source.auth !== undefined) target.auth = source.auth;
 
     // Merge middleware arrays (concatenate)
     if (source.middlewares?.length) {
-      target.middlewares = [
-        ...(target.middlewares ?? []),
-        ...source.middlewares,
-      ];
+      target.middlewares = [...(target.middlewares ?? []), ...source.middlewares];
     }
 
     // Merge roles (deduplicate)
@@ -955,9 +909,7 @@ export class RouteTree {
       if (!target.children) target.children = [];
 
       for (const sourceChild of source.children) {
-        const existingChild = target.children.find(
-          (c) => c.segment === sourceChild.segment,
-        );
+        const existingChild = target.children.find((c) => c.segment === sourceChild.segment);
         if (existingChild) {
           this.mergeNode(existingChild, sourceChild);
         } else {
@@ -970,9 +922,7 @@ export class RouteTree {
     if (source.parallelRoutes) {
       if (!target.parallelRoutes) target.parallelRoutes = {};
 
-      for (const [slotName, slotTree] of Object.entries(
-        source.parallelRoutes,
-      )) {
+      for (const [slotName, slotTree] of Object.entries(source.parallelRoutes)) {
         if (target.parallelRoutes[slotName]) {
           this.mergeNode(target.parallelRoutes[slotName], slotTree);
         } else {
@@ -1008,14 +958,7 @@ export class RouteTree {
       result: null as InternalMatchResult | null,
     };
 
-    const result = matchRecursive(
-      this.root,
-      segments,
-      {},
-      [rootEntry],
-      [],
-      bestPartialMatch,
-    );
+    const result = matchRecursive(this.root, segments, {}, [rootEntry], [], bestPartialMatch);
 
     if (result) {
       return {
@@ -1157,8 +1100,7 @@ export class RouteTree {
         child.segment === currentSegment
       ) {
         if (child.generateMetadata) generators.push(child.generateMetadata);
-        if (this.collectGeneratorsRecursive(child, rest, generators))
-          return true;
+        if (this.collectGeneratorsRecursive(child, rest, generators)) return true;
         // Backtrack: remove the generator we just added if it didn't lead to a match
         if (child.generateMetadata) generators.pop();
       }
@@ -1168,10 +1110,7 @@ export class RouteTree {
     for (const child of children) {
       if (isGroupSegment(child.segment)) {
         if (child.generateMetadata) generators.push(child.generateMetadata);
-        if (
-          this.collectGeneratorsRecursive(child, remainingSegments, generators)
-        )
-          return true;
+        if (this.collectGeneratorsRecursive(child, remainingSegments, generators)) return true;
         if (child.generateMetadata) generators.pop();
       }
     }
@@ -1180,8 +1119,7 @@ export class RouteTree {
     for (const child of children) {
       if (isDynamicSegment(child.segment)) {
         if (child.generateMetadata) generators.push(child.generateMetadata);
-        if (this.collectGeneratorsRecursive(child, rest, generators))
-          return true;
+        if (this.collectGeneratorsRecursive(child, rest, generators)) return true;
         if (child.generateMetadata) generators.pop();
       }
     }

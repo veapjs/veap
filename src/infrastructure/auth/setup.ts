@@ -1,6 +1,6 @@
-import { User } from "./models";
 import { eventBus } from "../../application/events/event-bus";
 import { logger } from "../logging/console-logger";
+import { User } from "./models";
 
 /**
  * Checks if the system is installed.

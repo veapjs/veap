@@ -1,9 +1,9 @@
 "use server";
-import { AppError } from "../../../domain/errors/app-error";
 
 import { getCurrentSession } from "../../../application/auth/facades/session";
-import { SystemUserWidget } from "../../../infrastructure/plugins/models/SystemUserWidget";
 import { pluginsContext } from "../../../application/plugins/context";
+import { AppError } from "../../../domain/errors/app-error";
+import { SystemUserWidget } from "../../../infrastructure/plugins/models/SystemUserWidget";
 
 export async function getPluginExtensionsAction(
   target: string,
@@ -14,15 +14,10 @@ export async function getPluginExtensionsAction(
   const userRoles = user?.roles || [];
   const userPermissions = user?.permissions || [];
 
-  return pluginsContext().registry.getExtensions(
-    target,
-    point,
-    includeDisabled,
-    {
-      roles: userRoles,
-      permissions: userPermissions,
-    },
-  );
+  return pluginsContext().registry.getExtensions(target, point, includeDisabled, {
+    roles: userRoles,
+    permissions: userPermissions,
+  });
 }
 
 export async function getPluginWidgetsAction(area: string) {

@@ -1,7 +1,7 @@
 "use client";
 
-import { eventBus } from "../../../application/events/event-bus";
 import { useCallback, useEffect, useRef } from "react";
+import { eventBus } from "../../../application/events/event-bus";
 
 type ConfirmOptions = {
   action?: string;
@@ -59,11 +59,7 @@ export function useConfirmAction() {
       }
     };
 
-    eventBus.subscribe(
-      "action:confirm:response",
-      subscriberId,
-      responseHandler,
-    );
+    eventBus.subscribe("action:confirm:response", subscriberId, responseHandler);
 
     return () => {
       eventBus.unsubscribe("action:confirm:response", subscriberId);

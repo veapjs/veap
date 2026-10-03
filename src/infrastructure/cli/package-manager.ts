@@ -30,16 +30,8 @@ export function detectPackageManager(dir: string): PackageManager {
       const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf-8"));
       if (typeof pkg.packageManager === "string") {
         // Handles both "pnpm@11.9.0" and "pnpm@https://..." forms
-        const name = pkg.packageManager.slice(
-          0,
-          pkg.packageManager.indexOf("@"),
-        );
-        if (
-          name === "pnpm" ||
-          name === "npm" ||
-          name === "yarn" ||
-          name === "bun"
-        ) {
+        const name = pkg.packageManager.slice(0, pkg.packageManager.indexOf("@"));
+        if (name === "pnpm" || name === "npm" || name === "yarn" || name === "bun") {
           return name;
         }
       }
@@ -61,21 +53,14 @@ export function detectPackageManager(dir: string): PackageManager {
  * No-op for pnpm (baseline stub), missing variants or missing Dockerfile -
  * best effort, Docker config is optional.
  */
-export function applyDockerfileForPackageManager(
-  projectDir: string,
-  pm: PackageManager,
-): void {
+export function applyDockerfileForPackageManager(projectDir: string, pm: PackageManager): void {
   if (pm === "pnpm") return;
   try {
     // Stubs live at the package root of the installed @veap/framework.
     const variantPath = stubPath("docker", `Dockerfile.${pm}.stub`);
     const dockerfilePath = path.join(projectDir, "Dockerfile");
     if (!fs.existsSync(variantPath) || !fs.existsSync(dockerfilePath)) return;
-    fs.writeFileSync(
-      dockerfilePath,
-      fs.readFileSync(variantPath, "utf-8"),
-      "utf-8",
-    );
+    fs.writeFileSync(dockerfilePath, fs.readFileSync(variantPath, "utf-8"), "utf-8");
   } catch {
     // best effort - docker config is optional
   }

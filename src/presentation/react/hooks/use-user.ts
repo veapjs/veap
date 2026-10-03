@@ -1,6 +1,6 @@
 "use client";
-import { AppError } from "../../../domain/errors/app-error";
 import { useContext } from "react";
+import { AppError } from "../../../domain/errors/app-error";
 import { AuthContext } from "../providers/auth-provider";
 
 /**

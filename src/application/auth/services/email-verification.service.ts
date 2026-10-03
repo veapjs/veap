@@ -1,21 +1,15 @@
 import { addMinutes } from "date-fns";
-import { sendVerifyEmail } from "../../communication/mail";
-import { registerSecurityRequirement } from "../logic";
-import { SessionService } from "./session.service";
-import {
-  TOKEN_GENERATOR,
-  type ITokenGenerator,
-} from "../../../domain/auth/ports/token-generator";
-import { Inject, Injectable } from "../../../domain/contracts/ioc";
-import {
-  COOKIE_STORE,
-  type ICookieStore,
-} from "../../../domain/contracts/http-transport";
+import { type ITokenGenerator, TOKEN_GENERATOR } from "../../../domain/auth/ports/token-generator";
 import {
   EMAIL_VERIFICATION_REPOSITORY,
   type EmailVerificationRecord,
   type IEmailVerificationRepository,
 } from "../../../domain/auth/repositories/email-verification.repository";
+import { COOKIE_STORE, type ICookieStore } from "../../../domain/contracts/http-transport";
+import { Inject, Injectable } from "../../../domain/contracts/ioc";
+import { sendVerifyEmail } from "../../communication/mail";
+import { registerSecurityRequirement } from "../logic";
+import { SessionService } from "./session.service";
 
 export type EmailVerificationRequestType = EmailVerificationRecord;
 
@@ -88,9 +82,7 @@ export class EmailVerificationService {
   /**
    * Sets the email verification request ID in a cookie.
    */
-  async setEmailVerificationRequestCookie(
-    request: EmailVerificationRequestType,
-  ): Promise<void> {
+  async setEmailVerificationRequestCookie(request: EmailVerificationRequestType): Promise<void> {
     await this.cookieStore.set("email_verification", request.id, {
       httpOnly: true,
       path: "/",

@@ -51,11 +51,8 @@ export async function send2FACode(email: string, code: string) {
   return sendMail({
     to: email,
     subject: t("Your 2FA Code"),
-    text: t(
-      "Your verification code is: {code}. It will expire in 10 minutes.",
-      {
-        code,
-      },
-    ),
+    text: t("Your verification code is: {code}. It will expire in 10 minutes.", {
+      code,
+    }),
   });
 }

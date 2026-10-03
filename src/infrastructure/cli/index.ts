@@ -1,12 +1,12 @@
 #!/usr/bin/env node
-import { container } from "../ioc/container.js";
-import { CliService } from "./service.js";
-import { CLI_SERVICE } from "../../domain/contracts/token.js";
-import { loadEnv } from "./env.js";
-import path from "node:path";
 import fs from "node:fs";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import pkg from "../../../package.json" with { type: "json" };
+import { CLI_SERVICE } from "../../domain/contracts/token.js";
+import { container } from "../ioc/container.js";
+import { loadEnv } from "./env.js";
+import { CliService } from "./service.js";
 
 async function main() {
   process.env.VEAP_CLI = "1";
@@ -31,10 +31,7 @@ async function main() {
   const cli = cliService.program;
 
   cli
-    .command(
-      "init [name]",
-      "Initialize a new Veap project (asks for details when omitted)",
-    )
+    .command("init [name]", "Initialize a new Veap project (asks for details when omitted)")
     .option("--docker", "Initialize Docker configuration")
     .option("--skip-install", "Skip dependencies installation")
     .option(

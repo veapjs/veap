@@ -29,15 +29,10 @@ export async function PluginExtensionPoint({
   const userRoles = user?.roles || [];
   const userPermissions = user?.permissions || [];
 
-  const extensions = await pluginsContext().registry.getExtensions(
-    target,
-    point,
-    includeDisabled,
-    {
-      roles: userRoles,
-      permissions: userPermissions,
-    },
-  );
+  const extensions = await pluginsContext().registry.getExtensions(target, point, includeDisabled, {
+    roles: userRoles,
+    permissions: userPermissions,
+  });
 
   const fallbackContent = (children ?? fallback ?? null) as React.ReactNode;
 

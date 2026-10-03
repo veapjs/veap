@@ -19,5 +19,4 @@ export interface Scope<M extends Model = any> {
 /**
  * Type representing either a callback or a Scope object.
  */
-export type GlobalScope<M extends Model = any> =
-  GlobalScopeCallback<M> | Scope<M>;
+export type GlobalScope<M extends Model = any> = GlobalScopeCallback<M> | Scope<M>;

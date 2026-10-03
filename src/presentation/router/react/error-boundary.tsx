@@ -1,7 +1,7 @@
 "use client";
 
-import { warn } from "../../../infrastructure/logging";
 import * as React from "react";
+import { warn } from "../../../infrastructure/logging";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -23,10 +23,7 @@ interface ErrorBoundaryState {
  * Reset is implemented via internal key increment, which forces
  * React to remount the children subtree.
  */
-export class RouterErrorBoundary extends React.Component<
-  ErrorBoundaryProps,
-  ErrorBoundaryState
-> {
+export class RouterErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { error: null, resetKey: 0 };

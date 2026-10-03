@@ -1,9 +1,9 @@
-import { AppError } from "../../domain/errors/app-error";
 /** biome-ignore-all lint/suspicious/noExplicitAny: <ignore> */
 import fs from "node:fs";
 import path from "node:path";
-import { warn } from "../logging/console-logger";
 import { DEFAULT_CONFIG, type VeapConfig } from "../../domain/config";
+import { AppError } from "../../domain/errors/app-error";
+import { warn } from "../logging/console-logger";
 
 let cachedConfig: VeapConfig | null = null;
 
@@ -40,10 +40,9 @@ export async function getVeapConfig(): Promise<VeapConfig> {
 
     if (fs.existsSync(configPathTS)) {
       const cacheBuster = `?t=${Date.now()}`;
-      const imported: any = await jiti.import(
-        `file://${configPathTS}${cacheBuster}`,
-        { default: true },
-      );
+      const imported: any = await jiti.import(`file://${configPathTS}${cacheBuster}`, {
+        default: true,
+      });
       loadedConfig = imported.default || imported;
     } else if (fs.existsSync(configPathMJS)) {
       const imported: any = await jiti.import(configPathMJS, { default: true });
@@ -53,11 +52,7 @@ export async function getVeapConfig(): Promise<VeapConfig> {
       loadedConfig = imported.default || imported;
     }
   } catch (error) {
-    warn(
-      "veap:config",
-      "Could not load veap.config.ts, using defaults.",
-      error,
-    );
+    warn("veap:config", "Could not load veap.config.ts, using defaults.", error);
   }
 
   const finalConfig = { ...DEFAULT_CONFIG, ...loadedConfig };

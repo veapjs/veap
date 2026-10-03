@@ -1,12 +1,6 @@
+import type { LayoutChainEntry, MatchResult } from "../../../application/router/route-tree";
 import type { UserPermission, UserRole } from "../../../domain/auth/types";
-import type {
-  ApiMiddleware,
-  VeapMiddleware,
-} from "../../../domain/plugins/types";
-import type {
-  LayoutChainEntry,
-  MatchResult,
-} from "../../../application/router/route-tree";
+import type { ApiMiddleware, VeapMiddleware } from "../../../domain/plugins/types";
 
 export function collectMiddlewares(
   chain: LayoutChainEntry[],

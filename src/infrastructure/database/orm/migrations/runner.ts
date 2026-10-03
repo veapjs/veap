@@ -42,9 +42,7 @@ function createMigrationDbAdapter(trx: any) {
   adapter.raw = (query: any, ...bindings: any[]) => trx.raw(query, ...bindings);
   adapter.execute = (query: any) => {
     const sqlString =
-      typeof query === "string"
-        ? query
-        : query?.query || query?.text || String(query);
+      typeof query === "string" ? query : query?.query || query?.text || String(query);
     return trx.raw(sqlString);
   };
   return new Proxy(adapter, {
@@ -78,9 +76,7 @@ export async function runMigrations(scope: string, migrations: Migration[]) {
     debug("veap:migration", `Running migrations for scope: ${scope}`);
 
     // 1. Get executed migrations for this scope
-    const executed = await tx("migrations")
-      .select("name")
-      .where("scope", scope);
+    const executed = await tx("migrations").select("name").where("scope", scope);
 
     const executedNames = executed.map((m: any) => m.name);
 
@@ -101,10 +97,7 @@ export async function runMigrations(scope: string, migrations: Migration[]) {
 
     // 4. Execute pending
     for (const migration of pending) {
-      debug(
-        "veap:migration",
-        `[${scope}] Running migration: ${migration.name}...`,
-      );
+      debug("veap:migration", `[${scope}] Running migration: ${migration.name}...`);
 
       try {
         await migration.up(dbAdapter, schema);
@@ -116,16 +109,9 @@ export async function runMigrations(scope: string, migrations: Migration[]) {
           executed_at: new Date(),
         });
 
-        debug(
-          "veap:migration",
-          `[${scope}] Successfully ran ${migration.name}.`,
-        );
+        debug("veap:migration", `[${scope}] Successfully ran ${migration.name}.`);
       } catch (error) {
-        warn(
-          "veap:migration",
-          `[${scope}] Failed to run ${migration.name}:`,
-          error,
-        );
+        warn("veap:migration", `[${scope}] Failed to run ${migration.name}:`, error);
         throw error; // Rollback the whole batch on error
       }
     }
@@ -136,10 +122,7 @@ export async function runMigrations(scope: string, migrations: Migration[]) {
  * Modern static migration rollback runner.
  * Reverts migrations in reverse order.
  */
-export async function rollbackMigrations(
-  scope: string,
-  migrations: Migration[],
-) {
+export async function rollbackMigrations(scope: string, migrations: Migration[]) {
   if (migrations.length === 0 || !process.env.DATABASE_URL) return;
 
   const knex = getKnex();
@@ -168,9 +151,7 @@ export async function rollbackMigrations(
     // 2. Find migrations to roll back
     const toRollback = [...migrations]
       .filter((m) => executedNames.includes(m.name))
-      .sort(
-        (a, b) => executedNames.indexOf(a.name) - executedNames.indexOf(b.name),
-      );
+      .sort((a, b) => executedNames.indexOf(a.name) - executedNames.indexOf(b.name));
 
     if (toRollback.length === 0) {
       debug("veap:migration", `No migrations to roll back for ${scope}.`);

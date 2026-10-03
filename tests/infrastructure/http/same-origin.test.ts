@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { verifySameOrigin } from "../../../src/infrastructure/http/next-request-context";
 
 describe("verifySameOrigin CSRF protection", () => {

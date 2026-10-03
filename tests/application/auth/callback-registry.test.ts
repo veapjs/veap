@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { AuthCallbackRegistry } from "../../../src/application/auth/registry";
+import {
+  augmentSession,
+  registerSessionAugmenter,
+  unregisterSessionAugmenter,
+} from "../../../src/application/auth/augment";
 import {
   checkSecurity,
   registerAuthValidator,
@@ -7,11 +11,7 @@ import {
   unregisterAuthValidator,
   unregisterSecurityRequirement,
 } from "../../../src/application/auth/logic";
-import {
-  augmentSession,
-  registerSessionAugmenter,
-  unregisterSessionAugmenter,
-} from "../../../src/application/auth/augment";
+import { AuthCallbackRegistry } from "../../../src/application/auth/registry";
 import type { FullUser, Session } from "../../../src/domain/auth/types";
 
 describe("AuthCallbackRegistry", () => {

@@ -4,10 +4,10 @@ import { Toaster } from "@veap/ui/components/sonner";
 import { TooltipProvider } from "@veap/ui/components/tooltip";
 import { ThemeProvider } from "@veap/ui/providers";
 import { PageLoader } from "@veap/ui/shared/page-loader";
-import type { AuthRoutesConfig, AuthSession } from "../../../domain/auth/types";
 import type * as React from "react";
 import { useEffect, useState } from "react";
 import { SWRConfig } from "swr";
+import type { AuthRoutesConfig, AuthSession } from "../../../domain/auth/types";
 import { AuthProvider } from "./auth-provider";
 
 export const AppProvider = ({
@@ -41,16 +41,11 @@ export const AppProvider = ({
     <ThemeProvider>
       <SWRConfig
         value={{
-          fetcher: (url: string) =>
-            fetch(url).then((response) => response.json()),
+          fetcher: (url: string) => fetch(url).then((response) => response.json()),
           revalidateIfStale: true,
         }}
       >
-        <AuthProvider
-          initialSession={initialSession}
-          prefix={prefix}
-          routes={authRoutes}
-        >
+        <AuthProvider initialSession={initialSession} prefix={prefix} routes={authRoutes}>
           <TooltipProvider>
             {children}
 

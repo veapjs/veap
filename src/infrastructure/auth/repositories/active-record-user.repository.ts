@@ -1,10 +1,10 @@
-import { User } from "../models/User";
 import type {
   CreateUserRecord,
   IUserRepository,
   UpdateUserRecord,
 } from "../../../domain/auth/repositories/user.repository";
 import type { User as UserEntity } from "../../../domain/auth/types";
+import { User } from "../models/User";
 
 /**
  * `IUserRepository` adapter backed by the `User` ActiveRecord model.
@@ -60,10 +60,7 @@ export class ActiveRecordUserRepository implements IUserRepository {
     await user.save();
   }
 
-  async setEmailVerifiedIfEmailMatches(
-    id: string,
-    email: string,
-  ): Promise<boolean> {
+  async setEmailVerifiedIfEmailMatches(id: string, email: string): Promise<boolean> {
     const updated = await User.where({ id, email }).update({
       emailVerifiedAt: new Date(),
     });

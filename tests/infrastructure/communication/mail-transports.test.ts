@@ -18,10 +18,7 @@ import { NodemailerMailService } from "../../../src/infrastructure/communication
 export const interpolatingTranslator = () =>
   Promise.resolve((key: string, params?: Record<string, unknown>) =>
     params
-      ? Object.entries(params).reduce(
-          (acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)),
-          key,
-        )
+      ? Object.entries(params).reduce((acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)), key)
       : key,
   );
 
@@ -34,9 +31,7 @@ const fakeConfig = (over: Record<string, string | undefined> = {}) => ({
 
 describe("NodemailerMailService (DTO mapping, pure delivery)", () => {
   it("maps MailMessage onto SendMailOptions with a default sender", () => {
-    const service = new NodemailerMailService(
-      fakeConfig({ from: "Veap <noreply@veap.dev>" }),
-    );
+    const service = new NodemailerMailService(fakeConfig({ from: "Veap <noreply@veap.dev>" }));
 
     const options = service.toSendMailOptions({
       to: "user@example.com",
@@ -51,9 +46,7 @@ describe("NodemailerMailService (DTO mapping, pure delivery)", () => {
   });
 
   it("lets an explicit sender override the default", () => {
-    const service = new NodemailerMailService(
-      fakeConfig({ from: "default@veap.dev" }),
-    );
+    const service = new NodemailerMailService(fakeConfig({ from: "default@veap.dev" }));
 
     const options = service.toSendMailOptions({
       to: "user@example.com",
@@ -69,9 +62,7 @@ describe("NodemailerMailService (DTO mapping, pure delivery)", () => {
   });
 
   it("falls back to a from-address derived from the username", () => {
-    const service = new NodemailerMailService(
-      fakeConfig({ username: "bot@veap.dev" }),
-    );
+    const service = new NodemailerMailService(fakeConfig({ username: "bot@veap.dev" }));
     expect(service.defaultFrom).toBe("Veap <bot@veap.dev>");
   });
 

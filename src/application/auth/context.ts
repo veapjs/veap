@@ -1,8 +1,5 @@
+import { type AuthRoutesConfig, DEFAULT_AUTH_ROUTES } from "../../domain/auth/types";
 import { AppError } from "../../domain/errors/app-error";
-import {
-  type AuthRoutesConfig,
-  DEFAULT_AUTH_ROUTES,
-} from "../../domain/auth/types";
 import type { AuthService } from "./services/auth.service";
 import type { EmailVerificationService } from "./services/email-verification.service";
 import type { PasswordResetService } from "./services/password-reset.service";

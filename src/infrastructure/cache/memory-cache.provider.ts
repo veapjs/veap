@@ -1,5 +1,5 @@
-import { Injectable } from "../ioc/decorators";
 import type { ICacheProvider } from "../../domain/contracts/cache";
+import { Injectable } from "../ioc/decorators";
 
 interface CacheEntry<T> {
   value: T;

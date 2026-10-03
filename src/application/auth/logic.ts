@@ -1,4 +1,3 @@
-import { coreRbacAugmenter } from "./rbac-logic";
 import type {
   AuthResponse,
   FullUser,
@@ -7,8 +6,6 @@ import type {
   UserPermission,
   UserRole,
 } from "../../domain/auth/types";
-
-import { AuthCallbackRegistry } from "./registry";
 import {
   augmentSession,
   augmentUser,
@@ -19,6 +16,8 @@ import {
   unregisterPasswordResetSessionAugmenter,
   unregisterSessionAugmenter,
 } from "./augment";
+import { coreRbacAugmenter } from "./rbac-logic";
+import { AuthCallbackRegistry } from "./registry";
 
 /**
  * Registry for login validators (e.g. 2FA module)
@@ -42,33 +41,26 @@ export type SecurityRequirement = (
 /**
  * Registry for password reset validators (e.g. 2FA module requiring check during reset)
  */
-export type PasswordResetValidator = (
-  userId: string,
-) => Promise<AuthResponse | null>;
+export type PasswordResetValidator = (userId: string) => Promise<AuthResponse | null>;
 
 /**
  * Registry for email verification validators
  */
-export type EmailVerificationValidator = (
-  userId: string,
-) => Promise<AuthResponse | null>;
+export type EmailVerificationValidator = (userId: string) => Promise<AuthResponse | null>;
 
 const globalForAuth = globalThis as unknown as {
   __VEAP_AUTH_VALIDATORS__: AuthCallbackRegistry<AuthValidator> | undefined;
-  __VEAP_SECURITY_REQUIREMENTS__:
-    AuthCallbackRegistry<SecurityRequirement> | undefined;
-  __VEAP_PASSWORD_RESET_VALIDATORS__:
-    AuthCallbackRegistry<PasswordResetValidator> | undefined;
+  __VEAP_SECURITY_REQUIREMENTS__: AuthCallbackRegistry<SecurityRequirement> | undefined;
+  __VEAP_PASSWORD_RESET_VALIDATORS__: AuthCallbackRegistry<PasswordResetValidator> | undefined;
   __VEAP_EMAIL_VERIFICATION_VALIDATORS__:
-    AuthCallbackRegistry<EmailVerificationValidator> | undefined;
+    | AuthCallbackRegistry<EmailVerificationValidator>
+    | undefined;
 };
 
 export const authValidators =
-  globalForAuth.__VEAP_AUTH_VALIDATORS__ ??
-  new AuthCallbackRegistry<AuthValidator>();
+  globalForAuth.__VEAP_AUTH_VALIDATORS__ ?? new AuthCallbackRegistry<AuthValidator>();
 const securityRequirements =
-  globalForAuth.__VEAP_SECURITY_REQUIREMENTS__ ??
-  new AuthCallbackRegistry<SecurityRequirement>();
+  globalForAuth.__VEAP_SECURITY_REQUIREMENTS__ ?? new AuthCallbackRegistry<SecurityRequirement>();
 const passwordResetValidators =
   globalForAuth.__VEAP_PASSWORD_RESET_VALIDATORS__ ??
   new AuthCallbackRegistry<PasswordResetValidator>();
@@ -79,14 +71,10 @@ const emailVerificationValidators =
 globalForAuth.__VEAP_AUTH_VALIDATORS__ = authValidators;
 globalForAuth.__VEAP_SECURITY_REQUIREMENTS__ = securityRequirements;
 globalForAuth.__VEAP_PASSWORD_RESET_VALIDATORS__ = passwordResetValidators;
-globalForAuth.__VEAP_EMAIL_VERIFICATION_VALIDATORS__ =
-  emailVerificationValidators;
+globalForAuth.__VEAP_EMAIL_VERIFICATION_VALIDATORS__ = emailVerificationValidators;
 
 export function registerAuthValidator(validator: AuthValidator): void;
-export function registerAuthValidator(
-  id: string,
-  validator: AuthValidator,
-): void;
+export function registerAuthValidator(id: string, validator: AuthValidator): void;
 export function registerAuthValidator(
   idOrValidator: string | AuthValidator,
   validator?: AuthValidator,
@@ -94,19 +82,12 @@ export function registerAuthValidator(
   authValidators.register(idOrValidator, validator);
 }
 
-export function unregisterAuthValidator(
-  idOrValidator: string | AuthValidator,
-): boolean {
+export function unregisterAuthValidator(idOrValidator: string | AuthValidator): boolean {
   return authValidators.unregister(idOrValidator);
 }
 
-export function registerPasswordResetValidator(
-  validator: PasswordResetValidator,
-): void;
-export function registerPasswordResetValidator(
-  id: string,
-  validator: PasswordResetValidator,
-): void;
+export function registerPasswordResetValidator(validator: PasswordResetValidator): void;
+export function registerPasswordResetValidator(id: string, validator: PasswordResetValidator): void;
 export function registerPasswordResetValidator(
   idOrValidator: string | PasswordResetValidator,
   validator?: PasswordResetValidator,
@@ -120,9 +101,7 @@ export function unregisterPasswordResetValidator(
   return passwordResetValidators.unregister(idOrValidator);
 }
 
-export function registerEmailVerificationValidator(
-  validator: EmailVerificationValidator,
-): void;
+export function registerEmailVerificationValidator(validator: EmailVerificationValidator): void;
 export function registerEmailVerificationValidator(
   id: string,
   validator: EmailVerificationValidator,
@@ -151,13 +130,8 @@ export {
   unregisterSessionAugmenter,
 };
 
-export function registerSecurityRequirement(
-  requirement: SecurityRequirement,
-): void;
-export function registerSecurityRequirement(
-  id: string,
-  requirement: SecurityRequirement,
-): void;
+export function registerSecurityRequirement(requirement: SecurityRequirement): void;
+export function registerSecurityRequirement(id: string, requirement: SecurityRequirement): void;
 export function registerSecurityRequirement(
   idOrRequirement: string | SecurityRequirement,
   requirement?: SecurityRequirement,
@@ -171,9 +145,7 @@ export function unregisterSecurityRequirement(
   return securityRequirements.unregister(idOrRequirement);
 }
 
-export async function runPasswordResetValidators(
-  userId: string,
-): Promise<AuthResponse | null> {
+export async function runPasswordResetValidators(userId: string): Promise<AuthResponse | null> {
   for (const validator of passwordResetValidators) {
     const interception = await validator(userId);
     if (interception) return interception;
@@ -181,9 +153,7 @@ export async function runPasswordResetValidators(
   return null;
 }
 
-export async function runEmailVerificationValidators(
-  userId: string,
-): Promise<AuthResponse | null> {
+export async function runEmailVerificationValidators(userId: string): Promise<AuthResponse | null> {
   for (const validator of emailVerificationValidators) {
     const interception = await validator(userId);
     if (interception) return interception;
@@ -223,9 +193,7 @@ export async function checkSecurity(
 
   // Organization UI disabled
   const userRoles = Array.isArray(user.roles) ? user.roles : [];
-  const userPermissions = Array.isArray(user.permissions)
-    ? user.permissions
-    : [];
+  const userPermissions = Array.isArray(user.permissions) ? user.permissions : [];
 
   // 1. Core Role Check (At least one role must match)
   if (requiredRoles && requiredRoles.length > 0) {
@@ -241,13 +209,9 @@ export async function checkSecurity(
 
   // 2. Core Permission Check (ALL permissions must match)
   if (requiredPermissions && requiredPermissions.length > 0) {
-    const hasAllPermissions = requiredPermissions.every((perm) =>
-      userPermissions.includes(perm),
-    );
+    const hasAllPermissions = requiredPermissions.every((perm) => userPermissions.includes(perm));
     if (!hasAllPermissions) {
-      console.warn(
-        `User lacks required permissions: ${requiredPermissions.join(", ")}`,
-      );
+      console.warn(`User lacks required permissions: ${requiredPermissions.join(", ")}`);
 
       return {
         satisfied: false,

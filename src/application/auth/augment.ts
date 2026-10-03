@@ -1,9 +1,4 @@
-import type {
-  FullUser,
-  PasswordResetSession,
-  Session,
-  User,
-} from "../../domain/auth/types";
+import type { FullUser, PasswordResetSession, Session, User } from "../../domain/auth/types";
 
 import { AuthCallbackRegistry } from "./registry";
 
@@ -18,34 +13,27 @@ type PasswordResetSessionAugmenter = (
 ) => Promise<Partial<PasswordResetSession>>;
 
 const globalForAugment = globalThis as unknown as {
-  __VEAP_IDENTITY_AUGMENTERS__:
-    AuthCallbackRegistry<IdentityAugmenter> | undefined;
-  __VEAP_SESSION_AUGMENTERS__:
-    AuthCallbackRegistry<SessionAugmenter> | undefined;
+  __VEAP_IDENTITY_AUGMENTERS__: AuthCallbackRegistry<IdentityAugmenter> | undefined;
+  __VEAP_SESSION_AUGMENTERS__: AuthCallbackRegistry<SessionAugmenter> | undefined;
   __VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__:
-    AuthCallbackRegistry<PasswordResetSessionAugmenter> | undefined;
+    | AuthCallbackRegistry<PasswordResetSessionAugmenter>
+    | undefined;
 };
 
 const identityAugmenters =
-  globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ ??
-  new AuthCallbackRegistry<IdentityAugmenter>();
+  globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ ?? new AuthCallbackRegistry<IdentityAugmenter>();
 const sessionAugmenters =
-  globalForAugment.__VEAP_SESSION_AUGMENTERS__ ??
-  new AuthCallbackRegistry<SessionAugmenter>();
+  globalForAugment.__VEAP_SESSION_AUGMENTERS__ ?? new AuthCallbackRegistry<SessionAugmenter>();
 const passwordResetSessionAugmenters =
   globalForAugment.__VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__ ??
   new AuthCallbackRegistry<PasswordResetSessionAugmenter>();
 
 globalForAugment.__VEAP_IDENTITY_AUGMENTERS__ = identityAugmenters;
 globalForAugment.__VEAP_SESSION_AUGMENTERS__ = sessionAugmenters;
-globalForAugment.__VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__ =
-  passwordResetSessionAugmenters;
+globalForAugment.__VEAP_PASSWORD_RESET_SESSION_AUGMENTERS__ = passwordResetSessionAugmenters;
 
 export function registerIdentityAugmenter(augmenter: IdentityAugmenter): void;
-export function registerIdentityAugmenter(
-  id: string,
-  augmenter: IdentityAugmenter,
-): void;
+export function registerIdentityAugmenter(id: string, augmenter: IdentityAugmenter): void;
 export function registerIdentityAugmenter(
   idOrAugmenter: string | IdentityAugmenter,
   augmenter?: IdentityAugmenter,
@@ -53,17 +41,12 @@ export function registerIdentityAugmenter(
   identityAugmenters.register(idOrAugmenter, augmenter);
 }
 
-export function unregisterIdentityAugmenter(
-  idOrAugmenter: string | IdentityAugmenter,
-): boolean {
+export function unregisterIdentityAugmenter(idOrAugmenter: string | IdentityAugmenter): boolean {
   return identityAugmenters.unregister(idOrAugmenter);
 }
 
 export function registerSessionAugmenter(augmenter: SessionAugmenter): void;
-export function registerSessionAugmenter(
-  id: string,
-  augmenter: SessionAugmenter,
-): void;
+export function registerSessionAugmenter(id: string, augmenter: SessionAugmenter): void;
 export function registerSessionAugmenter(
   idOrAugmenter: string | SessionAugmenter,
   augmenter?: SessionAugmenter,
@@ -71,9 +54,7 @@ export function registerSessionAugmenter(
   sessionAugmenters.register(idOrAugmenter, augmenter);
 }
 
-export function unregisterSessionAugmenter(
-  idOrAugmenter: string | SessionAugmenter,
-): boolean {
+export function unregisterSessionAugmenter(idOrAugmenter: string | SessionAugmenter): boolean {
   return sessionAugmenters.unregister(idOrAugmenter);
 }
 

@@ -1,6 +1,6 @@
-import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 import { SettingsService } from "../../application/settings/settings.service";
 import { SETTINGS_REPOSITORY } from "../../domain/settings/settings.repository";
+import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 import { ActiveRecordSettingsRepository } from "./repositories/setting.repository";
 
 export class SettingsServiceProvider extends ServiceProvider {

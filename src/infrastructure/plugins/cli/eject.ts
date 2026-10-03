@@ -32,9 +32,7 @@ export async function ejectPackage(packageName: string) {
   };
 
   if (!deps[packageName]) {
-    console.error(
-      `Error: Package "${packageName}" is not installed in dependencies.`,
-    );
+    console.error(`Error: Package "${packageName}" is not installed in dependencies.`);
     process.exit(1);
   }
 
@@ -43,9 +41,7 @@ export async function ejectPackage(packageName: string) {
   const pkgJsonPath = path.join(nodeModulesDir, "package.json");
 
   if (!fs.existsSync(pkgJsonPath)) {
-    console.error(
-      `Error: Cannot find package.json for installed package at ${pkgJsonPath}`,
-    );
+    console.error(`Error: Cannot find package.json for installed package at ${pkgJsonPath}`);
     process.exit(1);
   }
 
@@ -72,9 +68,7 @@ export async function ejectPackage(packageName: string) {
 
   if (!gitUrl) {
     // If not found in package.json, try querying registry
-    const spinUrl = ora(
-      `Querying registry for Git repository of ${packageName}...`,
-    ).start();
+    const spinUrl = ora(`Querying registry for Git repository of ${packageName}...`).start();
     try {
       const output = execSync(`npm view ${packageName} repository.url`, {
         stdio: "pipe",
@@ -93,9 +87,7 @@ export async function ejectPackage(packageName: string) {
       }
     } catch (_err) {
       spinUrl.fail();
-      console.error(
-        `Error: Could not retrieve repository URL from package or registry.`,
-      );
+      console.error(`Error: Could not retrieve repository URL from package or registry.`);
       process.exit(1);
     }
   }
@@ -105,9 +97,7 @@ export async function ejectPackage(packageName: string) {
   const destDir = path.join(rootDir, targetSubdir, folderName);
 
   if (fs.existsSync(destDir)) {
-    console.error(
-      `Error: Local ${itemType} directory already exists at ${destDir}`,
-    );
+    console.error(`Error: Local ${itemType} directory already exists at ${destDir}`);
     process.exit(1);
   }
 
@@ -139,25 +129,16 @@ export async function ejectPackage(packageName: string) {
   // Update root package.json dependency to workspace:*
   rootPkg.dependencies = rootPkg.dependencies || {};
   rootPkg.dependencies[packageName] = "workspace:*";
-  fs.writeFileSync(
-    rootPkgPath,
-    `${JSON.stringify(rootPkg, null, 2)}\n`,
-    "utf-8",
-  );
+  fs.writeFileSync(rootPkgPath, `${JSON.stringify(rootPkg, null, 2)}\n`, "utf-8");
   console.log(`✅ Updated root package.json dependencies.`);
 
   // Link workspace packages
-  const { detectPackageManager } =
-    await import("../../../infrastructure/cli/package-manager.js");
+  const { detectPackageManager } = await import("../../../infrastructure/cli/package-manager.js");
   const pm = detectPackageManager(rootDir);
-  const linkSpin = ora(
-    `Running ${pm} install to link ejected ${itemType}...`,
-  ).start();
+  const linkSpin = ora(`Running ${pm} install to link ejected ${itemType}...`).start();
   try {
     execSync(`${pm} install`, { cwd: rootDir, stdio: "ignore" });
-    linkSpin.succeed(
-      `${isTemplate ? "Template" : "Plugin"} linked successfully.`,
-    );
+    linkSpin.succeed(`${isTemplate ? "Template" : "Plugin"} linked successfully.`);
   } catch (_err) {
     linkSpin.fail(`Failed to run ${pm} install automatically.`);
   }

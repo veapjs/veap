@@ -1,5 +1,5 @@
-import { Injectable } from "../ioc/decorators";
 import type { ILogger } from "../../domain/contracts/logger";
+import { Injectable } from "../ioc/decorators";
 
 const colors = [
   "\x1b[32m", // Green
@@ -93,11 +93,7 @@ export function warn(group: string, message: string, ...args: any[]) {
     );
   } else {
     const color = colors[idx % colors.length];
-    console.warn(
-      `${color}[${group}]${reset}`,
-      `\x1b[33m${message}${reset}`,
-      ...args,
-    );
+    console.warn(`${color}[${group}]${reset}`, `\x1b[33m${message}${reset}`, ...args);
   }
 }
 
@@ -114,8 +110,7 @@ export function error(group: string, message: string, ...args: any[]) {
     args[0] !== null &&
     "isAppError" in args[0]
   ) {
-    const appError =
-      args[0] as import("../../domain/errors/app-error").AppError;
+    const appError = args[0] as import("../../domain/errors/app-error").AppError;
     formattedMessage = `${message} [${appError.code}]`;
     // We keep the original error in args so it logs the stack trace correctly
   }

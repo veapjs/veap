@@ -1,5 +1,5 @@
-import { Setting } from "../models/Setting";
 import type { ISettingsRepository } from "../../../domain/settings/settings.repository";
+import { Setting } from "../models/Setting";
 
 /**
  * `ISettingsRepository` adapter backed by the `Setting` ActiveRecord model.

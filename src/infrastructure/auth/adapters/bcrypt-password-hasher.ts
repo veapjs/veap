@@ -13,22 +13,17 @@ export class BcryptPasswordHasher implements IPasswordHasher {
   public readonly minLength: number;
 
   constructor(rounds?: number, minLength?: number) {
-    const envRounds = process.env.AUTH_BCRYPT_ROUNDS
-      ? Number(process.env.AUTH_BCRYPT_ROUNDS)
-      : NaN;
+    const envRounds = process.env.AUTH_BCRYPT_ROUNDS ? Number(process.env.AUTH_BCRYPT_ROUNDS) : NaN;
     const resolvedRounds = rounds !== undefined ? Number(rounds) : envRounds;
     this.rounds =
-      !Number.isNaN(resolvedRounds) &&
-      resolvedRounds >= 4 &&
-      resolvedRounds <= 31
+      !Number.isNaN(resolvedRounds) && resolvedRounds >= 4 && resolvedRounds <= 31
         ? Math.floor(resolvedRounds)
         : 10;
 
     const envMinLength = process.env.AUTH_PASSWORD_MIN_LENGTH
       ? Number(process.env.AUTH_PASSWORD_MIN_LENGTH)
       : NaN;
-    const resolvedMinLength =
-      minLength !== undefined ? Number(minLength) : envMinLength;
+    const resolvedMinLength = minLength !== undefined ? Number(minLength) : envMinLength;
     this.minLength =
       !Number.isNaN(resolvedMinLength) && resolvedMinLength >= 1
         ? Math.floor(resolvedMinLength)

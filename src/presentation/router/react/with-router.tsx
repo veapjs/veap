@@ -1,5 +1,5 @@
-import * as React from "react";
 import { headers } from "next/headers";
+import * as React from "react";
 import { buildRouteTree } from "../../../application/router/discovery";
 import { VeapRouter } from "./renderer";
 
@@ -32,9 +32,7 @@ export function withRouter(
     const searchParams = (await props.searchParams) || {};
 
     const config: WithRouterConfig =
-      typeof configOrPath === "string"
-        ? { path: configOrPath }
-        : configOrPath || {};
+      typeof configOrPath === "string" ? { path: configOrPath } : configOrPath || {};
 
     let routePath = config.path;
 

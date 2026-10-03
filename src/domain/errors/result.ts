@@ -1,5 +1,5 @@
-import type { ErrorCode } from "./types";
 import type { AppError } from "./app-error";
+import type { ErrorCode } from "./types";
 
 export type AppErrorJson = {
   code: ErrorCode;
