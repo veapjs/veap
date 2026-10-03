@@ -10,7 +10,7 @@ author: "Veap Core Team"
 # Veap Documentation
 
 > [!IMPORTANT]
-> **Early Access Release**: Veap is currently in active developer preview (`v0.12.x.x`). Core architecture, plugin interfaces, and developer tooling are actively evolving. We encourage testing and welcome issues, ideas, and contributions on GitHub.
+> **Early Access Release**: Veap is currently in active developer preview (`v0.13.x.x`). Core architecture, plugin interfaces, and developer tooling are actively evolving. We encourage testing and welcome issues, ideas, and contributions on GitHub.
 
 Veap is a modular application framework built on Next.js App Router and React Server Components. It provides a plugin system with a virtual router, an ActiveRecord-style ORM, built-in authentication with RBAC, and a Laravel-inspired service provider architecture with dependency injection.
 

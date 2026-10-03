@@ -1,5 +1,16 @@
 # @veap/framework
 
+## 0.13.0
+
+### Minor Changes
+
+- feat(router): add declarative `.withSiteLayout()` support for `(site)` route group
+
+  - Added `withSiteLayout(layout)` method to `ApplicationBuilder` allowing host applications to declare a shared layout for public virtual routes.
+  - Updated `RouterService` to attach the configured site layout specifically to the `(site)` route group node in `RouteTree`.
+  - Ensured virtual routes under `(site)` (e.g., `@veap/blog-plugin`) inherit the site layout while keeping administrative routes under `[prefix]` (`@veap/panel-plugin`) isolated with their own panel shell.
+  - Added `SITE_LAYOUT` DI token and extended `RouterConfig` interface.
+
 ## 0.12.0
 
 ### Minor Changes

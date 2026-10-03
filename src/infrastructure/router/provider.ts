@@ -1,9 +1,12 @@
 import { ServiceProvider } from "../../infrastructure/providers/service-provider";
 import { eventBus } from "../../application/events/event-bus";
 import { RouterService } from "../../application/router/router.service";
+import { SITE_LAYOUT } from "../../domain/contracts/token";
+import type * as React from "react";
 
 export interface RouterConfig {
   rewrites?: Record<string, string>;
+  siteLayout?: React.ComponentType<any>;
 }
 
 export class RouterServiceProvider extends ServiceProvider {
@@ -20,6 +23,14 @@ export class RouterServiceProvider extends ServiceProvider {
       useClass: RouterService,
       singleton: true,
     });
+
+    if (this.config?.siteLayout) {
+      this.container.register({
+        token: SITE_LAYOUT,
+        useValue: this.config.siteLayout,
+        singleton: true,
+      });
+    }
   }
 
   async boot(): Promise<void> {
@@ -30,6 +41,10 @@ export class RouterServiceProvider extends ServiceProvider {
       for (const [from, to] of Object.entries(this.config.rewrites)) {
         routerService.addRewrite(from, to);
       }
+    }
+
+    if (this.config?.siteLayout) {
+      routerService.setSiteLayout(this.config.siteLayout);
     }
 
     // Clear cache when plugins are enabled/disabled

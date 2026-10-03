@@ -1,6 +1,6 @@
 # Layouts and slots
 
-Layouts wrap pages and nested route segments. Veap supports layouts through native Next.js root and directory layouts, plugin route-tree layouts, and modular UI slot injection using `ExtensionPoint`.
+Layouts wrap pages and nested route segments. Veap supports layouts through native Next.js root and directory layouts, declarative public layouts (`.withSiteLayout()`), plugin route-tree layouts, and modular UI slot injection using `ExtensionPoint`.
 
 ## Root layout (physical)
 
@@ -51,6 +51,32 @@ Key points to understand:
 - `export const dynamic = "force-dynamic"` is required. Without it, `next build` prerenders `/_not-found` during the build phase, bootstrap intentionally skips provider boot, and context-bound helpers throw `Context is not bound`. This is a deliberate trade-off (framework decision record ADR-006).
 - `ExtensionPoint target="app"` lets plugins inject content around the whole application without modifying this file.
 - `AppProvider` wraps the tree in theme, tooltip, toaster and auth contexts (client). `initialSession` seeds the client auth context from the server-side session lookup.
+- Notice that `app/layout.tsx` contains no visual navbar or footer. Visual public shells are decoupled from the root layout so that administrative surfaces (such as the admin panel) remain clean.
+
+## Declarative public layouts with withSiteLayout()
+
+To provide a consistent header, navigation bar, and footer across both physical public pages and virtual plugin pages (such as `/blog` from `@veap/blog-plugin`), configure a site layout in your composition root:
+
+```tsx
+// lib/veap.ts
+import { Application } from "@veap/framework/core/server";
+import { SiteLayout } from "@/components/site-layout";
+import { plugins } from "./plugins.gen";
+
+export const app = Application.configure()
+  .withDatabase()
+  .withAuth()
+  .withRouter()
+  .withSiteLayout(SiteLayout)
+  .withPlugins(plugins)
+  .create();
+```
+
+When you declare `.withSiteLayout(SiteLayout)`:
+
+1. **Virtual public routes**: The Veap router binds `SiteLayout` to the `(site)` route group in `RouteTree`. Any plugin route that lives within `(site)` (for example, `/blog`, `/blog/[slug]`) automatically renders inside `SiteLayout`.
+2. **Admin panel isolation**: Routes under `[prefix]` (for example, `/app/*` provided by `@veap/panel-plugin`) never inherit `SiteLayout`. They render inside their own panel shell without duplicate navbars or footers.
+3. **Physical public routes**: Organize your host application's public pages in `app/(site)/` (for example, `app/(site)/page.tsx` and `app/(site)/layout.tsx`) so that native Next.js pages and virtual plugin pages share the exact same UI shell.
 
 ## Modular shells with ExtensionPoint
 
@@ -59,20 +85,20 @@ Rather than relying on closed, monolithic theme templates, Veap applications com
 Plugins can inject navigation headers, footers, or announcement banners into predefined application slots. Using `mode="single"`, the host application provides default components as fallback children. If an installed plugin registers a higher-priority component for that slot, it replaces the default:
 
 ```tsx
-// app/layout.tsx or components/layout-shell.tsx
+// components/site-layout.tsx
 import { ExtensionPoint } from "@veap/framework/plugins/server";
-import { DefaultHeader } from "@/components/default-header";
+import { DefaultNavbar } from "@/components/default-navbar";
 import { DefaultFooter } from "@/components/default-footer";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
-      {/* Plugin can override navbar; otherwise renders DefaultHeader */}
+    <div className="flex min-h-screen flex-col justify-between">
+      {/* Plugin can override navbar; otherwise renders DefaultNavbar */}
       <ExtensionPoint target="app" point="navbar" mode="single">
-        <DefaultHeader />
+        <DefaultNavbar />
       </ExtensionPoint>
 
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 w-full">{children}</main>
 
       {/* Plugin can override footer; otherwise renders DefaultFooter */}
       <ExtensionPoint target="app" point="footer" mode="single">
@@ -124,7 +150,7 @@ Each layout level can provide `loading.tsx` and `error.tsx`. The router wraps th
 
 Because Veap is an additive layer on top of Next.js App Router, host applications do not need template override systems to customize plugin user interfaces.
 
-Next.js file-system routing takes precedence over the catch-all virtual router. If a plugin provides a page at `/signin` or `/blog/[slug]`, you can override its UI simply by creating a physical Next.js file at `app/(auth)/signin/page.tsx` or `app/blog/[slug]/page.tsx`.
+Next.js file-system routing takes precedence over the catch-all virtual router. If a plugin provides a page at `/signin` or `/blog/[slug]`, you can override its UI simply by creating a physical Next.js file at `app/(auth)/signin/page.tsx` or `app/(site)/blog/[slug]/page.tsx`.
 
 The physical Next.js page renders your custom UI, while retaining full access to the plugin's backend services, models, and Server Actions.
 

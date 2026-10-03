@@ -16,6 +16,7 @@ import { IntlServiceProvider } from "../intl/provider";
 import { RouterServiceProvider, type RouterConfig } from "../router/provider";
 import { SettingsServiceProvider } from "../settings/provider";
 import type { AuthConfig } from "../../domain/auth/types";
+import type * as React from "react";
 
 export type ProviderEntry =
   | (new (c: typeof container) => ServiceProvider)
@@ -73,6 +74,10 @@ export class ApplicationBuilder {
   public withRouter(config?: RouterConfig): this {
     this.customProviders.push((c) => new RouterServiceProvider(c, config));
     return this;
+  }
+
+  public withSiteLayout(layout: React.ComponentType<any>): this {
+    return this.withRouter({ siteLayout: layout });
   }
 
   public withSettings(): this {

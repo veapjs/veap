@@ -4,7 +4,7 @@
  * A token is a string/symbol registry key or a class constructor. Symbol
  * tokens defined next to their contracts in `domain/contracts/*` (and next to
  * the repository ports) stay stable across HMR / dual-package boundaries,
- * the same reason the container keys class tokens with `Symbol.for(...)`.
+ * the same reason the container keys class tokens with `Symbol.for(...)`闢.
  *
  * The type lives in the domain so contract files can annotate their tokens
  * (`export const LOGGER: Token<ILogger> = Symbol.for(...)`) and consumers get
@@ -21,3 +21,4 @@ export const APP_MIGRATIONS: Token<any[]> = Symbol.for(
 );
 export const CLI_SERVICE: Token<any> = Symbol.for("veap:kernel:cli-service");
 export const AUTH_ROUTES: Token<any> = Symbol.for("veap:auth:routes");
+export const SITE_LAYOUT: Token<any> = Symbol.for("veap:router:site-layout");

@@ -5,10 +5,12 @@ import { NavigationService } from "../plugins/navigation";
 import { CACHE_PROVIDER, CONFIG_SERVICE } from "../../domain/contracts";
 import type { ICacheProvider } from "../../domain/contracts/cache";
 import type { IConfigService } from "../../domain/contracts/config";
+import type * as React from "react";
 
 @Injectable()
 export class RouterService {
   private rewrites = new Map<string, string>();
+  private siteLayout?: React.ComponentType<any>;
 
   constructor(
     @Inject(CACHE_PROVIDER) private cache: ICacheProvider,
@@ -16,6 +18,14 @@ export class RouterService {
     private pluginRegistry: PluginRegistry,
     private navigation: NavigationService,
   ) {}
+
+  public setSiteLayout(layout: React.ComponentType<any>): void {
+    this.siteLayout = layout;
+  }
+
+  public getSiteLayout(): React.ComponentType<any> | undefined {
+    return this.siteLayout;
+  }
 
   public addRewrite(from: string, to: string): void {
     this.rewrites.set(from, to);
@@ -87,6 +97,19 @@ export class RouterService {
         const resolvedTreeRoot = resolveMagicPrefix(pluginTree as any, prefix);
         tree.addTree(resolvedTreeRoot);
       }
+    }
+
+    // Attach siteLayout only to the "(site)" route group node
+    if (this.siteLayout) {
+      const rootNode = tree.getRoot();
+      if (!rootNode.children) rootNode.children = [];
+
+      let siteGroup = rootNode.children.find((c) => c.segment === "(site)");
+      if (!siteGroup) {
+        siteGroup = { segment: "(site)", children: [] };
+        rootNode.children.push(siteGroup);
+      }
+      siteGroup.layout = this.siteLayout;
     }
 
     return tree;
