@@ -267,6 +267,17 @@ await eventBus.publish("invoice:generated", {
 });
 ```
 
+## Native Next.js applications (without plugins)
+
+You do not need to build or install plugins to use Veap's event bus. In a native Next.js application, the event bus and core system events (`system:auth:*`, `model:*`) function out-of-the-box.
+
+To register side-effects (such as dispatching an email notification when a user signs in):
+
+1. **Service provider pattern (Clean Architecture):** Create a custom `ServiceProvider` and attach listeners in its `boot()` method. Then pass it to `.withProviders([AppEventsServiceProvider])` in `lib/veap.ts`.
+2. **Direct subscription:** Subscribe via `eventBus.subscribe("system:auth:login", "subscriber-id", handler)` directly in your `lib/veap.ts` module. Subscriptions using constant subscriber IDs are idempotent and safe under Next.js Fast Refresh.
+
+For an end-to-end recipe demonstrating login notifications in a native Next.js setup, see [Recipe 6 in the Cookbook](../guides/cookbook.md#recipe-6-native-nextjs-application-with-event-driven-mail-notifications).
+
 ## Best practices and cross-runtime constraints
 
 To avoid common pitfalls when working with events in Veap:

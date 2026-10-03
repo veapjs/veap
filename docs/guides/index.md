@@ -9,4 +9,4 @@ Task-oriented walkthroughs that combine several parts of the framework.
 - [Database setup](./database-setup.md): engines, connection strings and migration workflow.
 - [Custom service adapters](./custom-adapters.md): integrate AWS S3 / Cloudflare R2 storage, Resend / Postmark email, and Redis cache.
 - [Testing](./testing.md): write unit and integration tests with IoC container mocking, fake request contexts, and in-memory SQLite.
-- [Real-world cookbook](./cookbook.md): production-ready recipes for 2FA gates, file uploads, Vercel vs Docker deployments, and in-memory test suites.
+- [Real-world cookbook](./cookbook.md): production-ready recipes for 2FA gates, file uploads, Vercel vs Docker deployments, native event handlers, and in-memory test suites.

@@ -1,35 +1,36 @@
 # Custom service providers
 
-Service providers are the extension mechanism of the composition root. A provider registers services in the container at boot; plugins and application code then resolve them by token. This page shows how to write your own provider and how to bind custom implementations of framework ports.
+Service providers are the extension mechanism of the composition root. A provider registers services in the container at boot; plugins and application code then resolve them by token. This page shows how to write your own provider, how to listen to domain events during bootstrap, and how to bind custom implementations of framework ports.
 
 ## The ServiceProvider contract
 
 ```ts
-import type { ServiceProvider } from "@veap/framework/core/server";
+import { ServiceProvider, type Container } from "@veap/framework/core/server";
 
-export class MyServiceProvider implements ServiceProvider {
-  register(container: Container): void {
-    // bind services (no runtime dependencies yet)
+export class MyServiceProvider extends ServiceProvider {
+  register(): void {
+    // Bind services into this.container (no runtime dependencies yet)
   }
-  async boot(container: Container): Promise<void> {
-    // optional: start things that depend on other providers
+
+  async boot(): Promise<void> {
+    // Optional: wire event listeners or start logic depending on other providers
   }
 }
 ```
 
-`register()` runs for every provider first, then `boot()` runs in registration order. Keep `register()` free of side effects; resolve other services only in `boot()`.
+`register()` runs for every provider first, then `boot()` runs in registration order. Keep `register()` free of side effects; resolve other services or register event subscriptions in `boot()`.
 
 ## Writing a provider
 
 ```ts
 // src/providers/search-provider.ts
-import { Container, type ServiceProvider } from "@veap/framework/core/server";
+import { ServiceProvider } from "@veap/framework/core/server";
 import { SEARCH_CLIENT } from "../domain/ports/search-client";
 import { MeilisearchClient } from "../infrastructure/meilisearch-client";
 
-export class SearchServiceProvider implements ServiceProvider {
-  register(container: Container): void {
-    container.register({
+export class SearchServiceProvider extends ServiceProvider {
+  register(): void {
+    this.container.register({
       token: SEARCH_CLIENT,
       useFactory: () => new MeilisearchClient(),
       singleton: true,
@@ -48,7 +49,58 @@ Application.configure()
   .create();
 ```
 
-Token conventions used by the framework: class tokens for concrete services, typed `Token<T>` symbol constants (upper snake case, e.g. `PASSWORD_HASHER`, `CACHE_PROVIDER`, `CUSTOM_MAILER`) for swappable ports. Bind providers using `container.register({ token, useClass, useValue, useFactory, singleton: true })`.
+Token conventions used by the framework: class tokens for concrete services, typed `Token<T>` symbol constants (upper snake case, for example, `PASSWORD_HASHER`, `CACHE_PROVIDER`, `CUSTOM_MAILER`) for swappable ports. Bind providers using `this.container.register({ token, useClass, useValue, useFactory, singleton: true })`.
+
+## Handling domain events in a provider
+
+Service providers are the recommended pattern in clean architectures to attach side-effect listeners without coupling business logic to presentation layers or third-party plugins.
+
+Because `boot()` executes after all kernel and application providers finish their `register()` phase, you can safely subscribe to system events (like user authentication or database model mutations) and trigger notifications:
+
+```ts
+// src/providers/app-events-provider.ts
+import { ServiceProvider } from "@veap/framework/core/server";
+import { eventBus } from "@veap/framework/core";
+import { sendMail } from "@veap/framework/communication";
+
+export class AppEventsServiceProvider extends ServiceProvider {
+  register(): void {
+    // No container bindings required for this provider
+  }
+
+  boot(): void {
+    // Listen for authentication events fired by AuthService
+    eventBus.subscribe(
+      "system:auth:login",
+      "app:login-notifier",
+      async (event) => {
+        const { user } = event.payload;
+
+        await sendMail({
+          to: user.email,
+          subject: "New login detected",
+          text: `Hello ${user.name || user.email}, a new sign-in to your account was detected.`,
+        });
+      },
+    );
+  }
+}
+```
+
+Register your custom provider in `lib/veap.ts`:
+
+```ts
+// lib/veap.ts
+import { Application } from "@veap/framework/core/server";
+import { AppEventsServiceProvider } from "./providers/app-events-provider";
+
+export const app = Application.configure()
+  .withDatabase()
+  .withAuth()
+  .withCommunication()
+  .withProviders([AppEventsServiceProvider])
+  .create();
+```
 
 ## Replacing a framework port
 

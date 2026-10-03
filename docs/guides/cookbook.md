@@ -1,6 +1,6 @@
 ---
 title: "Real-World Cookbook"
-description: "Production-ready recipes for gate plugins, custom storage adapters, multi-tenant isolation, and auditing."
+description: "Production-ready recipes for gate plugins, custom storage adapters, multi-tenant isolation, auditing, and native event handlers."
 status: "Stable"
 category: "Guides & Cookbook"
 author: "Veap Core Team"
@@ -576,3 +576,132 @@ export function PostDetail({ post, comments, currentUserId }: any) {
   );
 }
 ```
+
+---
+
+## Recipe 6: Native Next.js application with event-driven mail notifications
+
+You can use Veap purely as an enterprise backend and domain toolkit in a native Next.js application without installing or authoring plugins. In this architecture, you rely on native App Router routes, server actions, and physical layouts while leveraging Veap's `EventBus`, `AuthService`, and `sendMail` facade.
+
+### Scenario: Send an email alert on user login
+
+When a user signs in, the auth module emits `system:auth:login`. You can subscribe to this event to execute side effects like audit logging or email notifications asynchronously without blocking the user interface.
+
+### Pattern A: Clean architecture with `ServiceProvider`
+
+The cleanest way to organize event listeners is through a dedicated `ServiceProvider` registered in the application builder.
+
+#### 1. Define the service provider
+
+Create `lib/providers/events-provider.ts`:
+
+```ts
+// lib/providers/events-provider.ts
+import { ServiceProvider } from "@veap/framework/core/server";
+import { eventBus } from "@veap/framework/core";
+import { sendMail } from "@veap/framework/communication";
+
+export class AppEventsServiceProvider extends ServiceProvider {
+  register(): void {
+    // Container registrations (if any)
+  }
+
+  boot(): void {
+    // Subscribe to auth events emitted during sign-in
+    eventBus.subscribe(
+      "system:auth:login",
+      "app:login-notifier",
+      async (event) => {
+        const { user } = event.payload;
+
+        await sendMail({
+          to: user.email,
+          subject: "Security notification: New login",
+          text: `Hello ${user.name || user.email}, we noticed a new sign-in to your account.`,
+        });
+      },
+    );
+  }
+}
+```
+
+#### 2. Register the provider in `lib/veap.ts`
+
+Attach the provider to your application configuration:
+
+```ts
+// lib/veap.ts
+import { cache } from "react";
+import { Application } from "@veap/framework/core/server";
+import { AppEventsServiceProvider } from "./providers/events-provider";
+
+export const app = Application.configure()
+  .withDatabase()
+  .withAuth()
+  .withCommunication()
+  .withProviders([AppEventsServiceProvider])
+  .create();
+
+export const initializeSystem = cache(async () => {
+  return app.bootstrap();
+});
+```
+
+### Pattern B: Direct subscription in initialization script
+
+For smaller applications or simpler workflows, subscribe directly in `lib/veap.ts`:
+
+```ts
+// lib/veap.ts
+import { cache } from "react";
+import { Application } from "@veap/framework/core/server";
+import { eventBus } from "@veap/framework/core";
+import { sendMail } from "@veap/framework/communication";
+
+export const app = Application.configure()
+  .withDatabase()
+  .withAuth()
+  .withCommunication()
+  .create();
+
+// Subscriptions are idempotent when registered with a constant subscriberId
+eventBus.subscribe(
+  "system:auth:login",
+  "app:direct-login-alert",
+  async (event) => {
+    const { user } = event.payload;
+
+    await sendMail({
+      to: user.email,
+      subject: "Security notification: New login",
+      text: `Hello ${user.name || user.email}, a new login was detected.`,
+    });
+  },
+);
+
+export const initializeSystem = cache(async () => {
+  return app.bootstrap();
+});
+```
+
+### How login triggers the event
+
+When authenticating a user in your native Next.js Server Action:
+
+```ts
+// app/actions/auth.ts
+"use server";
+
+import { signInWithCredentials } from "@veap/framework/auth/server";
+
+export async function loginAction(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  return await signInWithCredentials({ email, password });
+}
+```
+
+1. `signInWithCredentials` verifies credentials and generates a new session.
+2. The core auth service automatically publishes `system:auth:login` with `{ session, user }`.
+3. Your subscriber executes concurrently without delaying page navigation or server action responses.
