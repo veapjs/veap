@@ -1,6 +1,8 @@
 # Your first application
 
-This page walks from a fresh scaffold to a working page rendered through the virtual router, a Server Action, and a database model. It uses the CLI generators so you see the standard workflow.
+This page walks from a fresh scaffold to a working page rendered through the
+virtual router, a Server Action, and a database model. It uses the CLI
+generators so you see the standard workflow.
 
 ## 1. Create and boot the project
 
@@ -10,7 +12,9 @@ cd my-app
 bun dev
 ```
 
-Complete the setup wizard at [http://localhost:3000](http://localhost:3000). The wizard creates the first user (an admin). After finishing you can sign in; the admin panel lives under `/app`.
+Complete the setup wizard at [http://localhost:3000](http://localhost:3000). The
+wizard creates the first user (an admin). After finishing you can sign in; the
+admin panel lives under `/app`.
 
 ## 2. Generate a plugin
 
@@ -18,7 +22,10 @@ Complete the setup wizard at [http://localhost:3000](http://localhost:3000). The
 bun veap make:plugin tasks
 ```
 
-This creates `plugins/tasks-plugin` and registers it in `lib/plugins.gen.ts`. A generated plugin already declares a manifest (built from its `package.json` via `createManifestFromPackageJson`), an empty `app/` route directory, and a default export implementing `IPlugin`.
+This creates `plugins/tasks-plugin` and registers it in `lib/plugins.gen.ts`. A
+generated plugin already declares a manifest (built from its `package.json` via
+`createManifestFromPackageJson`), an empty `app/` route directory, and a default
+export implementing `IPlugin`.
 
 ## 3. Add a database model and migration
 
@@ -68,7 +75,9 @@ export class Task extends Model<TaskAttributes> {
 }
 ```
 
-Restart `bun dev`. The kernel runs the plugin's migrations the next time the plugin initializes (and whenever you toggle the plugin on, it runs pending migrations first).
+Restart `bun dev`. The kernel runs the plugin's migrations the next time the
+plugin initializes (and whenever you toggle the plugin on, it runs pending
+migrations first).
 
 ## 4. Add a page to the plugin's route tree
 
@@ -96,7 +105,10 @@ export default async function TasksPage() {
 }
 ```
 
-Because the plugin discovers routes from its `app/` directory (`discoverRoutes`), this page is served at `/tasks` by the virtual router once the plugin is enabled. The page is a React Server Component: it runs on the server, can query the database directly, and needs no data-fetching API.
+Because the plugin discovers routes from its `app/` directory
+(`discoverRoutes`), this page is served at `/tasks` by the virtual router once
+the plugin is enabled. The page is a React Server Component: it runs on the
+server, can query the database directly, and needs no data-fetching API.
 
 ## 5. Add a Server Action
 
@@ -164,7 +176,10 @@ Require a signed-in user by exporting `auth` from the page module:
 export const auth = true;
 ```
 
-The virtual router wraps the route with its authentication middleware; unauthenticated visitors are redirected to `/signin`. You can also export `roles` and `permissions` for RBAC checks. Details in [Route protection](../routing/middleware.md#route-protection).
+The virtual router wraps the route with its authentication middleware;
+unauthenticated visitors are redirected to `/signin`. You can also export
+`roles` and `permissions` for RBAC checks. Details in
+[Route protection](../routing/middleware.md#route-protection).
 
 ## 7. Build
 
@@ -173,9 +188,18 @@ bun run build
 bun run start
 ```
 
-That is the whole loop: plugin, migration, model, page, action. The rest of the documentation covers each area in depth:
+That is the whole loop: plugin, migration, model, page, action.
+
+<!-- prettier-ignore -->
+> [!TIP]
+> If your project does not require modular plugin packages and you prefer a
+> monolithic application architecture, see the guide on
+> [Building native host applications](../guides/native-applications.md).
+
+The rest of the documentation covers each area in depth:
 
 - [Routing](../routing/routing.md) for segments, layouts, boundaries and metadata
+- [Physical pages and withRouter](../routing/physical-pages.md) for custom Next.js pages
 - [Server Components](../fundamentals/server-components.md) and [Server Actions](../fundamentals/server-actions.md)
 - [Models and the ORM](../data/orm.md)
 - [Plugins](../plugins/index.md) for the full manifest, lifecycle and registration flow
