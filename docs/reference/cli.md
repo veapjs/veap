@@ -44,7 +44,8 @@ The Veap CLI operates in two modes depending on your current working directory:
 
 Initialize a new Veap project in an existing directory or create a new project
 directory. If the project name is omitted in an interactive terminal, the CLI
-prompts for a name and optional Docker configuration.
+prompts for a name and optional Docker configuration. The active package
+manager is auto-detected from the execution environment.
 
 ```bash
 bun veap init my-project
@@ -58,6 +59,10 @@ bun veap init my-project
 | `--no-docker`    | Skip Docker configuration without prompting.                                        |
 | `--skip-install` | Skip running the package manager installation step.                                 |
 | `--pm <manager>` | Specify package manager (`bun`, `pnpm`, `npm`, `yarn`). Auto-detected when omitted. |
+| `--pnpm`         | Force pnpm as package manager.                                                      |
+| `--bun`          | Force Bun as package manager.                                                       |
+| `--npm`          | Force npm as package manager.                                                       |
+| `--yarn`         | Force Yarn as package manager.                                                      |
 
 <!-- prettier-ignore -->
 > [!NOTE]

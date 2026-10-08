@@ -60,6 +60,21 @@ The scaffolder supports the following options:
 | `--no-docker`    | Skip Docker configuration and the interactive prompt.                                    |
 | `--skip-install` | Do not run the package manager install step.                                             |
 | `--pm <manager>` | Use a specific package manager (`bun`, `pnpm`, `npm`, `yarn`) instead of auto-detection. |
+| `--pnpm`         | Force pnpm as package manager.                                                           |
+| `--bun`          | Force Bun as package manager.                                                            |
+| `--npm`          | Force npm as package manager.                                                            |
+| `--yarn`         | Force Yarn as package manager.                                                           |
+
+`create-veap` automatically detects the running package manager from the
+execution command (such as `bun create`, `pnpm create`, `npm create`, or
+`yarn create`) and environment variables without prompting for selection. To
+explicitly choose a different package manager than the runner (for example, if
+you execute `bun create veap my-app` but want the generated project to use
+`pnpm`), pass the corresponding flag:
+
+```bash
+bun create veap my-app --pnpm
+```
 
 Under the hood, the scaffolder runs the official `create-next-app` with
 TypeScript, Tailwind CSS, ESLint, React Compiler, the App Router, and an `@/*`
