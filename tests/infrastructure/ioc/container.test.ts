@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import { Inject, Injectable } from "../../../src/domain/contracts/ioc";
 import { AppError } from "../../../src/domain/errors/app-error";
 import { Container } from "../../../src/infrastructure/ioc/container";
@@ -9,10 +9,18 @@ import { Container } from "../../../src/infrastructure/ioc/container";
  * Covered behaviours: value/factory/class registrations, singleton caching,
  * auto-wiring via `design:paramtypes`, explicit `@Inject` tokens for
  * interface ports, factory `inject` lists, missing-token errors, the
- * `import type` → `Object` guard, and Laravel-style `make`/`app` helpers.
+ * `import type` -> `Object` guard, and Laravel-style `make`/`app` helpers.
+ */
+/**
+ * IoC Container - the composition mechanics of the whole system.
+ *
+ * Covered behaviours: value/factory/class registrations, singleton caching,
+ * auto-wiring via `design:paramtypes`, explicit `@Inject` tokens for
+ * interface ports, factory `inject` lists, missing-token errors, the
+ * `import type` -> `Object` guard, and Laravel-style `make`/`app` helpers.
  */
 describe("Container", () => {
-  it("resolves a useValue registration", async () => {
+  it("resolvesresolves a useValue registrationa useValue registration", async () => {
     const container = new Container();
     const TOKEN = Symbol.for("test:value");
     container.register({ token: TOKEN, useValue: 42 });
@@ -102,8 +110,12 @@ describe("Container", () => {
 
     @Injectable()
     class Service {
-      constructor(@Inject(LOGGER) public readonly logger: ILogger) {}
+      public readonly logger: ILogger;
+      constructor(logger: ILogger) {
+        this.logger = logger;
+      }
     }
+    Inject(LOGGER)(Service, undefined, 0);
 
     container.register({
       token: LOGGER,
