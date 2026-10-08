@@ -37,13 +37,18 @@ bunx create-veap [name]
 npx create-veap [name]
 ```
 
-When you omit the project name in an interactive terminal, the command prompts
-you for a name and optional Docker configuration. You can also pass the name
-directly:
+When you omit the project name in an interactive terminal, `create-veap` prompts
+you for a name. You can also pass the project name directly as an argument:
 
 ```bash
 bun create veap my-app
 ```
+
+During initialization, `create-veap` asks whether you want to include optional
+Docker configuration (`Dockerfile`, `compose.yml`, and `.dockerignore`). You can
+preselect or bypass this prompt using the `--docker` or `--no-docker` flag.
+In non-interactive environments (such as CI), Docker generation is skipped
+by default unless `--docker` is explicitly supplied.
 
 The project name must follow npm package naming rules (lowercase, no leading dot
 or underscore, maximum 214 characters). Scoped names such as `@acme/my-app` are
@@ -119,26 +124,21 @@ private path, `/app` by default.
 
 ## Environment variables
 
-The scaffolder generates a `.env` file with a fresh random `ENCRYPTION_KEY`.
-Validation is strict: the key must decode to 16, 24, or 32 bytes, and a missing
-or invalid key stops the process at boot. To generate one manually:
+The generated `.env` file contains standard configuration:
 
 ```bash
-openssl rand -base64 16
+# Application encryption key (required for token hashing and session signing)
+ENCRYPTION_KEY=...
+
+# Database connection
+DATABASE_CLIENT=sqlite3
+DATABASE_URL=./storage/veap.sqlite
 ```
 
-The full list of environment variables Veap reads is described in
-[Environment variables](../configuration/environment-variables.md).
-
-## Building for production
-
-Veap applications are Next.js applications. Production build and runtime use the
-standard Next.js commands:
+When switching to PostgreSQL in production, update `DATABASE_CLIENT` to `pg`
+and provide a Postgres connection URL:
 
 ```bash
-bun run build
-bun run start
+DATABASE_CLIENT=pg
+DATABASE_URL=postgresql://user:password@localhost:5432/myapp
 ```
-
-Deployment specifics (Docker, Vercel, PostgreSQL) are covered in
-[Deployment](../deployment/production.md).

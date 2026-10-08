@@ -1,6 +1,6 @@
 {
   "name": "@veap/framework",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "description": "Unified Veap NEXT.js framework",
   "bugs": "https://github.com/veapjs/veap/issues",
   "repository": {
@@ -128,7 +128,7 @@
     "better-sqlite3": "^13.0.3",
     "cac": "^6.7.14",
     "chalk": "^5.3.0",
-    "create-veap": "0.3.1",
+    "create-veap": "0.3.2",
     "date-fns": "^4.4.0",
     "intl-messageformat": "^11.2.12",
     "ioredis": "^6.0.0",

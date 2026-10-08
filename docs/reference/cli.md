@@ -1,37 +1,35 @@
-# CLI reference
+# CLI Reference
 
-The `veap` command-line interface provides scaffolding, plugin management,
-database migration generation, and deployment utilities. It is distributed
-with `@veap/framework` and runs via your package manager.
+The `@veap/framework` CLI provides tools for project initialization, plugin
+management, database migrations, and Docker configurations.
+
+## Overview
+
+The CLI entry point is available as `veap` when installed globally or via package
+runners:
 
 ```bash
-bun veap <command> [options]
-# or
-npx veap <command> [options]
-# or
-pnpm exec veap <command> [options]
+# Using bun
+bun veap <command>
+
+# Using npx
+npx veap <command>
 ```
 
-## Global options
+When creating a new project from scratch, use the `create-veap` initializer:
 
-The CLI accepts the following global options:
+```bash
+bun create veap [name]
+# or
+pnpm create veap [name]
+```
 
-| Flag            | Description                                      |
-| --------------- | ------------------------------------------------ |
-| `-h, --help`    | Display help for the CLI or a specific command.  |
-| `-v, --version` | Output the current version of `@veap/framework`. |
+## Architecture
 
-## Architecture and command discovery
+The CLI is built with `cac` and extensible through service providers:
 
-The Veap CLI operates in two modes depending on your current working directory:
-
-- **Standalone mode (outside a project):** When run outside an existing Veap
-  project, the CLI exposes the project creation command (`veap init`).
-- **Project mode (inside a Veap project):** When `lib/veap.ts` exists in your
-  project directory, the CLI automatically loads your environment files
-  (`.env.local`, `.env`, and mode-specific files) into `process.env`. It then
-  boots the application through `lib/veap.ts` and allows registered service
-  providers to dynamically contribute commands during their `boot()` phase:
+- Commands are registered in the IoC container via `CliService`.
+- Core service providers register framework commands during bootstrap:
   - `MigrationServiceProvider` registers `make:migration`.
   - `PluginsServiceProvider` registers `add`, `register`, `eject`,
     `make:plugin`, and `docker`.
@@ -43,9 +41,10 @@ The Veap CLI operates in two modes depending on your current working directory:
 ### `veap init [name]`
 
 Initialize a new Veap project in an existing directory or create a new project
-directory. If the project name is omitted in an interactive terminal, the CLI
-prompts for a name and optional Docker configuration. The active package
-manager is auto-detected from the execution environment.
+directory. If you omit the project name in an interactive terminal, the CLI
+prompts for a name. During setup, the scaffolder asks whether you want to include
+Docker configuration unless the `--docker` or `--no-docker` flag is provided.
+The active package manager is auto-detected from the execution environment.
 
 ```bash
 bun veap init my-project
@@ -79,144 +78,131 @@ Install an official or third-party Veap plugin package and automatically
 register it in the application plugin registry (`lib/plugins.gen.ts`).
 
 ```bash
-# Install from npm registry
-bun veap add @veap/commentable
-
-# Install from Git repository into local workspace
-bun veap add https://github.com/user/my-veap-plugin.git --local
+bun veap add @veap/blog-plugin
 ```
 
-#### Options
+This command performs two actions:
 
-| Option           | Description                                                              |
-| ---------------- | ------------------------------------------------------------------------ |
-| `--local`        | Clone and install the plugin into the local `plugins/` directory.        |
-| `--skip-install` | Add the dependency to `package.json` without executing the install step. |
-
-Running `veap add` executes:
-
-1. Package installation via the active package manager.
-2. Discovery of the plugin manifest from the installed package `package.json`.
-3. Automatic regeneration of `lib/plugins.gen.ts`.
-
----
-
-### `veap eject <package>`
-
-Eject an installed npm plugin into your project's local `plugins/` folder,
-allowing you to modify and customize its source code directly.
-
-```bash
-# Eject an installed plugin
-bun veap eject @veap/commentable
-```
-
-The CLI:
-
-1. Inspects `veap.type` in the package's `package.json`.
-2. Clones the package repository into `plugins/<name>`.
-3. Updates root `package.json` dependencies to point to the local workspace
-   (`workspace:*`).
-4. Re-links workspace packages with the detected package manager.
-5. Re-syncs `lib/plugins.gen.ts`.
-
----
-
-### `veap make:plugin <name>`
-
-Scaffold a new, self-contained local plugin in the `plugins/` directory.
-
-```bash
-bun veap make:plugin blog
-```
-
-#### Options
-
-| Option           | Description                                           |
-| ---------------- | ----------------------------------------------------- |
-| `--skip-install` | Skip updating package manager workspace dependencies. |
-
-#### Generated structure
-
-```text
-plugins/blog/
-├── package.json         # Contains "veap" metadata block (id, name, type: "plugin")
-├── tsconfig.json        # TypeScript project references
-└── src/
-    ├── index.ts         # IPlugin export definition
-    └── app/
-        └── page.tsx     # Starter page route
-```
-
-The new plugin is automatically registered in `lib/plugins.gen.ts`.
-
----
-
-### `veap make:migration <name>`
-
-Generate a timestamped native application migration file inside the
-`migrations/` directory.
-
-```bash
-bun veap make:migration create_articles_table
-```
-
-#### Generated file format
-
-```ts
-// migrations/0002_create_articles_table.ts
-import type { Knex } from "knex";
-
-export const name = "0002_create_articles_table";
-
-export async function up(db: Knex, schema: Knex.SchemaBuilder): Promise<void> {
-  await schema.createTable("articles", (table) => {
-    table.uuid("id").primary();
-    table.string("title").notNullable();
-    table.text("content").notNullable();
-    table.timestamps(true, true);
-  });
-}
-
-export async function down(
-  db: Knex,
-  schema: Knex.SchemaBuilder,
-): Promise<void> {
-  await schema.dropTableIfExists("articles");
-}
-```
-
-Migrations are tracked in the database `migrations` table and executed during
-application boot (`withDatabase()` and `withMigrations()`).
+1. Runs your package manager to install the dependency (`bun add <plugin>`,
+   `pnpm add <plugin>`, etc.).
+2. Executes `veap register` to update `lib/plugins.gen.ts`.
 
 ---
 
 ### `veap register`
 
-Re-scan all local workspace plugins (`plugins/*`) and npm dependencies declaring
-`veap` metadata in `package.json`, then regenerate `lib/plugins.gen.ts`.
+Scan `node_modules` and local workspace packages (`plugins/*`) for installed Veap
+plugins and regenerate `lib/plugins.gen.ts`.
 
 ```bash
 bun veap register
 ```
 
-Use this command when you manually clone plugins, remove packages, or update
-workspace manifests without running `veap add` or `veap make:plugin`.
+Plugins are detected by checking `package.json` for:
+
+- `"veap": { "type": "plugin" }` configuration metadata.
+- Or package names matching the `@veap/*-plugin` or `*-veap-plugin` naming
+  convention.
+
+---
+
+### `veap eject <package>`
+
+Extract an installed plugin or template from `node_modules` into your local
+project tree for customization.
+
+```bash
+# Eject a plugin into local plugins/ directory
+bun veap eject @veap/blog-plugin
+
+# Eject into a custom target folder
+bun veap eject @veap/blog-plugin --path ./custom-plugins/blog
+```
+
+When ejecting:
+
+- The package source is copied to `plugins/<name>` (or the specified `--path`).
+- Root `package.json` dependencies are updated to point to the local workspace
+  reference (for example, `"@veap/blog-plugin": "workspace:*"`).
+- `veap register` runs automatically to update registry imports.
+
+---
+
+### `veap make:plugin <name>`
+
+Scaffold a new local plugin inside the `plugins/` directory.
+
+```bash
+bun veap make:plugin notifications
+```
+
+Creates a plugin workspace directory containing:
+
+- `package.json` with Veap plugin manifest metadata.
+- `tsconfig.json` with path mappings.
+- `src/index.ts` with a starter `PluginDefinition` and `ServiceProvider`.
+
+After creation, register the plugin by adding it to your root dependencies and
+running `veap register`.
+
+---
+
+### `veap make:template <name>`
+
+Scaffold a new layout template inside `templates/<name>`.
+
+```bash
+bun veap make:template marketing-layout
+```
+
+Creates a template component directory for customizable presentation shells.
+
+---
+
+### `veap make:migration <name>`
+
+Create a new Knex timestamped database migration file in `migrations/`.
+
+```bash
+bun veap make:migration create_posts_table
+```
+
+Generated file: `migrations/YYYYMMDDHHMMSS_create_posts_table.ts`
+
+```typescript
+import type { Knex } from "knex";
+
+export async function up(knex: Knex): Promise<void> {
+  return knex.schema.createTable("posts", (table) => {
+    table.uuid("id").primary().defaultTo(knex.fn.uuid());
+    table.string("title").notNullable();
+    table.text("content");
+    table.timestamps(true, true);
+  });
+}
+
+export async function down(knex: Knex): Promise<void> {
+  return knex.schema.dropTableIfExists("posts");
+}
+```
+
+Migrations are executed automatically on application bootstrap via
+`MigrationServiceProvider`.
 
 ---
 
 ### `veap docker`
 
-Generate production-ready Docker deployment files customized for your detected
-package manager (`bun`, `pnpm`, `npm`, or `yarn`).
+Generate production Docker deployment files for your Veap application.
 
 ```bash
 bun veap docker
 ```
 
-#### Generated files
+Generates:
 
-- `Dockerfile`: Multi-stage build leveraging Next.js standalone output.
-- `compose.yml`: Local Docker Compose service configuration.
+- `Dockerfile`: Multi-stage build tailored to the detected package manager
+  (Node.js 22 alpine base, standalone Next.js output).
+- `compose.yml`: Local multi-container development configuration.
 - `.dockerignore`: Exclusions for node_modules, build caches, and sensitive
-  environment files.
+  files.
