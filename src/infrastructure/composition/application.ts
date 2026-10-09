@@ -1,21 +1,33 @@
 import type * as React from "react";
-import { eventBus } from "../../application/events/event-bus";
-import type { AuthConfig } from "../../domain/auth/types";
+import {
+  container,
+  eventBus,
+  KernelServiceProvider,
+  logger,
+  ServiceProvider,
+  VEAP_CONFIG,
+} from "@veap/kernel";
+import {
+  DatabaseServiceProvider,
+  MigrationServiceProvider,
+} from "@veap/database";
+import {
+  StorageServiceProvider,
+} from "@veap/storage";
+import {
+  AuthServiceProvider,
+  type AuthConfig,
+} from "@veap/auth/server";
+import {
+  PluginServiceProvider,
+  type RouterConfig,
+  RouterServiceProvider,
+} from "@veap/plugins/server";
 import { APP_MIGRATIONS, APP_PLUGINS } from "../../domain/contracts/token";
-import { AuthServiceProvider } from "../auth/provider";
 import { CommunicationServiceProvider } from "../communication/provider";
-import { MigrationServiceProvider } from "../database/migration-provider";
-// Core Providers
-import { DatabaseServiceProvider } from "../database/provider";
 import { IntlServiceProvider } from "../intl/provider";
-import { container } from "../ioc/container";
-import { logger } from "../logging/console-logger";
-import { PluginServiceProvider } from "../plugins/provider";
-import { KernelServiceProvider } from "../providers/kernel.provider";
-import { ServiceProvider } from "../providers/service-provider";
-import { type RouterConfig, RouterServiceProvider } from "../router/provider";
 import { SettingsServiceProvider } from "../settings/provider";
-import { StorageServiceProvider } from "../storage/provider";
+import { VeapConfigProvider } from "../config/veap-config.provider";
 
 export type ProviderEntry =
   | (new (
@@ -27,6 +39,7 @@ export type ProviderEntry =
 export class ApplicationBuilder {
   private migrations: any[] = [];
   private plugins: any[] = [];
+  private templates: any[] = [];
   private customProviders: ProviderEntry[] = [];
   private authConfig?: AuthConfig;
 
@@ -38,6 +51,11 @@ export class ApplicationBuilder {
   public withPlugins(plugins: any[]): this {
     this.plugins = plugins;
     this.customProviders.push(PluginServiceProvider);
+    return this;
+  }
+
+  public withTemplates(templates: any[]): this {
+    this.templates = templates;
     return this;
   }
 
@@ -112,7 +130,6 @@ export class Application {
 
     const g = globalThis as any;
 
-    // 1. Skip initialization during Next.js build phase
     if (
       process.env.NEXT_PHASE === "phase-production-build" ||
       process.env.SKIP_VEAP_INIT === "true"
@@ -120,24 +137,16 @@ export class Application {
       return;
     }
 
-    // 2. Return if already bootstrapped successfully
     if (g.__VEAP_BOOTSTRAPPED__) {
-      // In development, when a plugin source file changes, the bundler
-      // re-evaluates this Application instance with fresh module references.
-      // We only refresh the in-memory registries so the renderer picks up
-      // the new component references (extensions, widgets, etc.).
       if (process.env.NODE_ENV === "development") {
         if (this.plugins.length) {
-          const { registerPlugins } = await import(
-            "../../application/plugins/facade"
-          );
+          const { registerPlugins } = await import("@veap/plugins/server");
           await registerPlugins(this.plugins);
         }
       }
       return;
     }
 
-    // 3. Wait if currently bootstrapping
     if (g.__VEAP_BOOTSTRAPPING_PROMISE__) {
       return g.__VEAP_BOOTSTRAPPING_PROMISE__;
     }
@@ -145,6 +154,12 @@ export class Application {
     g.__VEAP_BOOTSTRAPPING_PROMISE__ = (async () => {
       try {
         logger.info("veap:bootstrap", "Starting system initialization...");
+
+        container.register({
+          token: VEAP_CONFIG,
+          useClass: VeapConfigProvider,
+          singleton: true,
+        });
 
         if (this.migrations.length) {
           container.register({
@@ -162,47 +177,60 @@ export class Application {
         }
 
         const entries = [KernelServiceProvider, ...this.providerEntries];
-        const providers: ServiceProvider[] = [];
 
         for (const entry of entries) {
-          if (entry instanceof ServiceProvider) {
-            providers.push(entry);
-          } else if (
-            typeof entry === "function" &&
-            entry.prototype instanceof ServiceProvider
-          ) {
-            providers.push(new (entry as any)(container));
+          if (typeof entry === "function" && entry.prototype) {
+            const provider = new (entry as new (c: any) => ServiceProvider)(
+              container,
+            );
+            await provider.register();
           } else if (typeof entry === "function") {
-            providers.push((entry as any)(container));
+            const provider = (entry as (c: any) => ServiceProvider)(container);
+            await provider.register();
+          } else if (entry instanceof ServiceProvider) {
+            await entry.register();
           }
         }
 
-        for (const provider of providers) {
-          await provider.register();
-        }
+        for (const entry of entries) {
+          let provider: ServiceProvider | undefined;
+          if (typeof entry === "function" && entry.prototype) {
+            provider = new (entry as new (c: any) => ServiceProvider)(
+              container,
+            );
+          } else if (typeof entry === "function") {
+            provider = (entry as (c: any) => ServiceProvider)(container);
+          } else if (entry instanceof ServiceProvider) {
+            provider = entry;
+          }
 
-        for (const provider of providers) {
-          if (provider.boot) {
+          if (provider && typeof provider.boot === "function") {
             await provider.boot();
           }
         }
 
-        await eventBus.publish("system:start", { runtime: "nodejs" });
+        if (this.plugins.length) {
+          const { registerPlugins } = await import("@veap/plugins/server");
+          await registerPlugins(this.plugins);
+        }
 
-        logger.info("veap:bootstrap", "System initialized successfully.");
         g.__VEAP_BOOTSTRAPPED__ = true;
+        logger.info("veap:bootstrap", "System initialized successfully.");
+        await eventBus.publish("system:ready", { timestamp: Date.now() });
       } catch (error: any) {
         if (
-          error?.digest?.startsWith("NEXT_REDIRECT") ||
-          error?.digest?.startsWith("NEXT_NOT_FOUND")
+          error?.digest?.startsWith?.("NEXT_REDIRECT") ||
+          error?.digest === "NEXT_NOT_FOUND"
         ) {
           throw error;
         }
+
         logger.error(
           "veap:bootstrap",
           "Critical error during system initialization:",
           error,
         );
+
         throw error;
       } finally {
         g.__VEAP_BOOTSTRAPPING_PROMISE__ = null;

@@ -1,3 +1,3 @@
 "use client";
 
-export * from "../presentation/plugins/client";
+export * from "@veap/plugins/client";

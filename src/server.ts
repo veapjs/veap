@@ -6,15 +6,7 @@
  * IoC container and providers, the config loader and the CLI service.
  */
 
-// Domain
-export * from "./domain/events/types";
 export * from "./index";
 export * from "./infrastructure/cli/service";
-// Infrastructure
 export * from "./infrastructure/composition/index";
-export * from "./infrastructure/config/index";
-export * from "./infrastructure/ioc/index";
-export * from "./infrastructure/providers/index";
-
-// Presentation (server actions / HTTP error mapping)
 export * from "./presentation/errors/index";

@@ -2,6 +2,7 @@
 
 Task-oriented walkthroughs that combine several parts of the framework.
 
+- [Modular Architecture ("A la Carte" Usage)](./modular-architecture.md): learn how to use `@veap/database`, `@veap/auth`, `@veap/storage`, or `@veap/kernel` standalone without plugins or Next.js overhead.
 - [Your first plugin](./first-plugin.md): scaffold a plugin, add routes, widgets, a model and a migration.
 - [Building native applications](./native-applications.md): build monolithic host features with native models, migrations, Server Actions, and physical admin pages with `withRouter`.
 - [Build a CRUD feature](./crud.md): list, create, edit, delete with the ORM, Server Actions, validation and authorization.

@@ -1,2 +1,1 @@
-export * from "./SystemPlugin";
-export * from "./SystemUserWidget";
+export * from "@veap/plugins/models";
