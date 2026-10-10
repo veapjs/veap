@@ -1,5 +1,12 @@
 # @veap/framework
 
+## 0.13.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @veap/ui@0.1.2
+
 ## 0.13.4
 
 ### Patch Changes
