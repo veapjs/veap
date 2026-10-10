@@ -1,5 +1,14 @@
 # @veap/framework
 
+## 0.13.4
+
+### Patch Changes
+
+- bump(deps): fix typescript version
+- Updated dependencies []:
+  - @veap/ui@0.1.1
+  - create-veap@0.3.3
+
 ## 0.13.3
 
 ### Patch Changes
