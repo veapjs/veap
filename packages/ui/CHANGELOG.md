@@ -1,5 +1,11 @@
 # @veap/ui
 
+## 0.1.5
+
+### Patch Changes
+
+- feat: update globals.css
+
 ## 0.1.4
 
 ### Patch Changes

@@ -46,7 +46,7 @@
     "@veap/database": "0.1.9"
   },
   "peerDependencies": {
-    "@veap/ui": "^0.1.4",
+    "@veap/ui": "^0.1.5",
     "lucide-react": "^1.27.0",
     "react": "^19",
     "react-dom": "^19"
