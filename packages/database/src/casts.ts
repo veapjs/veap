@@ -75,10 +75,37 @@ export function serializeForStorage(
     }
     return value;
   }
-
   switch (type) {
-    case "json":
-      return typeof value === "string" ? value : JSON.stringify(value);
+    case "json": {
+      if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (
+          (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+          (trimmed.startsWith("[") && trimmed.endsWith("]"))
+        ) {
+          try {
+            JSON.parse(trimmed);
+            return trimmed;
+          } catch {
+            // Not valid JSON object/array, fall through to stringify
+          }
+        }
+        if (
+          trimmed.startsWith('"') &&
+          trimmed.endsWith('"') &&
+          trimmed.length >= 2
+        ) {
+          try {
+            JSON.parse(trimmed);
+            return trimmed;
+          } catch {
+            // Not valid JSON string, fall through to stringify
+          }
+        }
+        return JSON.stringify(value);
+      }
+      return JSON.stringify(value);
+    }
 
     case "boolean":
       if (clientType?.includes("sqlite")) {

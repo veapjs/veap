@@ -1,5 +1,11 @@
 # @veap/database
 
+## 0.1.10
+
+### Patch Changes
+
+- Fix JSON serialization in `serializeForStorage` to properly quote primitive strings (e.g. settings values) when targeting PostgreSQL JSON/JSONB columns.
+
 ## 0.1.9
 
 ### Patch Changes

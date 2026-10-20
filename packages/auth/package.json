@@ -1,6 +1,6 @@
 {
   "name": "@veap/auth",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Authentication, session management, RBAC, and crypto adapters for Veap",
   "author": "Damian Miller",
   "bugs": "https://github.com/veapjs/veap/issues",
@@ -57,7 +57,7 @@
     "@oslojs/binary": "^1.0.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "@veap/database": "0.1.9",
+    "@veap/database": "0.1.10",
     "@veap/kernel": "0.2.2",
     "bcryptjs": "^3.0.3",
     "date-fns": "^4.4.0",

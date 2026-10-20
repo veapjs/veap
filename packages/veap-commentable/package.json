@@ -42,10 +42,10 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@veap/database": "0.1.9"
+    "@veap/database": "0.1.10"
   },
   "peerDependencies": {
-    "@veap/auth": "^0.1.11",
+    "@veap/auth": "^0.1.12",
     "@veap/ui": "^0.1.5",
     "lucide-react": "^1.27.0",
     "react": "^19",

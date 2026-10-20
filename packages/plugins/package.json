@@ -1,6 +1,6 @@
 {
   "name": "@veap/plugins",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "Plugin lifecycle, extension points, and virtual router for Veap",
   "author": "Damian Miller",
   "bugs": "https://github.com/veapjs/veap/issues",
@@ -61,8 +61,8 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@veap/auth": "0.1.11",
-    "@veap/database": "0.1.9",
+    "@veap/auth": "0.1.12",
+    "@veap/database": "0.1.10",
     "@veap/intl": "0.1.9",
     "@veap/kernel": "0.2.2",
     "zod": "^4.6.5"

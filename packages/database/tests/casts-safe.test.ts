@@ -88,6 +88,19 @@ describe("Casts, Auto-Increment Primary Keys & Soft Delete Destroy", () => {
     // Model hydrates it back into an object
     const refreshed2 = await Product.find(p2.id);
     expect(refreshed2?.metadata).toEqual({ features: ["compact"] });
+
+    // 3. Pass raw primitive string (e.g. "JANBUD" or setting value)
+    const p3 = await Product.create({
+      name: "Primitive String JSON",
+      metadata: "JANBUD",
+    });
+
+    const rawRow3 = await db("products").where("id", p3.id).first();
+    // Must be valid JSON string literal for PostgreSQL/SQLite
+    expect(rawRow3?.metadata).toBe('"JANBUD"');
+
+    const refreshed3 = await Product.find(p3.id);
+    expect(refreshed3?.metadata).toBe("JANBUD");
   });
 
   it("correctly serializes soft delete timestamp on Model.destroy(id)", async () => {

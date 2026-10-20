@@ -1,5 +1,12 @@
 # @veap/auth
 
+## 0.1.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @veap/database@0.1.10
+
 ## 0.1.11
 
 ### Patch Changes
