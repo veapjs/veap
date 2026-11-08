@@ -1,4 +1,4 @@
-# Veap Framework Monorepo
+# Veap Framework
 
 The [Veap Framework](https://veap.pl) is a modular, enterprise-grade application framework for Next.js and Node.js.
 
@@ -8,22 +8,22 @@ Veap complements Next.js by providing robust backend architecture: an IoC depend
 
 The monorepo contains the core packages that form the Veap ecosystem:
 
-| Package | Purpose |
-|---|---|
-| [`@veap/kernel`](packages/kernel) | Foundation: IoC container, event bus, cache port, HTTP abstractions, config service, error handling, and the `veap` console CLI. |
-| [`@veap/database`](packages/database) | Database: Knex integration, Active Record models, fluent query builder, relationships, and cross-dialect migrations. |
-| [`@veap/auth`](packages/auth) | Security: Next.js Server Actions, session hashing, HTTP-only cookies, password hashing (bcrypt), encrypted secrets (AES-GCM), and RBAC. |
-| [`@veap/intl`](packages/intl) | Localization: Request-aware locale negotiation, ICU message formatting, and client React context/hooks. |
-| [`@veap/mail`](packages/mail) | Mail delivery: Mailer port contracts, recipient normalization, and pluggable transport adapters. |
-| [`@veap/settings`](packages/settings) | Settings: Persisted database key-value preferences with memory caching and schema management. |
-| [`@veap/storage`](packages/storage) | Storage: Unified file storage service, path-traversal security guards, and local/cloud provider contracts. |
-| [`@veap/plugins`](packages/plugins) | Extensibility: Plugin discovery, lifecycle management, route trees, navigation, and UI widget extension points. |
-| [`@veap/ui`](packages/ui) | UI components: Shared design system, React component library, and theme provider. |
-| [`create-veap`](packages/create-veap) | Scaffolding CLI: Interactive and non-interactive project generator for new Next.js + Veap applications. |
-| [`@veap/translatable`](packages/veap-translatable) | ORM trait: Polymorphic multilingual model attribute translations. |
-| [`@veap/taggable`](packages/veap-taggable) | ORM trait: Polymorphic tagging with localized tag names and query scopes. |
-| [`@veap/categorizable`](packages/veap-categorizable) | ORM trait: Hierarchical polymorphic categorization and nested category trees. |
-| [`@veap/commentable`](packages/veap-commentable) | ORM trait: Polymorphic threaded comments, nested replies, and moderation workflows. |
+| Package                                              | Purpose                                                                                                                                 |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| [`@veap/kernel`](packages/kernel)                    | Foundation: IoC container, event bus, cache port, HTTP abstractions, config service, error handling, and the `veap` console CLI.        |
+| [`@veap/database`](packages/database)                | Database: Knex integration, Active Record models, fluent query builder, relationships, and cross-dialect migrations.                    |
+| [`@veap/auth`](packages/auth)                        | Security: Next.js Server Actions, session hashing, HTTP-only cookies, password hashing (bcrypt), encrypted secrets (AES-GCM), and RBAC. |
+| [`@veap/intl`](packages/intl)                        | Localization: Request-aware locale negotiation, ICU message formatting, and client React context/hooks.                                 |
+| [`@veap/mail`](packages/mail)                        | Mail delivery: Mailer port contracts, recipient normalization, and pluggable transport adapters.                                        |
+| [`@veap/settings`](packages/settings)                | Settings: Persisted database key-value preferences with memory caching and schema management.                                           |
+| [`@veap/storage`](packages/storage)                  | Storage: Unified file storage service, path-traversal security guards, and local/cloud provider contracts.                              |
+| [`@veap/plugins`](packages/plugins)                  | Extensibility: Plugin discovery, lifecycle management, route trees, navigation, and UI widget extension points.                         |
+| [`@veap/ui`](packages/ui)                            | UI components: Shared design system, React component library, and theme provider.                                                       |
+| [`create-veap`](packages/create-veap)                | Scaffolding CLI: Interactive and non-interactive project generator for new Next.js + Veap applications.                                 |
+| [`@veap/translatable`](packages/veap-translatable)   | ORM trait: Polymorphic multilingual model attribute translations.                                                                       |
+| [`@veap/taggable`](packages/veap-taggable)           | ORM trait: Polymorphic tagging with localized tag names and query scopes.                                                               |
+| [`@veap/categorizable`](packages/veap-categorizable) | ORM trait: Hierarchical polymorphic categorization and nested category trees.                                                           |
+| [`@veap/commentable`](packages/veap-commentable)     | ORM trait: Polymorphic threaded comments, nested replies, and moderation workflows.                                                     |
 
 ## Quickstart
 
@@ -36,17 +36,17 @@ bun dev
 
 ## Common tasks
 
-| Task | Command |
-|---|---|
-| Install dependencies | `bun install` |
-| Start development servers | `bun dev` |
-| Build all packages and plugins | `bun run build` |
-| Run workspace tests | `bun run test` |
-| Check formatting and linter (Biome) | `bun run check` |
-| Fix formatting automatically (Biome) | `bun run check:write` |
-| Type-check the workspace | `bun run check:types` |
-| Check architectural boundary invariants | `bun run check:arch` |
-| Validate documentation links & navigation | `bun run check:docs` |
+| Task                                      | Command               |
+| ----------------------------------------- | --------------------- |
+| Install dependencies                      | `bun install`         |
+| Start development servers                 | `bun dev`             |
+| Build all packages and plugins            | `bun run build`       |
+| Run workspace tests                       | `bun run test`        |
+| Check formatting and linter (Biome)       | `bun run check`       |
+| Fix formatting automatically (Biome)      | `bun run check:write` |
+| Type-check the workspace                  | `bun run check:types` |
+| Check architectural boundary invariants   | `bun run check:arch`  |
+| Validate documentation links & navigation | `bun run check:docs`  |
 
 ## Repository structure
 
